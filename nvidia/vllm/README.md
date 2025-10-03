@@ -354,7 +354,7 @@ Expected response should contain `"content": "204"` or similar mathematical calc
 | Symptom | Cause | Fix |
 |---------|--------|-----|
 | CUDA version mismatch errors | Wrong CUDA toolkit version | Reinstall CUDA 12.9 using exact installer |
-| Container registry authentication fails | Invalid or expired GitLab token | Generate new token from ****** |
+| Container registry authentication fails | Invalid or expired GitLab token | Generate new auth token |
 | SM_121a architecture not recognized | Missing LLVM patches | Verify SM_121a patches applied to LLVM source |
 | Reduce MAX_JOBS to 1-2, add swap space |
 | Environment variables not set |
