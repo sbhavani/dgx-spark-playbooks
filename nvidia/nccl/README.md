@@ -36,12 +36,12 @@ and proper GPU topology detection.
 
 ## Prerequisites
 
-- [ ] Two DGX Spark systems with Blackwell GPUs: `nvidia-smi --query-gpu=gpu_name --format=csv`
-- [ ] ConnectX-7 InfiniBand network cards installed: `ibdev2netdev`
-- [ ] Docker installed on both nodes: `docker --version`
-- [ ] CUDA toolkit available: `nvcc --version`
-- [ ] SSH access between nodes: `ssh <OTHER_NODE_IP> echo "success"`
-- [ ] Root/sudo privileges: `sudo whoami`
+- Two DGX Spark systems with Blackwell GPUs: `nvidia-smi --query-gpu=gpu_name --format=csv`
+- ConnectX-7 InfiniBand network cards installed: `ibdev2netdev`
+- Docker installed on both nodes: `docker --version`
+- CUDA toolkit available: `nvcc --version`
+- SSH access between nodes: `ssh <OTHER_NODE_IP> echo "success"`
+- Root/sudo privileges: `sudo whoami`
 
 ## Ancillary files
 
@@ -235,27 +235,7 @@ mpirun --version
 Expected output should show NCCL libraries in `/opt/nccl/build/lib/` and test binaries in
 `/opt/nccl-tests/build/`.
 
-## Step 9. Performance validation
-
-Review the all_gather test output for communication performance metrics:
-
-Expected metrics from the test output:
-- Bandwidth measurements between nodes
-- Latency for different message sizes
-- GPU-to-GPU communication confirmation
-- No error messages or communication failures
-
-## Step 10. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| "Network unreachable" errors | Network interfaces not configured | Verify netplan config and `sudo netplan apply` |
-| SSH authentication failures | SSH keys not properly distributed | Re-run `./discover-sparks` and enter passwords |
-| NCCL build failures with Blackwell | Wrong compute capability specified | Verify `NVCC_GENCODE="-gencode=arch=compute_121,code=sm_121"` |
-| MPI communication timeouts | Wrong network interfaces specified | Check `ibdev2netdev` and update interface names |
-| Container networking issues | Host network mode problems | Ensure `--network host --ipc=host` in docker run |
-
-## Step 11. Cleanup and rollback
+## Step 10. Cleanup and rollback
 
 **Warning**: These steps will stop containers and reset network configuration.
 
@@ -271,7 +251,7 @@ sudo rm /etc/netplan/40-cx7.yaml
 sudo netplan apply
 ```
 
-## Step 12. Next steps
+## Step 11. Next steps
 
 Test your NCCL setup with a simple distributed training example:
 
