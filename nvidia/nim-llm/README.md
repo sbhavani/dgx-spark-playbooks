@@ -44,9 +44,9 @@ completions.
   ```bash
   nvidia-smi
   ```
-- [ ] Docker with NVIDIA Container Toolkit configured
+- [ ] Docker with NVIDIA Container Toolkit configured, instructions here: https://******.nvidia.com/dgx-docs/review/621/dgx-spark/latest/nvidia-container-runtime-for-docker.html
   ```bash
-  docker run --rm --gpus all nvidia/cuda:12.0-base-ubuntu20.04 nvidia-smi
+  docker run -it --gpus=all nvcr.io/nvidia/cuda:13.0.1-devel-ubuntu24.04 nvidia-smi
   ```
 - [ ] NGC account with API key from https://ngc.nvidia.com/setup/api-key
   ```bash
@@ -94,8 +94,6 @@ echo "$NGC_API_KEY" | docker login nvcr.io --username '$oauthtoken' --password-s
 
 Choose a specific LLM NIM from NGC and set up local caching for model assets.
 
-> TODO: Replace with actual available NIM container image from NGC catalog
-
 ```bash
 export CONTAINER_NAME="nim-llm-demo"
 export IMG_NAME="nvcr.io/nim/meta/llama-3.1-8b-instruct-dgx-spark:latest"
@@ -127,7 +125,6 @@ startup messages indicating the service is ready.
 
 Test the deployed service with a basic completion request to verify functionality. Run the following curl command in a new terminal.
 
-> TODO: Replace NIM_MODEL with actual model identifier from the container
 
 ```bash
 curl -X 'POST' \
@@ -158,25 +155,6 @@ curl -X 'POST' \
 
 Expected output should be a JSON response containing a completion field with generated text.
 
-## Step 6. Test additional functionality
-
-Perform extended validation with different prompts and parameters.
-
-> TODO: Add tool calling examples if supported by selected model
-
-```bash
-curl -X 'POST' \
-    'http://0.0.0.0:8000/v1/completions' \
-    -H 'accept: application/json' \
-    -H 'Content-Type: application/json' \
-    -d '{
-      "model": "<NIM_MODEL>",
-      "prompt": "Explain quantum computing in simple terms:",
-      "max_tokens": 128,
-      "temperature": 0.7
-    }'
-```
-
 ## Step 6. Troubleshooting
 
 | Symptom | Cause | Fix |
@@ -185,6 +163,7 @@ curl -X 'POST' \
 | "Invalid credentials" during docker login | Incorrect NGC API key format | Verify API key from NGC portal, ensure no extra whitespace |
 | Model download hangs or fails | Network connectivity or insufficient disk space | Check internet connection and available disk space in cache directory |
 | API returns 404 or connection refused | Container not fully started or wrong port | Wait for container startup completion, verify port 8000 is accessible |
+| runtime not found | NVIDIA Container Toolkit not properly configured | Run `sudo nvidia-ctk runtime configure --runtime=docker` and restart Docker |
 
 ## Step 8. Cleanup and rollback
 
