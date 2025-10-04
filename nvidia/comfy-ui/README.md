@@ -13,12 +13,13 @@
 
 ## Basic idea
 
-ComfyUI is an open-source web server application for AI image generation using diffusion based models like SDXL, Flux and others.
+ComfyUI is an open-source web server application for AI image generation using diffusion-based models like SDXL, Flux and others.
 It has a browser-based UI that lets you create, edit and run image generation and editing workflows with multiple steps.
 Generation and editing steps (e.g. loading a model, adding text or sampling) are configurable in the UI as a node, and you connect nodes with wires to form a workflow.  
-Workflows are saved as JSON files, so you can version them for future work, collaboration and reproducibility.
 
 ComfyUI uses the host's GPU for inference, so you can install it on your Spark and do all of your image generation and editing directly on device.  
+
+Workflows are saved as JSON files, so you can version them for future work, collaboration and reproducibility.
 
 ## What you'll accomplish
 
@@ -35,17 +36,17 @@ You'll install and configure ComfyUI on your NVIDIA DGX Spark device so you can 
 ## Prerequisites
 
 **Hardware Requirements:**
-- [ ] NVIDIA Spark device with Blackwell architecture
-- [ ] Minimum 8GB GPU memory for Stable Diffusion models
-- [ ] At least 20GB available storage space
+-  NVIDIA Spark device with Blackwell architecture
+-  Minimum 8GB GPU memory for Stable Diffusion models
+-  At least 20GB available storage space
 
 **Software Requirements:**
-- [ ] Python 3.8 or higher installed: `python3 --version`
-- [ ] pip package manager available: `pip3 --version`
-- [ ] CUDA toolkit compatible with Blackwell: `nvcc --version`
-- [ ] Git version control: `git --version`
-- [ ] Network access to download models from Hugging Face
-- [ ] Web browser access to `<SPARK_IP>:8188` port
+- Python 3.8 or higher installed: `python3 --version`
+- pip package manager available: `pip3 --version`
+- CUDA toolkit compatible with Blackwell: `nvcc --version`
+- Git version control: `git --version`
+- Network access to download models from Hugging Face
+- Web browser access to `<SPARK_IP>:8188` port
 
 ## Ancillary files
 
@@ -80,7 +81,7 @@ nvcc --version
 nvidia-smi
 ```
 
-Expected output should show Python 3.8+, pip available, CUDA toolkit, and GPU detection.
+Expected output should show Python 3.8+, pip available, CUDA toolkit and GPU detection.
 
 ## Step 2. Create Python virtual environment
 
@@ -164,6 +165,7 @@ Open a web browser and navigate to `http://<SPARK_IP>:8188` where `<SPARK_IP>` i
 | Model download fails | Network connectivity or storage space | Check internet connection, verify 20GB+ available space |
 | Web interface inaccessible | Firewall blocking port 8188 | Configure firewall to allow port 8188, check IP address |
 | Out of GPU memory errors | Insufficient VRAM for model | Use smaller models or enable CPU fallback mode |
+
 
 ## Step 10. Optional - Cleanup and rollback
 
