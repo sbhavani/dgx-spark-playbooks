@@ -67,10 +67,6 @@ All required assets can be found [in the ComfyUI repository on GitHub](https://g
 **Rollback:** Virtual environment can be deleted to remove all installed packages. Downloaded models 
 can be removed manually from the checkpoints directory.
 
-## Get Started
-
-- Follow the steps on the [Instruction tab](/instructions) to get Comfy installed directly on the Spark
-
 ## Instructions
 
 ## Step 1. Verify system prerequisites
