@@ -51,7 +51,7 @@ def _(mo):
     The following video shows an example of training a self-organizing map from color data using a batch algorithm, from a random initial map to a relatively converged set of colorful clusters.
     """
     ))
-    mo.output.append(mo.image("batch-som.mp4"))
+    mo.output.append(mo.video("batch-som.mp4"))
     mo.output.append(mo.md(
         r"""
 

@@ -45,7 +45,7 @@ GPU acceleration and performance optimization capabilities.
 [ ] Docker or container runtime installed
 [ ] NVIDIA Container Toolkit configured
 [ ] Verify GPU access: `nvidia-smi`
-[ ] Verify Docker GPU support: `docker run --gpus all nvidia/cuda:12.0-base-ubuntu20.04 nvidia-smi`
+[ ] Verify Docker GPU support: `docker run --gpus all --rm nvcr.io/nvidia/cuda:13.0.1-runtime-ubuntu24.04 nvidia-smi`
 [ ] Port 8080 available for marimo notebook access
 
 ## Ancillary files
@@ -92,17 +92,23 @@ If the `docker` command fails with a permission error, you can either
 
 To add yourself to the `docker` group, first run `sudo usermod -aG docker $USER`.  Then, as your user account, either run `newgrp docker` or log out and log back in.
 
-## Step 2. Build a Docker image
+## Step 3. Clone the playbook repository
+
+```bash
+git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main
+```
+
+## Step 3. Build the Docker image
 
 
 > **Warning:** This command will download a base image and build a container locally to support this environment
 
 ```bash
-cd jax-assets
+cd jax/assets
 docker build -t jax-on-spark .
 ```
 
-## Step 3. Launch Docker container
+## Step 4. Launch Docker container
 
 Run the JAX development environment in a Docker container with GPU support and port forwarding for marimo access.
 
@@ -113,7 +119,7 @@ docker run --gpus all --rm -it \
     jax-on-spark
 ```
 
-## Step 4. Access marimo interface
+## Step 5. Access marimo interface
 
 Connect to the marimo notebook server to begin the JAX tutorial.
 
@@ -124,7 +130,7 @@ Connect to the marimo notebook server to begin the JAX tutorial.
 
 The interface will load a table-of-contents display and brief introduction to marimo.
 
-## Step 5. Complete JAX introduction tutorial
+## Step 6. Complete JAX introduction tutorial
 
 Work through the introductory material to understand JAX programming model differences from NumPy.
 
@@ -133,7 +139,7 @@ Navigate to and complete the JAX introduction notebook, which covers:
 - Key differences from NumPy
 - Performance evaluation techniques
 
-## Step 6. Implement NumPy baseline
+## Step 7. Implement NumPy baseline
 
 Complete the NumPy-based self-organized map (SOM) implementation to establish a performance 
 baseline.
@@ -143,7 +149,7 @@ Work through the NumPy SOM notebook to:
 - Implement the algorithm using familiar NumPy operations
 - Record performance metrics for comparison
 
-## Step 7. Optimize with JAX implementations
+## Step 8. Optimize with JAX implementations
 
 Progress through the iteratively refined JAX implementations to see performance improvements.
 
@@ -153,7 +159,7 @@ Complete the JAX SOM notebook sections:
 - GPU-accelerated parallel JAX implementation
 - Compare performance across all versions
 
-## Step 8. Validate performance gains
+## Step 9. Validate performance gains
 
 The notebooks will show you how to check the performance of each SOM training implementation; you'll see that that JAX implementations show performance improvements over NumPy baseline (and some will be quite a lot faster).
 
