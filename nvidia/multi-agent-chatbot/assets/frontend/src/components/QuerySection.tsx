@@ -22,8 +22,6 @@ import remarkGfm from 'remark-gfm'; // NEW
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"; // NEW
 import { oneDark, oneLight, Dark, Light } from "react-syntax-highlighter/dist/esm/styles/prism"; // NEW
 import WelcomeSection from "./WelcomeSection";
-const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
-
 
 export function makeChatTheme(isDark: boolean) {
   const base = isDark ? oneDark : oneLight;
@@ -62,10 +60,30 @@ export function makeChatTheme(isDark: boolean) {
     'attr-name': { ...(base['attr-name'] || {}), color: isDark ? "#e6b450" : "#6b4f00" },
   } as const;
 }
-const theme = makeChatTheme(isDark);
 
 function CodeBlockWithCopy({ code, language }: { code: string; language: string }) {
   const [copied, setCopied] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  // Listen for theme changes
+  useEffect(() => {
+    const updateTheme = () => {
+      const darkMode = document.documentElement.classList.contains("dark");
+      setIsDark(darkMode);
+    };
+
+    // Set initial theme
+    updateTheme();
+
+    // Listen for changes to the document element's class list
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleCopy = async () => {
     try {
@@ -123,7 +141,7 @@ function CodeBlockWithCopy({ code, language }: { code: string; language: string 
       </button>
       <SyntaxHighlighter
         language={language}
-        style={theme}
+        style={makeChatTheme(isDark)}
         PreTag="div"
         wrapLongLines
         showLineNumbers={false}
@@ -646,6 +664,10 @@ export default function QuerySection({
           </button>
         )}
       </form>
+      
+      <div className={styles.disclaimer}>
+        This is a concept demo to showcase multiple models and MCP use. It is not optimized for performance. Developers can customize and further optimize it for performance.
+      </div>
       
       {inferenceStats.tokensPerSecond > 0 && (
         <div className={styles.inferenceStats}>

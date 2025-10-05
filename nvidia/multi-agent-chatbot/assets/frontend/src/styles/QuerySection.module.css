@@ -1031,3 +1031,19 @@
   margin-bottom: 4px;
 }
 
+.disclaimer {
+  text-align: center;
+  font-size: 12px;
+  color: #6b7280;
+  padding: 2px 16px;
+  margin: -16px auto 0 auto;
+  max-width: 600px;
+  line-height: 1.4;
+  opacity: 0.8;
+  transition: color 0.3s ease;
+}
+
+:global(.dark) .disclaimer {
+  color: #9ca3af;
+}
+

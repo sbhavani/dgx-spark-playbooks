@@ -85,6 +85,19 @@ You can either provide URLs or drag and drop images.
 Describe this image: https://en.wikipedia.org/wiki/London_Bridge#/media/File:London_Bridge_from_St_Olaf_Stairs.jpg
 
 
+## Cleanup
+
+Follow these steps to completely remove the containers and free up resources.
+
+From the root directory of the multi-agent-chatbot project, run the following commands:
+
+```bash
+docker compose -f docker-compose.yml docker-compose-models.yml down
+
+docker volume rm chatbot-spark_postgres_data
+```
+> **Note**: If you do not execute these commands containers, will continue to run and take up memory.
+
 ## Customizations
 
 ### Using different models

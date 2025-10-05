@@ -119,8 +119,8 @@ Steps to completely remove the containers and free up resources.
 From the root directory of the multi-agent-chatbot project, run the following commands:
 
 ```bash
-docker compose -f docker-compose.yml -d docker-compose-models.yml down
-docker volume rm chatbot-spark_model-data chatbot-spark_postgres_data
+docker compose -f docker-compose.yml docker-compose-models.yml down
+docker volume rm chatbot-spark_postgres_data
 ```
 
 ## Step 9. Next steps
