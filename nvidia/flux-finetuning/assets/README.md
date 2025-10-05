@@ -7,14 +7,14 @@ This project demonstrates fine-tuning the FLUX.1-dev 11B model using Dreambooth 
 Fine-tuning FLUX.1 with custom concepts enables the model to generate images with your specific objects and styles:
 
 <figure>
-  <img src="assets/before_finetuning.png" alt="Before Fine-tuning" width="400"/>
+  <img src="flux_assets/before_finetuning.png" alt="Before Fine-tuning" width="400"/>
   <figcaption>Base FLUX.1 model without custom concept knowledge</figcaption>
 </figure>
 
 <br>
 
 <figure>
-  <img src="assets/after_finetuning.png" alt="After Fine-tuning" width="400"/>
+  <img src="flux_assets/after_finetuning.png" alt="After Fine-tuning" width="400"/>
   <figcaption>FLUX.1 model after LoRA fine-tuning with custom "tjtoy" and "sparkgpu" concepts</figcaption>
 </figure>
 
@@ -146,7 +146,7 @@ Access ComfyUI at `http://localhost:8188`
 
 ### 4. ComfyUI Workflow Example
 
-![ComfyUI Workflow](assets/comfyui_workflow.png)
+![ComfyUI Workflow](flux_assets/comfyui_workflow.png)
 *ComfyUI workflow showing how easily LoRA can be integrated into the base FLUX model*
 
 The workflow demonstrates the simplicity of LoRA integration:

@@ -16,11 +16,11 @@
 
 ## Basic Idea
 
-The DGX Dashboard is a web application that runs locally on DGX Spark devices, providing a graphical interface for system updates, resource monitoring, and an integrated JupyterLab environment. Users can access the dashboard locally from the app launcher or remotely through NVIDIA Sync or SSH tunneling. The dashboard is the easiest way to update system packages and firmware when working remotely.
+The DGX Dashboard is a web application that runs locally on DGX Spark devices, providing a graphical interface for system updates, resource monitoring and an integrated JupyterLab environment. Users can access the dashboard locally from the app launcher or remotely through NVIDIA Sync or SSH tunneling. The dashboard is the easiest way to update system packages and firmware when working remotely.
 
 ## What you'll accomplish
 
-You will learn how to access and use the DGX Dashboard on your DGX Spark device. By the end of this walkthrough, you will be able to launch JupyterLab instances with pre-configured Python environments, monitor GPU performance, manage system updates, and run a sample AI workload using Stable Diffusion. You'll understand multiple access methods including desktop shortcuts, NVIDIA Sync, and manual SSH tunneling.
+You will learn how to access and use the DGX Dashboard on your DGX Spark device. By the end of this walkthrough, you will be able to launch JupyterLab instances with pre-configured Python environments, monitor GPU performance, manage system updates and run a sample AI workload using Stable Diffusion. You'll understand multiple access methods including desktop shortcuts, NVIDIA Sync and manual SSH tunneling.
 
 ## What to know before starting
 
@@ -70,15 +70,15 @@ If you have NVIDIA Sync installed on your local machine:
 4. Click "DGX Dashboard" to launch the dashboard
 5. The dashboard will open in your default web browser at `http://localhost:11000` using an automatic SSH tunnel
 
-Don't have NVIDIA Sync? [Install it here](TODO!!!!!!)
+Don't have NVIDIA Sync? [Install it here](/spark/connect-to-your-spark/sync)
 
 ### Option C: Manual SSH tunnels
 
-For manual remote access without NVIDIA Sync you must first manually configure an SSH tunnels.
+For manual remote access without NVIDIA Sync you must first manually configure an SSH tunnel.
 
 You must open a tunnel for the Dashboard server (port 11000) and for JupyterLab if you want to access it remotely. Each user account will have a different assigned port number for JupyterLab.
 
-1. Check your assigned JupyterLab port by sshing into the Spark device and running the following command:
+1. Check your assigned JupyterLab port by SSH-ing into the Spark device and running the following command:
 
 ```bash
 cat /opt/nvidia/dgx-dashboard-service/jupyterlab_ports.yaml
@@ -119,7 +119,7 @@ Create and start a JupyterLab environment:
 When starting, a default working directory (/home/<USERNAME>/jupyterlab) is created and a virtual environment is set up automatically. You can
 review the packages installed by looking at the `requirements.txt` file that is created in the working directory.
 
-In the future, you can change the working directory, creating a new isolated environment, by clicking the "Stop" button, changing the path to the new working directory, and then clicking the "Start" button again.
+In the future, you can change the working directory, creating a new isolated environment, by clicking the "Stop" button, changing the path to the new working directory and then clicking the "Start" button again.
 
 ## Step 4. Test with sample AI workload
 
@@ -194,7 +194,7 @@ When finished with your session:
 
 ## Step 6. Manage system updates
 
-If system updates are available it will indicated by a banner or on the Settings page.
+If system updates are available it will be indicated by a banner or on the Settings page.
 
 From the Settings page, under the "Updates" tab:
 
