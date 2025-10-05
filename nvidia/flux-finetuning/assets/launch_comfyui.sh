@@ -14,16 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM nvcr.io/nvidia/pytorch:25.09-py3
-
-RUN cd /workspace/ && \
-    git clone https://github.com/comfyanonymous/ComfyUI.git && \
-    cd ComfyUI && \
-    git checkout 4ffea0e864275301329ddb5ecc3fbc7211d7a802 && \
-    sed -i '/torch/d' requirements.txt && \
-    pip install -r requirements.txt && \
-    pip install torchsde
-
-WORKDIR /workspace/ComfyUI
-
-CMD ["/bin/bash"]
+docker run -it \
+    --gpus all \
+    --ipc=host \
+    --net=host \
+    --ulimit memlock=-1 \
+    --ulimit stack=67108864 \
+    -v $(pwd)/models/vae:/workspace/ComfyUI/models/vae \
+    -v $(pwd)/models/loras:/workspace/ComfyUI/models/loras \
+    -v $(pwd)/models/checkpoints:/workspace/ComfyUI/models/checkpoints \
+    -v $(pwd)/models/text_encoders:/workspace/ComfyUI/models/text_encoders \
+    -v $(pwd)/workflows/:/workspace/ComfyUI/user/default/workflows/ \
+    flux-comfyui \
+    python main.py

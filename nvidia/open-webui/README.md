@@ -1,6 +1,6 @@
-# Use Open WebUI
+# Use Open WebUI with Ollama
 
-> Install Open WebUI and chat with models on your Spark
+> Install Open WebUI and use Ollama to chat with models on your Spark
 
 ## Table of Contents
 
@@ -12,9 +12,9 @@
 
 ## Overview
 
-## Basic Idea
+## Basic idea
 
-Open WebUI is an extensible, self-hosted AI interface that operating entirely offline.
+Open WebUI is an extensible, self-hosted AI interface that operates entirely offline.
 This playbook shows you how to deploy Open WebUI with an integrated Ollama server on your DGX Spark device using
 NVIDIA Sync. The setup creates a secure SSH tunnel that lets you access the web
 interface from your local browser while the models run on Spark's GPU.
@@ -45,7 +45,7 @@ for model management, persistent data storage, and GPU acceleration for model in
 - Large model downloads may take significant time depending on network speed
 
 **Rollback**: Stop and remove Docker containers using provided cleanup commands, remove Custom Port
-from NVIDIA Sync settings
+from NVIDIA Sync settings.
 
 ## Instructions
 
@@ -137,12 +137,12 @@ Common issues and their solutions.
 |---------|-------|-----|
 | Permission denied on docker ps | User not in docker group | Run Step 1 completely, including logging out and logging back in or use sudo|
 | Model download fails | Network connectivity issues | Check internet connection, retry download |
-| GPU not detected in container | Missing --gpus=all flag | Recreate container with correct command |
+| GPU not detected in container | Missing `--gpus=all flag` | Recreate container with correct command |
 | Port 8080 already in use | Another application using port | Change port in docker command or stop conflicting service |
 
 ## Step 8. Cleanup and rollback
 
-Steps to completely remove the Open WebUI installation and free up resources.
+Steps to completely remove the Open WebUI installation and free up resources:
 
 > **Warning**: These commands will permanently delete all Open WebUI data and downloaded models.
 
@@ -224,7 +224,7 @@ Click the gear icon in the top right corner to open the Settings window.
 
 Click on the "Custom" tab to access Custom Ports configuration.
 
-## Step 4. Add Open WebUI Custom Port
+## Step 4. Add Open WebUI custom port
 
 This step creates a new entry in NVIDIA Sync that will manage the Open
 WebUI container and create the necessary SSH tunnel.
@@ -337,7 +337,7 @@ Press Enter to send the message and wait for the model's response.
 
 ## Step 9. Stop the Open WebUI 
 
-When you are finished with your session and want to stop the Open WebUI server and reclaim resource, close the Open WebUI from NVIDIA Sync.
+When you are finished with your session and want to stop the Open WebUI server and reclaim resources, close the Open WebUI from NVIDIA Sync.
 
 Click on the NVIDIA Sync icon in your system tray or taskbar to open the main application window.
 
@@ -354,12 +354,12 @@ Common issues and their solutions.
 | Permission denied on docker ps | User not in docker group | Run Step 1 completely, including terminal restart |
 | Browser doesn't open automatically | Auto-open setting disabled | Manually navigate to localhost:12000 |
 | Model download fails | Network connectivity issues | Check internet connection, retry download |
-| GPU not detected in container | Missing --gpus=all flag | Recreate container with correct start script |
+| GPU not detected in container | Missing `--gpus=all flag` | Recreate container with correct start script |
 | Port 12000 already in use | Another application using port | Change port in Custom App settings or stop conflicting service |
 
 ## Step 11. Cleanup and rollback
 
-Steps to completely remove the Open WebUI installation and free up resources.
+Steps to completely remove the Open WebUI installation and free up resources:
 
 > **Warning**: These commands will permanently delete all Open WebUI data and downloaded models.
 
@@ -398,4 +398,4 @@ If Open WebUI reports an update is available, you can update the container image
 docker pull ghcr.io/open-webui/open-webui:ollama
 ```
 
-Then launch Open WebUI again fromNVIDIA Sync.
+After the updated, launch Open WebUI again from NVIDIA Sync.

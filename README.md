@@ -35,7 +35,7 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [Use a NIM on Spark](nvidia/nim-llm/)
 - [Quantize to NVFP4](nvidia/nvfp4-quantization/)
 - [Ollama](nvidia/ollama/)
-- [Use Open WebUI](nvidia/open-webui/)
+- [Use Open WebUI with Ollama](nvidia/open-webui/)
 - [Use Open Fold](nvidia/protein-folding/)
 - [Fine tune with Pytorch](nvidia/pytorch-fine-tune/)
 - [RAG application in AI Workbench](nvidia/rag-ai-workbench/)

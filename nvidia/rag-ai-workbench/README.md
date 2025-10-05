@@ -74,7 +74,11 @@ On your DGX Spark system, open the **NVIDIA AI Workbench** application and click
 
 ### Troubleshooting installation issues
 
-If you encounter the error message: `An error occurred ... container tool failed to reach ready state. try again: docker is not running` reboot your DGX Spark system to restart the docker service, then reopen NVIDIA AI Workbench.
+If you encounter an error message that says:
+
+An error occurred ... container tool failed to reach ready state. try again: docker is not running
+
+Reboot your DGX Spark system to restart the docker service, then reopen NVIDIA AI Workbench.
 
 ## Step 2. Verify API key requirements
 
