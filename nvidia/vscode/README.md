@@ -12,8 +12,8 @@
 
 ## Overview
 
-## Basic Idea
-This walkthrough establishes a local Visual Studio Code development environment directly on DGX Spark devices. By installing VSCode natively on the ARM64-based Spark system, you gain access to a full-featured IDE with extensions, integrated terminal, and Git integration while leveraging the specialized hardware for development and testing.
+## Basic idea
+This walkthrough establishes a local Visual Studio Code development environment directly on DGX Spark devices. By installing VS Code natively on the ARM64-based Spark system, you gain access to a full-featured IDE with extensions, integrated terminal, and Git integration while leveraging the specialized hardware for development and testing.
 
 ## What you'll accomplish
 You will have Visual Studio Code running natively on your DGX Spark device with access to the system's ARM64 architecture and GPU resources. This setup enables direct code development, debugging, and execution on the target hardware without remote development overhead.
@@ -30,7 +30,7 @@ You will have Visual Studio Code running natively on your DGX Spark device with 
 
 • DGX Spark device with administrative privileges
 
-• Active internet connection for downloading the VSCode installer
+• Active internet connection for downloading the VS Code installer
 
 • Verify ARM64 architecture:
   ```bash
@@ -56,22 +56,22 @@ You will have Visual Studio Code running natively on your DGX Spark device with 
 
 ## Step 1. Verify system requirements
 
-Before installing VSCode, confirm your DGX Spark system meets the requirements and has GUI support.
+Before installing VS Code, confirm your DGX Spark system meets the requirements and has GUI support.
 
 ```bash
 ## Verify ARM64 architecture
 uname -m
 
-## Check available disk space (VSCode requires ~200MB)
+## Check available disk space (VS Code requires ~200MB)
 df -h /
 
 ## Verify desktop environment is running
 ps aux | grep -E "(gnome|kde|xfce)"
 ```
 
-## Step 2. Download VSCode ARM64 installer
+## Step 2. Download VS Code ARM64 installer
 
-Navigate to the VSCode [download](https://code.visualstudio.com/download) page and download the appropriate ARM64 `.deb` package for your system. 
+Navigate to the VS Code [download](https://code.visualstudio.com/download) page and download the appropriate ARM64 `.deb` package for your system. 
 
 Alternatively, you can download the installer with this command:
 
@@ -79,7 +79,7 @@ Alternatively, you can download the installer with this command:
 wget https://code.visualstudio.com/sha/download?build=stable\&os=linux-deb-arm64 -O vscode-arm64.deb
 ```
 
-## Step 3. Install VSCode package
+## Step 3. Install VS Code package
 
 Install the downloaded package using the system package manager. 
 
@@ -95,29 +95,29 @@ sudo apt-get install -f
 
 ## Step 4. Verify installation
 
-Confirm the VSCode app is installed successfully and can launch. 
+Confirm the VS Code app is installed successfully and can launch. 
 
 You can open the app directly from the list of applications or use the command line. 
 
 ```bash
-## Check if VSCode is installed
+## Check if VS Code is installed
 which code
 
 ## Verify version
 code --version
 
-## Test launch (will open VSCode GUI)
+## Test launch (will open VS Code GUI)
 code &
 ```
 
-VSCode should launch and display the welcome screen.
+VS Code should launch and display the welcome screen.
 
 ## Step 5. Configure for Spark development
 
-Set up VSCode for development on the DGX Spark platform.
+Set up VS Code for development on the DGX Spark platform.
 
 ```bash
-## Launch VSCode if not already running
+## Launch VS Code if not already running
 code
 
 ## Or create a new project directory and open it
@@ -126,7 +126,7 @@ cd ~/spark-dev-workspace
 code .
 ```
 
-From within VSCode:
+From within VS Code:
 
 * Open **File** > **Preferences** > **Settings**
 * Search for "terminal integrated shell" to configure default terminal
@@ -134,7 +134,7 @@ From within VSCode:
 
 ## Step 6. Validate setup and test functionality
 
-Test core VSCode functionality to ensure proper operation on ARM64.
+Test core VS Code functionality to ensure proper operation on ARM64.
 
 Create a test file:
 ```bash
@@ -145,7 +145,7 @@ echo 'print("Hello from DGX Spark!")' > test.py
 code test.py
 ```
 
-Within VSCode:
+Within VS Code:
 * Verify syntax highlighting works
 * Open integrated terminal (**Terminal** > **New Terminal**)
 * Run the test script: `python3 test.py`
@@ -156,16 +156,16 @@ Within VSCode:
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | `dpkg: dependency problems` during install | Missing dependencies | Run `sudo apt-get install -f` |
-| VSCode won't launch with GUI error | No display server/X11 | Verify GUI desktop is running: `echo $DISPLAY` |
+| VS Code won't launch with GUI error | No display server/X11 | Verify GUI desktop is running: `echo $DISPLAY` |
 | Extensions fail to install | Network connectivity or ARM64 compatibility | Check internet connection, verify extension ARM64 support |
 
-## Step 8. Uninstalling VSCode
+## Step 8. Uninstalling VS Code
 
-> **Warning:** Uninstalling VSCode will remove all user settings and extensions.
+> **Warning:** Uninstalling VS Code will remove all user settings and extensions.
 
-To remove VSCode if needed:
+To remove VS Code if needed:
 ```bash
-## Remove VSCode package
+## Remove VS Code package
 sudo apt-get remove code
 
 ## Remove configuration files (optional)
@@ -175,23 +175,28 @@ rm -rf ~/.vscode
 
 ## Access with NVIDIA Sync
 
-## Step 1. Install and Open NVIDIA Sync
+## Step 1. Install and configure NVIDIA Sync
 
-## Step 2. Add your Spark to NVIDIA Sync
+Follow the [NVIDIA Sync setup guide](/spark/connect-to-your-spark/sync) to:
+- Install NVIDIA Sync for your operating system
+- Configure which development tools you want to use (VS Code, Cursor, Terminal, etc.)
+- Add your DGX Spark device by providing its hostname/IP and credentials
 
-## Step 3. Install VS Code locally
+NVIDIA Sync will automatically configure SSH key-based authentication for secure, password-free access.
 
-## Step 4. Open Sync and launch VS Code
+## Step 2. Launch VS Code through NVIDIA Sync
 
+- Click the NVIDIA Sync icon in your system tray/taskbar
+- Ensure your device is connected (click "Connect" if needed)
+- Click on "VS Code" to launch it with an automatic SSH connection to your Spark
 - Wait for the remote connection to be established (may ask your local machine for a password or to authorize the connection)
-- It may prompt you to "trust the authors of the files in this folder" when you first land in the home directory after a successful ssh connection.
+- It may prompt you to "trust the authors of the files in this folder" when you first land in the home directory after a successful SSH connection
 
+## Step 3. Validation and follow-ups
 
-
-## Step 5. Validation and Follow-ups
-
-- Verify that you can access your Spark's filesystem with VSCode as a text editor. Run test commands in the terminal like `hostnamectl` and `whoami` to ensure you are remotely accessing your spark.
-- Specify a file path or directory and start editing/writing files
-- Install extensions
-- Clone repos
-- Locally host LLM code assistant
+- Verify that you can access your Spark's filesystem with VS Code as a text editor
+- Open the integrated terminal in VS Code and run test commands like `hostnamectl` and `whoami` to ensure you are remotely accessing your Spark
+- Navigate to a specific file path or directory and start editing/writing files
+- Install VS Code extensions for your development workflow (Python, Docker, GitLens, etc.)
+- Clone repositories from GitHub or other version control systems
+- Configure and locally host an LLM code assistant if desired

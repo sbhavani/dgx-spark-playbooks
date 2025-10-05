@@ -1,6 +1,6 @@
-# Optimized Jax
+# Optimized JAX
 
-> Develop with Optimized Jax
+> Develop with Optimized JAX
 
 ## Table of Contents
 
@@ -17,10 +17,10 @@ JAX lets you write **NumPy-style Python code** and run it fast on GPUs without w
 
 - **NumPy on accelerators**: Use `jax.numpy` just like NumPy, but arrays live on the GPU.  
 - **Function transformations**:  
-  - `jit` → Compiles your function into fast GPU code.  
-  - `grad` → Gives you automatic differentiation.  
-  - `vmap` → Vectorizes your function across batches.  
-  - `pmap` → Runs across multiple GPUs in parallel.  
+  - `jit` → Compiles your function into fast GPU code  
+  - `grad` → Gives you automatic differentiation 
+  - `vmap` → Vectorizes your function across batches  
+  - `pmap` → Runs across multiple GPUs in parallel 
 - **XLA backend**: JAX hands your code to XLA (Accelerated Linear Algebra compiler), which fuses operations and generates optimized GPU kernels.
 
 ## What you'll accomplish
@@ -40,12 +40,12 @@ GPU acceleration and performance optimization capabilities.
 
 ## Prerequisites
 
-[ ] NVIDIA Spark device with Blackwell architecture
-[ ] ARM64 (AArch64) processor architecture
-[ ] Docker or container runtime installed
-[ ] NVIDIA Container Toolkit configured
-[ ] Verify GPU access: `nvidia-smi`
-[ ] Port 8080 available for marimo notebook access
+- NVIDIA Spark device with Blackwell architecture
+- ARM64 (AArch64) processor architecture
+- Docker or container runtime installed
+- NVIDIA Container Toolkit configured
+- Verify GPU access: `nvidia-smi`
+- Port 8080 available for marimo notebook access
 
 ## Ancillary files
 
@@ -119,7 +119,7 @@ docker run --gpus all --rm -it \
     jax-on-spark
 ```
 
-## Step 5. Access marimo interface
+## Step 5. Access the marimo interface
 
 Connect to the marimo notebook server to begin the JAX tutorial.
 
@@ -130,7 +130,7 @@ Connect to the marimo notebook server to begin the JAX tutorial.
 
 The interface will load a table-of-contents display and brief introduction to marimo.
 
-## Step 6. Complete JAX introduction tutorial
+## Step 6. Complete the JAX introduction tutorial
 
 Work through the introductory material to understand JAX programming model differences from NumPy.
 
@@ -172,7 +172,7 @@ Common issues and their solutions:
 | Symptom | Cause | Fix |
 |---------|--------|-----|
 | `nvidia-smi` not found | Missing NVIDIA drivers | Install NVIDIA drivers for ARM64 |
-| Container fails to access GPU | Missing NVIDIA Container Toolkit | Install nvidia-container-toolkit |
+| Container fails to access GPU | Missing NVIDIA Container Toolkit | Install `nvidia-container-toolkit` |
 | JAX only uses CPU | CUDA/JAX version mismatch | Reinstall JAX with CUDA support |
 | Port 8080 unavailable | Port already in use | Use `-p 8081:8080` or kill process on 8080 |
 | Package conflicts in Docker build | Outdated environment file | Update environment file for Blackwell |

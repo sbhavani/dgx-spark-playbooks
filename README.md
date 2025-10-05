@@ -25,7 +25,7 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [Connect to your Spark](nvidia/connect-to-your-spark/)
 - [DGX Dashboard](nvidia/dgx-dashboard/)
 - [FLUX.1 Dreambooth LoRA Fine-tuning](nvidia/flux-finetuning/)
-- [Optimized Jax](nvidia/jax/)
+- [Optimized JAX](nvidia/jax/)
 - [Llama Factory](nvidia/llama-factory/)
 - [MONAI-Reasoning-CXR-3B Model](nvidia/monai-reasoning/)
 - [Build and Deploy a Multi-Agent Chatbot](nvidia/multi-agent-chatbot/)

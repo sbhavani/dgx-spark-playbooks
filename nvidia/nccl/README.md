@@ -13,7 +13,7 @@
 
 ## Overview
 
-## Basic Idea
+## Basic idea
 
 NCCL (NVIDIA Collective Communication Library) enables high-performance GPU-to-GPU communication
 across multiple nodes. This walkthrough sets up NCCL for multi-node distributed training on

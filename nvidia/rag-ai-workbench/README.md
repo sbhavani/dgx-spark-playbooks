@@ -14,7 +14,7 @@
 
 ## Overview
 
-## Basic Idea
+## Basic idea
 
 This walkthrough demonstrates how to set up and run an agentic retrieval-augmented generation (RAG)
 project using NVIDIA AI Workbench. You'll use AI Workbench to clone and run a pre-built agentic RAG
@@ -39,16 +39,16 @@ architectures.
 
 ## Prerequisites
 
-- [ ] DGX Spark system with NVIDIA AI Workbench installed or ready to install
-- [ ] Free NVIDIA API key: Generate at [NGC API Keys](https://org.ngc.nvidia.com/setup/api-keys)
-- [ ] Free Tavily API key: Generate at [Tavily](https://tavily.com/)
-- [ ] Internet connection for cloning repositories and accessing APIs
-- [ ] Web browser for accessing the Gradio interface
+- DGX Spark system with NVIDIA AI Workbench installed or ready to install
+- Free NVIDIA API key: Generate at [NGC API Keys](https://org.ngc.nvidia.com/setup/api-keys)
+- Free Tavily API key: Generate at [Tavily](https://tavily.com/)
+- Internet connection for cloning repositories and accessing APIs
+- Web browser for accessing the Gradio interface
 
-**Verification commands:**
+## Verification commands
 
-* Verify the NVIDIA AI Workbench application exists on your DGX Spark system
-* Verify your API keys are valid and up-to-date
+- Verify the NVIDIA AI Workbench application exists on your DGX Spark system
+- Verify your API keys are valid and up-to-date
 
 
 ## Time & risk
@@ -74,7 +74,7 @@ On your DGX Spark system, open the **NVIDIA AI Workbench** application and click
 
 ### Troubleshooting installation issues
 
-If you encounter the error message: `An error occurred ... container tool failed to reach ready state. try again: docker is not running`, reboot your DGX Spark system to restart the docker service, then reopen NVIDIA AI Workbench.
+If you encounter the error message: `An error occurred ... container tool failed to reach ready state. try again: docker is not running` reboot your DGX Spark system to restart the docker service, then reopen NVIDIA AI Workbench.
 
 ## Step 2. Verify API key requirements
 
@@ -94,7 +94,7 @@ This step clones the pre-built agentic RAG project from GitHub into your AI Work
 
 From the AI Workbench landing page, select the **Local** location if not done so already, then click **Clone Project** from the top right corner.
 
-Paste this Git repository URL in the clone dialog: ``https://github.com/NVIDIA/workbench-example-agentic-rag``. 
+Paste this Git repository URL in the clone dialog: https://github.com/NVIDIA/workbench-example-agentic-rag
 
 Click **Clone** to begin the clone and build process.
 
