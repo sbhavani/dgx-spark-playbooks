@@ -6,9 +6,6 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
-  - [Option A: Desktop shortcut (local access)](#option-a-desktop-shortcut-local-access)
-  - [Option B: NVIDIA Sync (recommended for remote access)](#option-b-nvidia-sync-recommended-for-remote-access)
-  - [Option C: Manual SSH tunnels](#option-c-manual-ssh-tunnels)
 
 ---
 
@@ -51,7 +48,7 @@ You will learn how to access and use the DGX Dashboard on your DGX Spark device.
 
 Choose one of the following methods to access the DGX Dashboard web interface:
 
-### Option A: Desktop shortcut (local access)
+**Option A: Desktop shortcut (local access)**
 
 If you have physical or remote desktop access to the Spark device:
 
@@ -60,7 +57,7 @@ If you have physical or remote desktop access to the Spark device:
 3. Click on the DGX Dashboard shortcut in the app launcher
 4. The dashboard will open in your default web browser at `http://localhost:11000`
 
-### Option B: NVIDIA Sync (recommended for remote access)
+**Option B: NVIDIA Sync (recommended for remote access)**
 
 If you have NVIDIA Sync installed on your local machine:
 
@@ -72,7 +69,7 @@ If you have NVIDIA Sync installed on your local machine:
 
 Don't have NVIDIA Sync? [Install it here](/spark/connect-to-your-spark/sync)
 
-### Option C: Manual SSH tunnels
+**Option C: Manual SSH tunnels**
 
 For manual remote access without NVIDIA Sync you must first manually configure an SSH tunnel.
 
