@@ -45,7 +45,6 @@ GPU acceleration and performance optimization capabilities.
 [ ] Docker or container runtime installed
 [ ] NVIDIA Container Toolkit configured
 [ ] Verify GPU access: `nvidia-smi`
-[ ] Verify Docker GPU support: `docker run --gpus all --rm nvcr.io/nvidia/cuda:13.0.1-runtime-ubuntu24.04 nvidia-smi`
 [ ] Port 8080 available for marimo notebook access
 
 ## Ancillary files
@@ -56,7 +55,7 @@ All required assets can be found [here on GitHub](https://gitlab.com/nvidia/dgx-
 - [**NumPy SOM implementation**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/numpy-som.py) — reference implementation of self-organized map training algorithm in NumPy  
 - [**JAX SOM implementations**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/som-jax.py) — multiple iteratively refined implementations of SOM algorithm in JAX
 - [**Environment configuration**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/Dockerfile) — package dependencies and container setup specifications
-- [**Course guide notebook**]() — overall material navigation and learning path
+
 
 ## Time & risk
 
@@ -85,12 +84,13 @@ uname -m
 docker run --gpus all --rm nvcr.io/nvidia/cuda:13.0.1-runtime-ubuntu24.04 nvidia-smi
 ```
 
-If the `docker` command fails with a permission error, you can either
+If the `docker` command fails with a permission error, you can either run the command with `sudo`, or add yourself to the `docker` group to use `docker` without `sudo`. 
 
-1. run it with `sudo`, e.g., `sudo docker run --gpus all --rm nvcr.io/nvidia/cuda:13.0.1-runtime-ubuntu24.04 nvidia-smi`, or
-2. add yourself to the `docker` group so you can use `docker` without `sudo`.
-
-To add yourself to the `docker` group, first run `sudo usermod -aG docker $USER`.  Then, as your user account, either run `newgrp docker` or log out and log back in.
+```bash
+sudo usermod -aG docker $USER
+newgrp docker
+sudo systemctl restart docker
+```
 
 ## Step 3. Clone the playbook repository
 
@@ -101,7 +101,7 @@ git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-
 ## Step 3. Build the Docker image
 
 
-> **Warning:** This command will download a base image and build a container locally to support this environment
+> **Warning:** This command will download a base image and build a container locally to support this environment.
 
 ```bash
 cd jax/assets
@@ -165,21 +165,7 @@ The notebooks will show you how to check the performance of each SOM training im
 
 Visually inspect the SOM training output on random color data to confirm algorithm correctness.
 
-## Step 10. Validate installation
-
-Confirm all components are working correctly and notebooks execute successfully.
-
-```bash
-## Test GPU JAX functionality
-python -c "import jax; print(jax.devices()); print(jax.device_count())"
-
-## Verify JAX can access GPU
-python -c "import jax.numpy as jnp; x = jnp.array([1, 2, 3]); print(x.device())"
-```
-
-Expected output should show GPU devices detected and JAX arrays placed on GPU.
-
-## Step 11. Troubleshooting
+## Step 10. Troubleshooting
 
 Common issues and their solutions:
 
@@ -191,24 +177,7 @@ Common issues and their solutions:
 | Port 8080 unavailable | Port already in use | Use `-p 8081:8080` or kill process on 8080 |
 | Package conflicts in Docker build | Outdated environment file | Update environment file for Blackwell |
 
-## Step 12. Cleanup and rollback
-
-Remove containers and reset environment if needed.
-
-> **Warning:** This will remove all container data and downloaded images.
-
-```bash
-## Stop and remove containers
-docker stop $(docker ps -q)
-docker system prune -f
-
-## Reset pipenv environment
-pipenv --rm
-```
-
-To rollback: Re-run installation steps from Step 2.
-
-## Step 13. Next steps
+## Step 11. Next steps
 
 Apply JAX optimization techniques to your own NumPy-based machine learning code.
 
