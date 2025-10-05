@@ -44,8 +44,7 @@ for model management, persistent data storage, and GPU acceleration for model in
 - Docker permission issues may require user group changes and session restart
 - Large model downloads may take significant time depending on network speed
 
-**Rollback**: Stop and remove Docker containers using provided cleanup commands, remove Custom Port
-from NVIDIA Sync settings.
+**Rollback**: Stop and remove Docker containers using provided cleanup commands, remove custom port from NVIDIA Sync settings.
 
 ## Instructions
 
@@ -398,4 +397,4 @@ If Open WebUI reports an update is available, you can update the container image
 docker pull ghcr.io/open-webui/open-webui:ollama
 ```
 
-After the updated, launch Open WebUI again from NVIDIA Sync.
+After the update, launch Open WebUI again from NVIDIA Sync.
