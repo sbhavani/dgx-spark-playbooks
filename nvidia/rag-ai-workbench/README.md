@@ -6,8 +6,6 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
-  - [Substep A: Upload sample dataset](#substep-a-upload-sample-dataset)
-  - [Substep B: Test custom dataset (optional)](#substep-b-test-custom-dataset-optional)
 
 ---
 
@@ -85,7 +83,7 @@ Verify you have both required API keys. Keep these keys safe!
 
 * Tavily API Key: https://tavily.com/
 * NVIDIA API Key: https://org.ngc.nvidia.com/setup/api-keys 
-    * Ensure this key has ``Public API Endpoints`` permissions
+* Ensure this key has ``Public API Endpoints`` permissions
 
 Keep both keys available for the next step.
 
@@ -145,10 +143,10 @@ Verify the following components are functioning:
 
 This step demonstrates advanced features by uploading data, retrieving context, and testing custom queries.
 
-### Substep A: Upload sample dataset
+**Substep A: Upload sample dataset**
 Complete the in-app quickstart instructions to upload the sample dataset and test improved RAG-based responses.
 
-### Substep B: Test custom dataset (optional)
+**Substep B: Test custom dataset (optional)**
 Upload a custom dataset, adjust the Router prompt, and submit custom queries to test customization.
 
 ## Step 9. Troubleshooting
