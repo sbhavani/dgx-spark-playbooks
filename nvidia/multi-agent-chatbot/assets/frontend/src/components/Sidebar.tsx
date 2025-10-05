@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styles from '@/styles/Sidebar.module.css';
 
 interface Model {
@@ -126,7 +126,7 @@ export default function Sidebar({
   };
 
   // Fetch available sources
-  const fetchSources = async () => {
+  const fetchSources = useCallback(async () => {
     try {
       setIsLoadingSources(true);
       console.log("Fetching sources...");
@@ -148,21 +148,21 @@ export default function Sidebar({
     } finally {
       setIsLoadingSources(false);
     }
-  };
+  }, []);
 
   // Get sources on initial load and when the context section is expanded
   useEffect(() => {
     if (expandedSections.has('context')) {
       fetchSources();
     }
-  }, [expandedSections]);
+  }, [expandedSections.has('context'), fetchSources]);
 
   // Refresh sources when refreshTrigger changes (document ingestion)
   useEffect(() => {
     if (refreshTrigger > 0) { // Only refresh if not the initial render
       fetchSources();
     }
-  }, [refreshTrigger]);
+  }, [refreshTrigger, fetchSources]);
 
   // Add function to fetch chat metadata
   const fetchChatMetadata = async (chatId: string) => {
@@ -181,7 +181,7 @@ export default function Sidebar({
   };
 
   // Update fetchChats to also fetch metadata
-  const fetchChats = async () => {
+  const fetchChats = useCallback(async () => {
     try {
       console.log("fetchChats: Starting to fetch chats...");
       setIsLoadingChats(true);
@@ -201,14 +201,14 @@ export default function Sidebar({
     } finally {
       setIsLoadingChats(false);
     }
-  };
+  }, []);
 
   // Fetch chats when history section is expanded
   useEffect(() => {
     if (expandedSections.has('history')) {
       fetchChats();
     }
-  }, [expandedSections]);
+  }, [expandedSections.has('history'), fetchChats]);
 
 
   // Update highlight position when currentChatId changes
@@ -234,7 +234,7 @@ export default function Sidebar({
         }
       }, 50);
     }
-  }, [isVisible, expandedSections.has('history'), chats.length]);
+  }, [currentChatId, chats.length]);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -580,16 +580,38 @@ export default function Sidebar({
                       ))
                     )}
                   </div>
-                  <button 
-                    className={styles.refreshButton}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      fetchSources();
-                    }}
-                    disabled={isLoadingSources}
-                  >
-                    {isLoadingSources ? "Loading..." : "Refresh Sources"}
-                  </button>
+                  <div className={styles.buttonGroup}>
+                    <button 
+                      className={styles.uploadDocumentsButton}
+                      onClick={() => setShowIngestion(true)}
+                      title="Upload Documents"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        width="16"
+                        height="16"
+                      >
+                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                      </svg>
+                      Upload Documents
+                    </button>
+                    <button 
+                      className={styles.refreshButton}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        fetchSources();
+                      }}
+                      disabled={isLoadingSources}
+                    >
+                      {isLoadingSources ? "Loading..." : "Refresh Sources"}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

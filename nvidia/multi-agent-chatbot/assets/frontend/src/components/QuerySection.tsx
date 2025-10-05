@@ -368,7 +368,7 @@ export default function QuerySection({
       }, 800); // match CSS transition duration
       return () => clearTimeout(timeout);
     }
-  }, [graphStatus]);
+  }, [graphStatus, isPinnedToolOutputVisible]);
 
   // Replace the effect for fade logic with this minimal version
   useEffect(() => {
@@ -611,26 +611,6 @@ export default function QuerySection({
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
-          <button
-            type="button"
-            onClick={() => setShowIngestion(true)}
-            className={`${styles.uploadButton} ${showButtons ? styles.show : ''}`}
-            title="Upload Documents"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              width="20"
-              height="20"
-            >
-              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-            </svg>
-          </button>
           <textarea
             rows={1}
             value={query}
@@ -667,6 +647,8 @@ export default function QuerySection({
       
       <div className={styles.disclaimer}>
         This is a concept demo to showcase multiple models and MCP use. It is not optimized for performance. Developers can customize and further optimize it for performance.
+        <br />
+        <span className={styles.warning}>Don't forget to shutdown docker containers at the end of the demo.</span>
       </div>
       
       {inferenceStats.tokensPerSecond > 0 && (

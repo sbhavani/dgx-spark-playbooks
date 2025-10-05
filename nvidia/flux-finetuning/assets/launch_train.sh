@@ -38,7 +38,7 @@ CMD="accelerate launch \
     --gradient_accumulation_steps 4 \
     --gradient_checkpointing \
     --sdpa \
-    --max_train_epochs=1 \
+    --max_train_epochs=25 \
     --save_every_n_epochs=25 \
     --mixed_precision=bf16 \
     --guidance_scale=1.0 \
@@ -52,6 +52,7 @@ CMD="accelerate launch \
     --cache_text_encoder_outputs_to_disk"
 
 docker run -it \
+    --rm \
     --gpus all \
     --ipc=host \
     --net=host \

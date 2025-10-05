@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 docker run -it \
+    --rm \
     --gpus all \
     --ipc=host \
     --net=host \

@@ -20,38 +20,30 @@ The project includes:
 
 ## 1. Model Download
 
-### 1.1 Install HuggingFace Hub
-
-Let's install the Hugging Face CLI client for authentication and downloading model checkpoints.
-
-```bash
-pip install huggingface_hub
-```
-
-### 1.2 Huggingface Authentication
+### 1.1 Huggingface Authentication
 
 You will have to be granted access to the FLUX.1-dev model since it is gated. Go to their [model card](https://huggingface.co/black-forest-labs/FLUX.1-dev), to accept the terms and gain access to the checkpoints.
 
 If you do not have a `HF_TOKEN` already, follow the instructions [here](https://huggingface.co/docs/hub/en/security-tokens) to generate one. Authenticate your system by replacing your generated token in the following command.
 
 ```bash
-hf auth login --token <YOUR_HF_TOKEN>
+export HF_TOKEN=<YOUR_HF_TOKEN>
 ```
 
-### 1.3 Download the pre-trained checkpoints
+### 1.2 Download the pre-trained checkpoints
+
+```bash
+cd flux-finetuning/assets
+
+# script to download (can take about a total of 15-60 mins, based on your internet speed)
+sh download.sh
+```
 
 The following snippet downloads the required FLUX models for training and inference.
 - `flux1-dev.safetensors` (~23.8GB)
 - `ae.safetensors` (~335MB) 
 - `clip_l.safetensors` (~246MB)
 - `t5xxl_fp16.safetensors` (~9.8GB)
-
-```bash
-cd flux-finetuning/assets
-
-# script to download (takes about a total of 5-10 mins, based on your internet speed)
-sh download.sh
-```
 
 Verify that your `models/` directory follows this structure after downloading the checkpoints.
 
@@ -67,7 +59,7 @@ models/
     └── ae.safetensors
 ```
 
-### 1.4 (Optional) Using fine-tuned checkpoints
+### 1.3 (Optional) Using fine-tuned checkpoints
 
 If you already have fine-tuned LoRAs, place them inside `models/loras`. If you do not have one yet, proceed to the [Training](#training) section for more details.
 
@@ -145,7 +137,7 @@ Now, let's modify the `flux_data/data.toml` file to reflect the concepts chosen.
 
 ### 4.1 Build the docker image
 
-Make sure that the ComfyUI inference container is brought down before proceeding to train.
+Make sure that the ComfyUI inference container is brought down before proceeding to train. You can bring it by interrupting the terminal with `Ctrl+C` keystroke.
 
 ```bash
 # Build the inference docker image
@@ -160,7 +152,7 @@ Launch training by executing the follow command. The training script is setup to
 sh launch_train.sh
 ```
 
-If you wish to generate very-quality images on your custom concepts (like the images we have shown in the README), you will have to train for much longer (~8 hours). To accomplish this, modify the num epochs in the `launch_train.sh` script to 100.
+If you wish to generate very-quality images on your custom concepts (like the images we have shown in the README), you will have to train for much longer (~4 hours). To accomplish this, modify the num epochs in the `launch_train.sh` script to 100.
 
 ```bash
 --max_train_epochs=100

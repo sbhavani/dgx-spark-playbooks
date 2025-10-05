@@ -47,10 +47,3 @@ download_if_needed "https://huggingface.co/ggml-org/gpt-oss-120b-GGUF/resolve/ma
 # download_if_needed "https://huggingface.co/ggml-org/gpt-oss-20b-GGUF/resolve/main/gpt-oss-20b-mxfp4.gguf" "gpt-oss-20b-mxfp4.gguf"
 
 echo "All models downloaded."
-
-cd "$ROOT_DIR"
-
-echo "Starting Docker Compose services..."
-docker compose -f docker-compose.yml -f docker-compose-models.yml up -d --build
-
-echo "Docker Compose services are up and running."

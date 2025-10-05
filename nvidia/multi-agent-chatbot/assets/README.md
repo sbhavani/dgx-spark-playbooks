@@ -6,6 +6,8 @@ Chatbot Spark is a fully local multi-agent system built on DGX Spark. With 128GB
 
 At the core is a supervisor agent powered by GPT-OSS-120B, orchestrating specialized downstream agents for coding, retrieval-augmented generation (RAG), and image understanding. Thanks to DGX Spark’s out-of-the-box support for popular AI frameworks and libraries, development and prototyping were fast and frictionless. Together, these components demonstrate how complex, multimodal workflows can be executed efficiently on local, high-performance hardware.
 
+> **Note**: This demo uses ~120 out of the 128GB of DGX Spark's memory by default, so ensure that no other workloads are running on your Spark using `nvidia-smi` or switch to a smaller supervisor model like gpt-oss-20B.
+
 This project was built to be customizable, serving as a framework that developers can customize. 
 
 ## Key Features
@@ -43,20 +45,42 @@ This project was built to be customizable, serving as a framework that developer
 ## Quick Start
 #### 1. Clone the repository and change directories to the multi-agent chatbot directory.
 
-#### 2. Run the setup script
-The setup script will take care of pulling model GGUF files from HuggingFace, building base llama cpp server images and starting all the required docker services to serve models, the backend API server as well as the frontend UI.
+#### 2. Configure docker permissions
 ```bash
-chmod +x setup.sh
-./setup.sh
+sudo usermod -aG docker $USER
+newgrp docker
 ```
+
+> **Warning**: After running usermod, you may need to reboot using `sudo reboot` to start a new
+> session with updated group permissions.
+
+#### 3. Run the model download script
+The setup script will take care of pulling model GGUF files from HuggingFace. The model files being pulled include gpt-oss-120B (~63GB), Deepseek-Coder:6.7B-Instruct (~7GB) and Qwen3-Embedding-4B (~4GB). This may take between 30 minutes to 2 hours depending on network speed.
+```bash
+chmod +x model_download.sh
+./model_download.sh
+```
+
+#### 4. Start the docker containers for the application
+This step builds the base llama cpp server image and starts all the required docker services to serve models, the backend API server as well as the frontend UI. This step can take 10 to 20 minutes depending on network speed.
+```bash
+docker compose -f docker-compose.yml -f docker-compose-models.yml up -d --build
+```
+> Note: Qwen2.5 VL model container may be reported as unhealthy while starting up, which can be ignored.
+
 Wait for all the containers to become ready and healthy. 
 ```bash
 watch 'docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Status}}"'
 ```
-> Note: Downloading model files may take ~10 minutes and starting containers may take another 10 minutes depending on network speed. Look for "server is listening on http://0.0.0.0:8000" in the logs of model server containers.
 
+>**Note**: If any of the model downloads fail, change directories to the `models/` directory and delete the problematic file and start from step 3 again.
+```bash
+cd models/
+rm -rf <model_file>
+./model_download.sh
+```
 
-#### 3. Access the frontend UI
+#### 5. Access the frontend UI
 
 Open your browser and go to: [http://localhost:3000](http://localhost:3000)
 
@@ -68,19 +92,19 @@ Open your browser and go to: [http://localhost:3000](http://localhost:3000)
 You should see the following UI in your browser:
 <img src="assets/multi-agent-chatbot.png" alt="Frontend UI" style="max-width:600px;border-radius:5px;justify-content:center">
 
-### 4. Try out the sample prompts
+### 6. Try out the sample prompts
 Click on any of the tiles on the frontend to try out the supervisor and the other agents.
 
 #### RAG Agent:
-Before trying out the RAG agent, upload the example PDF document [NVIDIA Blackwell Whitepaper](https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf) as context by clicking on the "Attach" icon in the text input space at the botton of the UI and then make sure to check the box in the "Select Sources" section on the left side of the UI.
-<img src="assets/upload-image.png" alt="Upload Image" style="max-width:300px;border-radius:5px;justify-content:center">
+Before trying out the example prompt for the RAG agent, upload the example PDF document [NVIDIA Blackwell Whitepaper](https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf) as context by going to the link, downloading the PDF to the local filesystem, clicking on the green "Upload Documents" button in the left sidebar under "Context" and then make sure to check the box in the "Select Sources" section.
+
 <img src="assets/document-ingestion.png" alt="Ingest Documents" style="max-width:300px;border-radius:5px;justify-content:center">
 
+> **Note**: You may upload any PDF of your choice, and ask corresponding queries. The default prompt requires the NVIDIA Blackwell Whitepaper.
+
 #### Image Understanding Agent:
-You can either provide URLs or drag and drop images.
 
 **Example Prompt:**
-
 
 Describe this image: https://en.wikipedia.org/wiki/London_Bridge#/media/File:London_Bridge_from_St_Olaf_Stairs.jpg
 
@@ -92,10 +116,11 @@ Follow these steps to completely remove the containers and free up resources.
 From the root directory of the multi-agent-chatbot project, run the following commands:
 
 ```bash
-docker compose -f docker-compose.yml docker-compose-models.yml down
+docker compose -f docker-compose.yml -f docker-compose-models.yml down
 
-docker volume rm chatbot-spark_postgres_data
+docker volume rm "$(basename "$PWD")_postgres_data"
 ```
+You can optionally run `docker volume prune` to remove all unused volumes at the end of the demo.
 > **Note**: If you do not execute these commands containers, will continue to run and take up memory.
 
 ## Customizations

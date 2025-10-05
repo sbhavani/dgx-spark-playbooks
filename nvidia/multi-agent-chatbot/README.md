@@ -35,14 +35,15 @@ The setup includes:
 -  No other processes running on the DGX Spark GPU
 -  Enough disk space for model downloads
 
+> **Note**: This demo uses ~120 out of the 128GB of DGX Spark's memory by default. 
+> Please ensure that no other workloads are running on your Spark using `nvidia-smi`, or switch to a smaller supervisor model like gpt-oss-20B.
+
 
 ## Time & risk
 
-**Duration**: 30 minutes for initial setup, plus model download time (varies by model size)
-
 **Risks**:
 - Docker permission issues may require user group changes and session restart
-- Large model downloads may take significant time depending on network speed
+- Setup includes downloading model files for gpt-oss-120B (~63GB), Deepseek-Coder:6.7B-Instruct (~7GB) and Qwen3-Embedding-4B (~4GB), which may take between 30 minutes to 2 hours depending on network speed
 
 **Rollback**: Stop and remove Docker containers using provided cleanup commands
 
@@ -62,6 +63,7 @@ If you see a permission denied error (something like `permission denied while tr
 
 ```bash
 sudo usermod -aG docker $USER
+newgrp docker
 ```
 
 > **Warning**: After running usermod, you must log out and log back in to start a new
@@ -72,28 +74,33 @@ sudo usermod -aG docker $USER
 In a terminal, clone the [GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main) repository and navigate to the root directory of the multi-agent-chatbot project.
 
 ```bash
-cd multi-agent-chatbot
+cd multi-agent-chatbot/assets
 ```
 
-## Step 3. Run the setup script
+## Step 3. Run the model download script
 
 ```bash
-chmod +x setup.sh
-./setup.sh
+chmod +x model_download.sh
+./model_download.sh
 ```
 
-This script will:
-- Pull model GGUF files from HuggingFace
-- Build base llama cpp server images
-- Start the required docker containers - model servers, the backend API server as well as the frontend UI.
+The setup script will take care of pulling model GGUF files from HuggingFace. 
+The model files being pulled include gpt-oss-120B (~63GB), Deepseek-Coder:6.7B-Instruct (~7GB) and Qwen3-Embedding-4B (~4GB). 
+This may take between 30 minutes to 2 hours depending on network speed.
 
-## Step 4. Wait for all the containers to become ready and healthy.
+
+## Step 4. Start the docker containers for the application
+
+```bash
+  docker compose -f docker-compose.yml -f docker-compose-models.yml up -d --build
+```
+This step builds the base llama cpp server image and starts all the required docker services to serve models, the backend API server as well as the frontend UI. 
+This step can take 10 to 20 minutes depending on network speed.
+Wait for all the containers to become ready and healthy.
 
 ```bash
 watch 'docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Status}}"'
 ```
-
-This step can take ~20 minutes - pulling model files may take 10 minutes and starting containers may take another 10 minutes depending on network speed.
 
 ## Step 5. Access the frontend UI
 
@@ -108,9 +115,7 @@ Open your browser and go to: http://localhost:3000
 Click on any of the tiles on the frontend to try out the supervisor and the other agents.
 
 **RAG Agent**:
-Before trying out the RAG agent, upload the example PDF document NVIDIA Blackwell Whitepaper as context by clicking on the "Attach" icon in the text input space at the botton of the UI.
-Make sure to check the box in the "Select Sources" section on the left side of the UI before submitting the query.
-
+Before trying out the example prompt for the RAG agent, upload the example PDF document [NVIDIA Blackwell Whitepaper](https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf) as context by going to the link, downloading the PDF to the local filesystem, clicking on the green "Upload Documents" button in the left sidebar under "Context" and then make sure to check the box in the "Select Sources" section.
 
 ## Step 8. Cleanup and rollback
 
@@ -119,8 +124,9 @@ Steps to completely remove the containers and free up resources.
 From the root directory of the multi-agent-chatbot project, run the following commands:
 
 ```bash
-docker compose -f docker-compose.yml docker-compose-models.yml down
-docker volume rm chatbot-spark_postgres_data
+docker compose -f docker-compose.yml -f docker-compose-models.yml down
+
+docker volume rm "$(basename "$PWD")_postgres_data"
 ```
 
 ## Step 9. Next steps

@@ -6,8 +6,6 @@
 
 - [Overview](#overview)
 - [Run on two Sparks](#run-on-two-sparks)
-  - [Option 1: Suggested - Netplan configuration](#option-1-suggested-netplan-configuration)
-  - [Option 2: Manual IP assignment (advanced)](#option-2-manual-ip-assignment-advanced)
 
 ---
 
@@ -52,7 +50,9 @@ and proper GPU topology detection.
 ## Time & risk
 
 **Duration**: 45-60 minutes for setup and validation
+
 **Risk level**: Medium - involves network configuration changes and container networking
+
 **Rollback**: Network changes can be reverted using `sudo netplan apply` with original configs,
 containers can be stopped with `docker stop`
 
@@ -63,7 +63,7 @@ containers can be stopped with `docker stop`
 Configure network interfaces for high-performance inter-node communication. Choose one option
 based on your network requirements.
 
-### Option 1: Suggested - Netplan configuration
+**Option 1: Suggested - Netplan configuration**
 
 Configure network interfaces using netplan on both DGX Spark nodes for automatic link-local
 addressing:
@@ -87,7 +87,7 @@ sudo chmod 600 /etc/netplan/40-cx7.yaml
 sudo netplan apply
 ```
 
-### Option 2: Manual IP assignment (advanced)
+**Option 2: Manual IP assignment (advanced)**
 
 Configure dedicated cluster networking with static IP addresses:
 

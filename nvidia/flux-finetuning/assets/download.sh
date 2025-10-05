@@ -14,7 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-hf download black-forest-labs/FLUX.1-dev ae.safetensors --local-dir models/vae
-hf download black-forest-labs/FLUX.1-dev flux1-dev.safetensors --local-dir  models/checkpoints
-hf download comfyanonymous/flux_text_encoders clip_l.safetensors --local-dir models/text_encoders
-hf download comfyanonymous/flux_text_encoders t5xxl_fp16.safetensors --local-dir models/text_encoders
+download_if_needed() {
+  url="$1"
+  file="$2"
+  if [ -f "$file" ]; then
+    echo "$file already exists, skipping."
+  else
+    curl -C - -L -H "Authorization: Bearer $HF_TOKEN" -o "$file" "$url"
+  fi
+}
+
+download_if_needed "https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/ae.safetensors" "models/vae/ae.safetensors"
+download_if_needed "https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/flux1-dev.safetensors" "models/checkpoints/flux1-dev.safetensors"
+download_if_needed "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors" "models/text_encoders/clip_l.safetensors"
+download_if_needed "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors" "models/text_encoders/t5xxl_fp16.safetensors"

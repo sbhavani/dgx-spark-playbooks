@@ -377,7 +377,7 @@
 .messageInput {
   width: 100%;
   max-width: 600px;
-  padding: 12px 50px;
+  padding: 12px 50px 12px 16px;
   border: 1px solid #e2e8f0;
   border-radius: 20px;
   resize: none;
@@ -1045,5 +1045,14 @@
 
 :global(.dark) .disclaimer {
   color: #9ca3af;
+}
+
+.warning {
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+:global(.dark) .warning {
+  color: #fbbf24;
 }
 

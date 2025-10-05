@@ -6,14 +6,12 @@
 
 - [Overview](#overview)
 - [Run on two Sparks](#run-on-two-sparks)
-  - [Option 1: Automatic IP Assignment (Recommended)](#option-1-automatic-ip-assignment-recommended)
-  - [Option 2: Manual IP Assignment (Advanced)](#option-2-manual-ip-assignment-advanced)
 
 ---
 
 ## Overview
 
-## Basic Idea
+## Basic idea
 
 Configure two DGX Spark systems for high-speed inter-node communication using 200GbE direct
 QSFP connections and NCCL multi-node communication. This setup enables distributed training
@@ -36,13 +34,13 @@ the setup with NCCL multi-node tests to create a functional distributed computin
 
 ## Prerequisites
 
-- [ ] Two DGX Spark systems with NVIDIA Blackwell GPUs available
-- [ ] QSFP cable for direct 200GbE connection between devices
-- [ ] Docker installed on both systems: `docker --version`
-- [ ] CUDA toolkit installed: `nvcc --version` (should show 12.9 or higher)
-- [ ] SSH access available on both systems: `ssh-keygen -t rsa` (if keys don't exist)
-- [ ] Git available for source code compilation: `git --version`
-- [ ] Root or sudo access on both systems: `sudo whoami`
+- Two DGX Spark systems with NVIDIA Blackwell GPUs available
+- QSFP cable for direct 200GbE connection between devices
+- Docker installed on both systems: `docker --version`
+- CUDA toolkit installed: `nvcc --version` (should show 12.9 or higher)
+- SSH access available on both systems: `ssh-keygen -t rsa` (if keys don't exist)
+- Git available for source code compilation: `git --version`
+- Root or sudo access on both systems: `sudo whoami`
 
 ## Ancillary files
 
@@ -55,7 +53,9 @@ All required files for this playbook can be found [here on GitHub](https://gitla
 ## Time & risk
 
 **Duration:** 2-3 hours including validation tests
+
 **Risk level:** Medium - involves network reconfiguration and container setup
+
 **Rollback:** Network changes can be reversed by removing netplan configs or IP assignments
 
 ## Run on two Sparks
@@ -77,7 +77,7 @@ Expected output shows the interface exists but may be down initially.
 
 Choose one option based on your network requirements.
 
-### Option 1: Automatic IP Assignment (Recommended)
+**Option 1: Automatic IP Assignment (Recommended)**
 
 Configure network interfaces using netplan on both DGX Spark nodes for automatic
 link-local addressing:
@@ -101,7 +101,7 @@ sudo chmod 600 /etc/netplan/40-cx7.yaml
 sudo netplan apply
 ```
 
-### Option 2: Manual IP Assignment (Advanced)
+**Option 2: Manual IP Assignment (Advanced)**
 
 Configure dedicated cluster networking with static IP addresses:
 
