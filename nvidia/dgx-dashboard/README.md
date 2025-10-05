@@ -14,7 +14,7 @@
 
 ## Overview
 
-## Basic Idea
+## Basic idea
 
 The DGX Dashboard is a web application that runs locally on DGX Spark devices, providing a graphical interface for system updates, resource monitoring and an integrated JupyterLab environment. Users can access the dashboard locally from the app launcher or remotely through NVIDIA Sync or SSH tunneling. The dashboard is the easiest way to update system packages and firmware when working remotely.
 
