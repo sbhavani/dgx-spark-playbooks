@@ -76,7 +76,6 @@ In a terminal, clone the repository and navigate to the flux-finetuning director
 
 ```bash
 git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main dgx-spark-playbooks
-cd dgx-spark-playbooks/nvidia/flux-finetuning
 ```
 
 ## Step 3. Build the Docker container
@@ -86,17 +85,21 @@ This docker image will download the required models and set up the environment f
 - `ae.safetensors`
 - `clip_l.safetensors`
 - `t5xxl_fp16.safetensors`
+
 ```bash
-docker build -t flux-training .
+docker build -f Dockerfile.train --build-arg HF_TOKEN=$HF_TOKEN -t flux-training .
 ```
 
 ## Step 4. Run the Docker container
 
 ```bash
 ## Run with GPU support and mount current directory
-docker run --gpus all -it --rm \
-    -v $(pwd):/workspace \
-    -p 8188:8188 \
+docker run -it \
+    --gpus all \
+    --ipc=host \
+    --ulimit memlock=-1 \
+    --ulimit stack=67108864 \
+    --net=host \
     flux-training
 ```
 
@@ -106,7 +109,7 @@ Inside the container, navigate to the sd-scripts directory and run the training 
 
 ```bash
 cd /workspace/sd-scripts
-../train.sh
+sh train.sh
 ```
 
 The training will:
@@ -120,18 +123,37 @@ The training will:
 After training completes, generate sample images:
 
 ```bash
-../inference.sh
+sh inference.sh
 ```
 
 This will generate several images demonstrating the learned concepts, stored in the `outputs` directory.
 
 ## Step 7. Spin up ComfyUI for visual workflows
 
+Build the Docker image for ComfyUI:
+
+```bash
+## Build the Docker image (this will download FLUX models automatically)
+docker build -f Dockerfile.inference --build-arg HF_TOKEN=$HF_TOKEN -t flux-comfyui .
+```
+
+Run the ComfyUI container:
+
+```bash
+docker run -it \
+    --gpus all \
+    --ipc=host \
+    --ulimit memlock=-1 \
+    --ulimit stack=67108864 \
+    --net=host \
+    flux-comfyui
+```
+
 Start ComfyUI for an intuitive interface:
 
 ```bash
 cd /workspace/ComfyUI
-python main.py --listen 0.0.0.0 --port 8188
+python main.py 
 ```
 
 Access ComfyUI at `http://localhost:8188`
