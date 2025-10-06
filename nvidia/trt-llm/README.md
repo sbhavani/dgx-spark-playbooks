@@ -12,7 +12,9 @@
   - [Step 4. Validate TensorRT-LLM installation](#step-4-validate-tensorrt-llm-installation)
   - [Step 5. Create cache directory](#step-5-create-cache-directory)
   - [Step 6. Validate setup with quickstart_advanced](#step-6-validate-setup-with-quickstartadvanced)
+  - [LLM quickstart example](#llm-quickstart-example)
   - [Step 7. Validate setup with quickstart_multimodal](#step-7-validate-setup-with-quickstartmultimodal)
+  - [VLM quickstart example](#vlm-quickstart-example)
   - [Step 8. Serve LLM with OpenAI-compatible API](#step-8-serve-llm-with-openai-compatible-api)
   - [Step 9. Troubleshooting](#step-9-troubleshooting)
   - [Step 10. Cleanup and rollback](#step-10-cleanup-and-rollback)
@@ -36,15 +38,6 @@
 ---
 
 ## Overview
-
-## Basic idea
-
-**NVIDIA TensorRT-LLM (TRT-LLM)** is an open-source library for optimizing and accelerating large language model (LLM) inference on NVIDIA GPUs. 
-
-It provides highly efficient kernels, memory management, and parallelism strategies—like tensor, pipeline, and sequence parallelism—so developers can serve LLMs with lower latency and higher throughput. 
-
-TRT-LLM integrates with frameworks like Hugging Face and PyTorch, making it easier to deploy state-of-the-art models at scale.
-
 
 ## What you'll accomplish
 
@@ -96,17 +89,13 @@ The following models are supported with TensorRT-LLM on Spark. All listed models
 | **Llama-4-Scout-17B-16E-Instruct** | NVFP4 | ✅ | `nvidia/Llama-4-Scout-17B-16E-Instruct-FP4` |
 | **Qwen3-235B-A22B (two Sparks only)** | NVFP4 | ✅ | `nvidia/Qwen3-235B-A22B-FP4` |
 
-**Note:** You can use the NVFP4 Quantization documentation to generate your own NVFP4-quantized checkpoints for your favorite models. This enables you to take advantage of the performance and memory benefits of NVFP4 quantization even for models not already published by NVIDIA. 
-
-Reminder: not all model architectures are supported for NVFP4 quantization.
+**Note:** You can use the NVFP4 Quantization documentation to generate your own NVFP4-quantized checkpoints for your favorite models. This enables you to take advantage of the performance and memory benefits of NVFP4 quantization even for models not already published by NVIDIA. Note: Not all model architectures are supported for NVFP4 quantization.
 
 ## Time & risk
 
 **Duration**: 45-60 minutes for setup and API server deployment
-
 **Risk level**: Medium - container pulls and model downloads may fail due to network issues
-
-**Rollback**: Stop inference servers and remove downloaded models to free resources.
+**Rollback**: Stop inference servers and remove downloaded models to free resources
 
 ## Single Spark
 
@@ -181,7 +170,7 @@ mkdir -p $HOME/.cache/huggingface/
 
 This quickstart validates your TensorRT-LLM setup end-to-end by testing model loading, inference engine initialization, and GPU execution with real text generation. It's the fastest way to confirm everything works before starting the inference API server.
 
-**LLM quickstart example**
+### LLM quickstart example
 
 #### Llama 3.1 8B Instruct
 ```bash
@@ -252,7 +241,7 @@ docker run \
 ```
 ### Step 7. Validate setup with quickstart_multimodal
 
-**VLM quickstart example**
+### VLM quickstart example
 
 This demonstrates vision-language model capabilities by running inference with image understanding. The example uses multimodal inputs to validate both text and vision processing pipelines.
 
@@ -416,7 +405,9 @@ docker rmi nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev
 
 ### Step 1. Review Spark clustering documentation
 
-Go to the official DGX Spark clustering documentation to understand the networking requirements and setup procedures:[DGX Spark Clustering Documentation](https://docs.nvidia.com/dgx/dgx-spark/spark-clustering.html)
+Go to the official DGX Spark clustering documentation to understand the networking requirements and setup procedures:
+
+[DGX Spark Clustering Documentation](https://docs.nvidia.com/dgx/dgx-spark/spark-clustering.html)
 
 Review the networking configuration options and choose the appropriate setup method for your environment.
 
