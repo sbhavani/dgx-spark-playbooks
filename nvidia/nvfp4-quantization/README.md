@@ -19,7 +19,7 @@
 - **What it is:** A new 4-bit floating-point format for NVIDIA Blackwell GPUs.
 - **How it works:** Uses two levels of scaling (local per-block + global tensor) to keep accuracy while using fewer bits.
 - **Why it matters:**
-  - Cuts memory use ~3.5× vs FP16 and ~1.8× vs FP8
+  - Cuts memory use ~3.5x vs FP16 and ~1.8x vs FP8
   - Keeps accuracy close to FP8 (usually <1% loss)
   - Improves speed and energy efficiency for inference
 - **Ecosystem:** Supported in NVIDIA tools (TensorRT, LLM Compressor, vLLM) and Hugging Face models.
@@ -49,7 +49,7 @@ inside a TensorRT-LLM container, producing an NVFP4 quantized model for deployme
 Verify your setup:
 ```bash
 ## Check Docker GPU access
-docker run --rm --gpus all nvidia/cuda:12.0-base-ubuntu20.04 nvidia-smi
+docker run --rm --gpus all nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev nvidia-smi
 
 ## Verify sufficient disk space
 df -h .
@@ -57,8 +57,6 @@ df -h .
 ## Check Hugging Face CLI (install if needed: pip install huggingface_hub)
 huggingface-cli whoami
 ```
-
-
 
 ## Time & risk
 
@@ -73,7 +71,26 @@ huggingface-cli whoami
 
 ## Instructions
 
-## Step 1. Prepare the environment
+## Step 1. Configure Docker permissions
+
+To easily manage containers without sudo, you must be in the `docker` group. If you choose to skip this step, you will need to run Docker commands with sudo.
+
+Open a new terminal and test Docker access. In the terminal, run:
+
+```bash
+docker ps
+```
+
+If you see a permission denied error (something like `permission denied while trying to connect to the Docker daemon socket`), add your user to the docker group:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+> **Warning**: After running usermod, you must log out and log back in to start a new
+> session with updated group permissions.
+
+## Step 2. Prepare the environment
 
 Create a local output directory where the quantized model files will be stored. This directory will be mounted into the container to persist results after the container exits.
 
@@ -82,34 +99,41 @@ mkdir -p ./output_models
 chmod 755 ./output_models
 ```
 
-## Step 2. Authenticate with Hugging Face
+## Step 3. Authenticate with Hugging Face
 
-Ensure you have access to the DeepSeek model by logging in to Hugging Face. If you don't have the CLI installed, install it first.
+Ensure you have access to the DeepSeek model by setting your Hugging Face authentication token.
 
 ```bash
-## Install Hugging Face CLI if needed
-pip install huggingface_hub
-
-## Login to Hugging Face
-huggingface-cli login
+## Export your Hugging Face token as an environment variable
+## Get your token from: https://huggingface.co/settings/tokens
+export HF_TOKEN="your_token_here"
 ```
 
-Enter your Hugging Face token when prompted. The token will be cached in `~/.cache/huggingface/token`.
+The token will be automatically used by the container for model downloads.
 
-## Step 3. Run the TensorRT Model Optimizer container
+## Step 4. Run the TensorRT Model Optimizer container
 
 Launch the TensorRT-LLM container with GPU access, IPC settings optimized for multi-GPU workloads, and volume mounts for model caching and output persistence.
 
 ```bash
 docker run --rm -it --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
-  -v "$(pwd)/output_models:/workspace/outputs" \
+  -v "./output_models:/workspace/output_models" \
   -v "$HOME/.cache/huggingface:/root/.cache/huggingface" \
-  nvcr.io/nvidia/tensorrt-llm/release:1.1.0rc3 \
-  bash -c "git clone --single-branch https://github.com/NVIDIA/TensorRT-Model-Optimizer.git /app/TensorRT-Model-Optimizer && \
-  cd /app/TensorRT-Model-Optimizer && pip install -e '.[dev]' && \
-  export ROOT_SAVE_PATH='/workspace/outputs' && \
-  time /app/TensorRT-Model-Optimizer/examples/llm_ptq/scripts/huggingface_example.sh --model 'deepseek-ai/DeepSeek-R1-Distill-Llama-8B' --quant nvfp4 --tp 1 --export_fmt hf"
+  -e HF_TOKEN=$HF_TOKEN \
+  nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
+  bash -c "
+    git clone -b 0.35.0 --single-branch https://github.com/NVIDIA/TensorRT-Model-Optimizer.git /app/TensorRT-Model-Optimizer && \
+    cd /app/TensorRT-Model-Optimizer && pip install -e '.[dev]' && \
+    export ROOT_SAVE_PATH='/workspace/output_models' && \
+    /app/TensorRT-Model-Optimizer/examples/llm_ptq/scripts/huggingface_example.sh \
+    --model 'deepseek-ai/DeepSeek-R1-Distill-Llama-8B' \
+    --quant nvfp4 \
+    --tp 1 \
+    --export_fmt hf
+  "
 ```
+
+Warning: If your model is too large, you may encounter an out of memory error. You can try quantizing a smaller model instead.
 
 This command:
 - Runs the container with full GPU access and optimized shared memory settings
@@ -118,23 +142,14 @@ This command:
 - Clones and installs the TensorRT Model Optimizer from source
 - Executes the quantization script with NVFP4 quantization parameters
 
-## Step 4. Monitor the quantization process
+## Step 5. Monitor the quantization process
 
 The quantization process will display progress information including:
 - Model download progress from Hugging Face
 - Quantization calibration steps
 - Model export and validation phases
-- Total execution time
 
-Expected output includes lines similar to:
-```
-Downloading model...
-Starting quantization...
-Calibrating with NVFP4...
-Exporting to Hugging Face format...
-```
-
-## Step 5. Validate the quantized model
+## Step 6. Validate the quantized model
 
 After the container completes, verify that the quantized model files were created successfully.
 
@@ -148,31 +163,30 @@ find ./output_models/ -name "*.bin" -o -name "*.safetensors" -o -name "config.js
 
 You should see model weight files, configuration files, and tokenizer files in the output directory.
 
-## Step 6. Test model loading
+## Step 7. Test model loading
 
 Verify the quantized model can be loaded properly using a simple Python test.
 
 ```bash
-## Create test script
-cat > test_model.py << 'EOF'
-import os
-from transformers import AutoTokenizer, AutoModelForCausalLM
 
-model_path = "./output_models"
-try:
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
-    model = AutoModelForCausalLM.from_pretrained(model_path)
-    print(f"✓ Model loaded successfully from {model_path}")
-    print(f"Model config: {model.config}")
-except Exception as e:
-    print(f"✗ Error loading model: {e}")
-EOF
+export MODEL_PATH="./output_models/saved_models_DeepSeek-R1-Distill-Llama-8B_nvfp4_hf/"
 
-## Run the test
-python test_model.py
+docker run \
+  -e HF_TOKEN=$HF_TOKEN \
+  -v $HOME/.cache/huggingface/:/root/.cache/huggingface/ \
+  -v "$MODEL_PATH:/workspace/model" \
+  --rm -it --ulimit memlock=-1 --ulimit stack=67108864 \
+  --gpus=all --ipc=host --network host \
+  nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
+  bash -c '
+    python examples/llm-api/quickstart_advanced.py \
+      --model_dir /workspace/model/ \
+      --prompt "Paris is great because" \
+      --max_tokens 64
+    '
 ```
 
-## Step 7. Troubleshooting
+## Step 8. Troubleshooting
 
 | Symptom | Cause | Fix |
 |---------|--------|-----|
@@ -196,7 +210,7 @@ rm -rf ./output_models
 rm -rf ~/.cache/huggingface
 
 ## Remove Docker image (optional)
-docker rmi nvcr.io/nvidia/tensorrt-llm/release:1.1.0rc3
+docker rmi nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev
 ```
 
 ## Step 9. Next steps
