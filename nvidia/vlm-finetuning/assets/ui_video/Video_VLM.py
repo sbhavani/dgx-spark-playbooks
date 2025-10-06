@@ -28,6 +28,7 @@ import streamlit as st
 import torchvision.transforms as T
 from decord import VideoReader, cpu
 from transformers import AutoTokenizer, AutoModel
+from transformers.trainer_utils import get_last_checkpoint
 from torchvision.transforms.functional import InterpolationMode
 
 
@@ -68,10 +69,10 @@ def random_id():
     return "".join(random.choices(chars, k=8)).lower()
 
 
-def initialize_session_state(resources):
+def initialize_session_state(base_model, finetuned_model):
     # Initialize page-specific session state
-    st.session_state["base_video_vlm"] = st.session_state.get("base_video_vlm", resources["base"])
-    st.session_state["finetuned_video_vlm"] = st.session_state.get("finetuned_video_vlm", resources["finetuned"])
+    st.session_state["base_video_vlm"] = st.session_state.get("base_video_vlm", base_model)
+    st.session_state["finetuned_video_vlm"] = st.session_state.get("finetuned_video_vlm", finetuned_model)
     st.session_state["current_sample"] = st.session_state.get("current_sample", None)
     st.session_state["df"] = st.session_state.get("df",
         pd.DataFrame(columns=[
@@ -97,14 +98,9 @@ def load_config():
 
 
 @st.cache_resource
-def initialize_resources(inference_config):
-    base_model = load_model_for_inference(inference_config, "base")
-    finetuned_model = load_model_for_inference(inference_config, "finetuned")
-
-    return {
-        "base": {"model": base_model},
-        "finetuned": {"model": finetuned_model},
-    }
+def initialize_model(model_path):
+    model = InternVLModel(model_path)
+    return {"model": model}
 
 
 def main():
@@ -121,10 +117,15 @@ def main():
     config = load_config()
     if st.session_state.get("base_video_vlm", None) is None:
         st.toast("Loading model", icon="⏳", duration="short")
-    resource = initialize_resources(config["inference"])
+    base_model = initialize_model(config["inference"]["model_id"])
+    finetuned_model_path = get_last_checkpoint(config["inference"]["finetuned_model_id"])
+    if finetuned_model_path is not None:
+        finetuned_model = initialize_model(finetuned_model_path)
+    else:
+        finetuned_model = {"model": None}
     if st.session_state.get("base_video_vlm", None) is None:
         st.toast("Model loaded", icon="✅", duration="short")
-    initialize_session_state(resource)
+    initialize_session_state(base_model, finetuned_model)
 
     # gallery section
     st.markdown("---")
@@ -194,13 +195,16 @@ def main():
                     response = start_inference("base")
                 base_generation.markdown(response)
 
-                with st.spinner("Running..."):
-                    response = start_inference("finetuned")
-                finetuned_generation.markdown(response)
+                if st.session_state["finetuned_video_vlm"].get("model", None) is not None:
+                    with st.spinner("Running..."):
+                        response = start_inference("finetuned")
+                    finetuned_generation.markdown(response)
 
-                response = json.loads(response[7: -3].strip())
-                response["caption"] = random_id() # replace caption with driver id
-                st.session_state["df"].loc[len(st.session_state["df"])] = list(response.values())
+                    response = json.loads(response[7: -3].strip())
+                    response["caption"] = random_id() # replace caption with driver id
+                    st.session_state["df"].loc[len(st.session_state["df"])] = list(response.values())
+                else:
+                    finetuned_generation.markdown("```No response since there is no finetuned model```")
 
     # data analysis section
     st.markdown("---")
@@ -349,7 +353,7 @@ class InternVLModel:
         )
 
         return response
-    
+
     def _infer_realtime(self, video_path, prompt, num_frames, chunk_duration):
         video = VideoReader(video_path, ctx=cpu(0), num_threads=1)
         fps = video.get_avg_fps()
@@ -378,17 +382,6 @@ class InternVLModel:
             yield response
 
 
-def load_model_for_inference(config, model_type):
-    if model_type == "finetuned":
-        model_name = config["finetuned_model_id"]
-    elif model_type == "base":
-        model_name = config["model_id"]
-    else:
-        raise ValueError(f"Invalid model type: {model_type}")
-
-    return InternVLModel(model_name)
-
-
 @torch.no_grad()
 def start_inference(model_type):
     # define prompt
@@ -396,6 +389,7 @@ def start_inference(model_type):
     if model_type == "finetuned":
         prompt = SCAP_PROMPT.format(prompt=prompt)
 
+    print(print(model_type))
     response = st.session_state[f"{model_type}_video_vlm"]["model"].infer(
         st.session_state["current_sample"],
         prompt,

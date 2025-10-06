@@ -1,84 +1,0 @@
-/usr/local/lib/python3.12/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
-  import pynvml  # type: ignore[import]
-🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
-🦥 Unsloth Zoo will now patch everything to make training faster!
-==((====))==  Unsloth 2025.9.11: Fast Qwen2_5_Vl patching. Transformers: 4.56.2.
-   \\   /|    NVIDIA GB10. Num GPUs = 1. Max memory: 119.699 GB. Platform: Linux.
-O^O/ \_/ \    Torch: 2.9.0a0+50eac811a6.nv25.09. CUDA: 12.1. CUDA Toolkit: 13.0. Triton: 3.4.0
-\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.33+5146f2a.d20251005. FA2 = True]
- "-____-"     Free license: http://github.com/unslothai/unsloth
-Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
-Unsloth: QLoRA and full finetuning all not selected. Switching to 16bit LoRA.
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:29<01:28, 29.57s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:58<00:58, 29.48s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [01:27<00:28, 28.99s/it]Loading checkpoint shards: 100%|██████████| 4/4 [01:36<00:00, 21.25s/it]Loading checkpoint shards: 100%|██████████| 4/4 [01:36<00:00, 24.20s/it]
-Unsloth: Dropout = 0 is supported for fast patching. You are using dropout = 0.05.
-Unsloth will patch all other layers, except LoRA matrices, causing a performance hit.
-The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'bos_token_id': None}.
-==((====))==  Unsloth - 2x faster free finetuning | Num GPUs used = 1
-   \\   /|    Num examples = 30,250 | Num Epochs = 1 | Total steps = 30,250
-O^O/ \_/ \    Batch size per device = 2 | Gradient accumulation steps = 1
-\        /    Data Parallel GPUs = 1 | Total batch size (2 x 1 x 1) = 2
- "-____-"     Trainable parameters = 103,043,072 of 8,395,209,728 (1.23% trained)
-  0%|          | 0/30250 [00:00<?, ?it/s]`generation_config` default values have been modified to match model-specific defaults: {'max_length': 32768, 'temperature': 1e-06, 'repetition_penalty': 1.05}. If this is not desired, please set these values explicitly.
-----------------------------------
-Question:
-<|im_start|>system
-You are a helpful assistant.<|im_end|>
-<|im_start|>user
-<|vision_start|><|image_pad|><|vision_end|>Identify if this region has been affected by a wildfire. Also first provide your reasoning or working out on how you would go about identifying the presence of wildfire affected regions between <REASONING> and </REASONING> and then your final answer between <SOLUTION> and (put a simple Yes or No here) </SOLUTION><|im_end|>
-<|im_start|>assistant
- 
-Answer:
-No 
-Response:
-<REASONING>
-To identify if the region has been affected by a wildfire, we need to look for signs such as charred areas, absence of vegetation, or changes in the landscape that might indicate fire activity. In satellite imagery, these signs can be subtle but may include:
-
-1. **Burnt Vegetation**: Areas where the vegetation appears to have been consumed by fire, often appearing as darkened patches.
-2. **Ash or Ash Patches**: These can appear as lighter-colored areas compared to surrounding areas.
-3. **Changes in Land Cover**: The presence of new structures or changes in the type of land cover that could indicate recent construction or clearing.
-4. **Smoke Plumes**: While not visible in this still image, smoke plumes from wildfires can sometimes be seen in satellite imagery.
-
-In this image:
-- There are no obvious darkened or charred areas that would suggest recent fire activity.
-- The vegetation appears intact, with no signs of ash or burnt areas.
-- There are no visible smoke plumes or signs of recent construction that would indicate recent fire activity.
-
-</REASONING>
-
-<SOLUTION>
-No
-</SOLUTION>
-  0%|          | 1/30250 [01:15<631:36:01, 75.17s/it]                                                     {'loss': 0.0, 'grad_norm': 3.589693005778827e-05, 'learning_rate': 0.0, 'num_tokens': 879.0, 'completions/mean_length': 205.5, 'completions/min_length': 177.0, 'completions/max_length': 234.0, 'completions/clipped_ratio': 0.0, 'completions/mean_terminated_length': 205.5, 'completions/min_terminated_length': 177.0, 'completions/max_terminated_length': 234.0, 'rewards/format_reward_func/mean': 2.0, 'rewards/format_reward_func/std': 0.0, 'rewards/correctness_reward_func/mean': 5.0, 'rewards/correctness_reward_func/std': 0.0, 'reward': 7.0, 'reward_std': 0.0, 'frac_reward_zero_std': 1.0, 'completion_length': 205.5, 'kl': 0.0005636619171127677, 'epoch': 0.0}
-  0%|          | 1/30250 [01:15<631:36:01, 75.17s/it]----------------------------------
-Question:
-<|im_start|>system
-You are a helpful assistant.<|im_end|>
-<|im_start|>user
-<|vision_start|><|image_pad|><|vision_end|>Identify if this region has been affected by a wildfire. Also first provide your reasoning or working out on how you would go about identifying the presence of wildfire affected regions between <REASONING> and </REASONING> and then your final answer between <SOLUTION> and (put a simple Yes or No here) </SOLUTION><|im_end|>
-<|im_start|>assistant
- 
-Answer:
-Yes 
-Response:
-<REASONING>
-To identify if a region has been affected by a wildfire, one would typically look for signs such as charred areas, burn scars, or changes in vegetation color and texture. In satellite imagery, these changes can be subtle but often noticeable.
-
-1. **Burn Scars**: These are areas where the ground has been scorched, often appearing as lighter or different shades compared to surrounding areas.
-2. **Vegetation Changes**: Wildfires can alter the appearance of vegetation, making it appear more brown or less dense than before.
-3. **Ash and Debris**: Ash and debris from a fire can leave a distinct mark on the landscape, which might not be immediately obvious but can be seen with close inspection.
-
-In the provided image:
-- The area appears to have a mix of green and brown tones, which could indicate recent vegetation change.
-- There is a distinct darker area that could be interpreted as a burn scar, but without more detailed information or higher resolution imagery, it's difficult to confirm.
-- The overall pattern suggests a mix of forested and open areas, which is typical for many regions.
-
-However, without more specific indicators like smoke plumes, ash deposits, or detailed post-fire analysis, it's challenging to definitively conclude the presence of a wildfire.
-
-</REASONING>
-
-<SOLUTION>
-No
-</SOLUTION>
-Unsloth: Will smartly offload gradients to save VRAM!
-  0%|          | 2/30250 [02:21<587:04:23, 69.87s/it]                                                     {'loss': 0.0, 'grad_norm': 3.785433727898635e-05, 'learning_rate': 3.3057851239669425e-09, 'num_tokens': 1864.0, 'completions/mean_length': 258.5, 'completions/min_length': 242.0, 'completions/max_length': 275.0, 'completions/clipped_ratio': 0.0, 'completions/mean_terminated_length': 258.5, 'completions/min_terminated_length': 242.0, 'completions/max_terminated_length': 275.0, 'rewards/format_reward_func/mean': 2.0, 'rewards/format_reward_func/std': 0.0, 'rewards/correctness_reward_func/mean': 0.0, 'rewards/correctness_reward_func/std': 0.0, 'reward': 2.0, 'reward_std': 0.0, 'frac_reward_zero_std': 1.0, 'completion_length': 258.5, 'kl': 0.0006416599499061704, 'epoch': 0.0}
-  0%|          | 2/30250 [02:21<587:04:23, 69.87s/it]

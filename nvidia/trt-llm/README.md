@@ -6,17 +6,18 @@
 
 - [Overview](#overview)
 - [Single Spark](#single-spark)
-  - [Step 1. Verify environment prerequisites](#step-1-verify-environment-prerequisites)
-  - [Step 2. Set environment variables](#step-2-set-environment-variables)
-  - [Step 3. Validate TensorRT-LLM installation](#step-3-validate-tensorrt-llm-installation)
-  - [Step 4. Create cache directory](#step-4-create-cache-directory)
-  - [Step 5. Validate setup with quickstart_advanced](#step-5-validate-setup-with-quickstartadvanced)
+  - [Step 1. Configure Docker permissions](#step-1-configure-docker-permissions)
+  - [Step 2. Verify environment prerequisites](#step-2-verify-environment-prerequisites)
+  - [Step 3. Set environment variables](#step-3-set-environment-variables)
+  - [Step 4. Validate TensorRT-LLM installation](#step-4-validate-tensorrt-llm-installation)
+  - [Step 5. Create cache directory](#step-5-create-cache-directory)
+  - [Step 6. Validate setup with quickstart_advanced](#step-6-validate-setup-with-quickstartadvanced)
   - [LLM quickstart example](#llm-quickstart-example)
-  - [Step 6. Validate setup with quickstart_multimodal](#step-6-validate-setup-with-quickstartmultimodal)
+  - [Step 7. Validate setup with quickstart_multimodal](#step-7-validate-setup-with-quickstartmultimodal)
   - [VLM quickstart example](#vlm-quickstart-example)
-  - [Step 7. Serve LLM with OpenAI-compatible API](#step-7-serve-llm-with-openai-compatible-api)
-  - [Step 8. Troubleshooting](#step-8-troubleshooting)
-  - [Step 9. Cleanup and rollback](#step-9-cleanup-and-rollback)
+  - [Step 8. Serve LLM with OpenAI-compatible API](#step-8-serve-llm-with-openai-compatible-api)
+  - [Step 9. Troubleshooting](#step-9-troubleshooting)
+  - [Step 10. Cleanup and rollback](#step-10-cleanup-and-rollback)
 - [Run on two Sparks](#run-on-two-sparks)
   - [Step 1. Review Spark clustering documentation](#step-1-review-spark-clustering-documentation)
   - [Step 2. Verify connectivity and SSH setup](#step-2-verify-connectivity-and-ssh-setup)
@@ -68,6 +69,8 @@ The following models are supported with TensorRT-LLM on Spark. All listed models
 
 | Model | Quantization | Support Status | HF Handle |
 |-------|-------------|----------------|-----------|
+| **GPT-OSS-20B** | MXFP4 | ✅ | `openai/gpt-oss-20b` |
+| **GPT-OSS-120B** | MXFP4 | ✅ | `openai/gpt-oss-120b` |
 | **Llama-3.1-8B-Instruct** | FP8 | ✅ | `nvidia/Llama-3.1-8B-Instruct-FP8` |
 | **Llama-3.1-8B-Instruct** | NVFP4 | ✅ | `nvidia/Llama-3.1-8B-Instruct-FP4` |
 | **Llama-3.3-70B-Instruct** | NVFP4 | ✅ | `nvidia/Llama-3.3-70B-Instruct-FP4` |
@@ -96,7 +99,27 @@ The following models are supported with TensorRT-LLM on Spark. All listed models
 
 ## Single Spark
 
-### Step 1. Verify environment prerequisites
+### Step 1. Configure Docker permissions
+
+To easily manage containers without sudo, you must be in the `docker` group. If you choose to skip this step, you will need to run Docker commands with sudo.
+
+Open a new terminal and test Docker access. In the terminal, run:
+
+```bash
+docker ps
+```
+
+If you see a permission denied error (something like `permission denied while trying to connect to the Docker daemon socket`), add your user to the docker group:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+> **Warning**: After running usermod, you must log out and log back in to start a new
+> session with updated group permissions.
+
+
+### Step 2. Verify environment prerequisites
 
 Confirm your Spark device has the required GPU access and network connectivity for downloading
 models and containers.
@@ -110,7 +133,7 @@ docker run --rm --gpus all nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-
 
 ```
 
-### Step 2. Set environment variables
+### Step 3. Set environment variables
 
 Set `HF_TOKEN` for model access.
 
@@ -118,7 +141,7 @@ Set `HF_TOKEN` for model access.
 export HF_TOKEN=<your-huggingface-token>
 ```
 
-### Step 3. Validate TensorRT-LLM installation
+### Step 4. Validate TensorRT-LLM installation
 
 After confirming GPU access, verify that TensorRT-LLM can be imported inside the container.
 
@@ -134,7 +157,7 @@ Expected output:
 TensorRT-LLM version: 1.1.0rc3
 ```
 
-### Step 4. Create cache directory
+### Step 5. Create cache directory
 
 Set up local caching to avoid re-downloading models on subsequent runs.
 
@@ -143,7 +166,7 @@ Set up local caching to avoid re-downloading models on subsequent runs.
 mkdir -p $HOME/.cache/huggingface/
 ```
 
-### Step 5. Validate setup with quickstart_advanced
+### Step 6. Validate setup with quickstart_advanced
 
 This quickstart validates your TensorRT-LLM setup end-to-end by testing model loading, inference engine initialization, and GPU execution with real text generation. It's the fastest way to confirm everything works before starting the inference API server.
 
@@ -181,6 +204,10 @@ docker run \
   --gpus=all --ipc=host --network host \
   nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
   bash -c '
+    export TIKTOKEN_ENCODINGS_BASE="/tmp/harmony-reqs" && \
+    mkdir -p $TIKTOKEN_ENCODINGS_BASE && \
+    wget -P $TIKTOKEN_ENCODINGS_BASE https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken && \
+    wget -P $TIKTOKEN_ENCODINGS_BASE https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken && \
     hf download $MODEL_HANDLE && \
     python examples/llm-api/quickstart_advanced.py \
       --model_dir $MODEL_HANDLE \
@@ -201,6 +228,10 @@ docker run \
   --gpus=all --ipc=host --network host \
   nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
   bash -c '
+    export TIKTOKEN_ENCODINGS_BASE="/tmp/harmony-reqs" && \
+    mkdir -p $TIKTOKEN_ENCODINGS_BASE && \
+    wget -P $TIKTOKEN_ENCODINGS_BASE https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken && \
+    wget -P $TIKTOKEN_ENCODINGS_BASE https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken && \
     hf download $MODEL_HANDLE && \
     python examples/llm-api/quickstart_advanced.py \
       --model_dir $MODEL_HANDLE \
@@ -208,7 +239,7 @@ docker run \
       --max_tokens 64
     '
 ```
-### Step 6. Validate setup with quickstart_multimodal
+### Step 7. Validate setup with quickstart_multimodal
 
 ### VLM quickstart example
 
@@ -266,10 +297,11 @@ docker run \
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 ```
 
-### Step 7. Serve LLM with OpenAI-compatible API
+### Step 8. Serve LLM with OpenAI-compatible API
 
 Serve with OpenAI-compatible API via trtllm-serve:
 
+#### Llama 3.1 8B Instruct
 ```bash
 export MODEL_HANDLE="nvidia/Llama-3.1-8B-Instruct-FP4"
 
@@ -283,7 +315,39 @@ docker run --name trtllm_llm_server --rm -it --gpus all --ipc host --network hos
     cat > /tmp/extra-llm-api-config.yml <<EOF
 print_iter_log: false
 kv_cache_config:
-  dtype: "fp8"
+  dtype: "auto"
+  free_gpu_memory_fraction: 0.9
+cuda_graph_config:
+  enable_padding: true
+disable_overlap_scheduler: true
+EOF
+    trtllm-serve "$MODEL_HANDLE" \
+      --max_batch_size 64 \
+      --trust_remote_code \
+      --port 8355 \
+      --extra_llm_api_options /tmp/extra-llm-api-config.yml
+  '
+```
+
+#### GPT-OSS 20B
+```bash
+export MODEL_HANDLE="openai/gpt-oss-20b"
+
+docker run --name trtllm_llm_server --rm -it --gpus all --ipc host --network host \
+  -e HF_TOKEN=$HF_TOKEN \
+  -e MODEL_HANDLE="$MODEL_HANDLE" \
+  -v $HOME/.cache/huggingface/:/root/.cache/huggingface/ \
+  nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
+  bash -c '
+    export TIKTOKEN_ENCODINGS_BASE="/tmp/harmony-reqs" && \
+    mkdir -p $TIKTOKEN_ENCODINGS_BASE && \
+    wget -P $TIKTOKEN_ENCODINGS_BASE https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken && \
+    wget -P $TIKTOKEN_ENCODINGS_BASE https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken && \
+    hf download $MODEL_HANDLE && \
+    cat > /tmp/extra-llm-api-config.yml <<EOF
+print_iter_log: false
+kv_cache_config:
+  dtype: "auto"
   free_gpu_memory_fraction: 0.9
 cuda_graph_config:
   enable_padding: true
@@ -309,7 +373,7 @@ curl -s http://localhost:8355/v1/chat/completions \
   }'
 ```
 
-### Step 8. Troubleshooting
+### Step 9. Troubleshooting
 
 Common issues and their solutions:
 
@@ -321,7 +385,7 @@ Common issues and their solutions:
 | Container pull timeout | Network connectivity issues | Retry pull or use local mirror |
 | Import tensorrt_llm fails | Container runtime issues | Restart Docker daemon and retry |
 
-### Step 9. Cleanup and rollback
+### Step 10. Cleanup and rollback
 
 Remove downloaded models and containers to free up space when testing is complete.
 
@@ -454,7 +518,7 @@ export TRTLLM_MN_CONTAINER=$(docker ps -q -f name=trtllm-multinode)
 docker exec $TRTLLM_MN_CONTAINER bash -c 'cat <<EOF > /tmp/extra-llm-api-config.yml
 print_iter_log: false
 kv_cache_config:
-  dtype: "fp8"
+  dtype: "auto"
   free_gpu_memory_fraction: 0.9
 cuda_graph_config:
   enable_padding: true

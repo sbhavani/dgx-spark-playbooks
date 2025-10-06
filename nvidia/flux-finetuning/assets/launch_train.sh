@@ -38,7 +38,7 @@ CMD="accelerate launch \
     --gradient_accumulation_steps 4 \
     --gradient_checkpointing \
     --sdpa \
-    --max_train_epochs=25 \
+    --max_train_epochs=100 \
     --save_every_n_epochs=25 \
     --mixed_precision=bf16 \
     --guidance_scale=1.0 \

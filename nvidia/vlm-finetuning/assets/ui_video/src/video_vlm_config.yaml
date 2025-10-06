@@ -17,6 +17,6 @@
 
 inference:
   model_id: OpenGVLab/InternVL3-8B
-  finetuned_model_id: RLakshmi24/internvl_nexar_sft
+  finetuned_model_id: saved_model
   num_frames: 12
   sampling_mode: default

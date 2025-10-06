@@ -29,9 +29,25 @@ hf download Qwen/Qwen2.5-VL-7B-Instruct
 
 ### 1.2 (Optional) Download the fine-tuned model
 
-If you already have a fine-tuned checkpoint, place it in the `saved_model/` folder. 
+If you already have a fine-tuned checkpoint, place it in the `saved_model/` folder. Your directory structure should look something like this. Note that your checkpoint number can be different.
 
-# TODO: SHOW TREE AND SKIP TO INFERENCE
+```
+saved_model/
+└── checkpoint-3/
+    ├── config.json
+    ├── generation_config.json
+    ├── model.safetensors.index.json
+    ├── model-00001-of-00004.safetensors
+    ├── model-00002-of-00004.safetensors
+    ├── model-00003-of-00004.safetensors
+    ├── model-00004-of-00004.safetensors
+    ├── preprocessor_config.json
+    ├── special_tokens_map.json
+    ├── tokenizer_config.json
+    ├── tokenizer.json
+    ├── merges.txt
+    └── vocab.json
+```
 
 If you already have a finetuned checkpoint that you would like to just use for a comparative analysis against the base model, skip directly to the [Finetuned Model Inference](#5-finetuned-model-inference) section.
 
@@ -119,7 +135,7 @@ You can additionally choose whether the layers you want to finetune in the VLM. 
 
 In this section, we can select certain model parameters as relevant to our training run.
 
-- `Epochs`: 1-100
+- `Steps`: 1-1000
 - `Batch Size`: 1, 2, 4, 8, or 16
 - `Learning Rate`: 1e-6 to 1e-2
 - `Optimizer`: AdamW or Adafactor
@@ -134,11 +150,15 @@ For a GRPO setup, we also have the flexibility in choosing the reward that is as
 
 ### 4.4 Start training
 
-After configuring all the parameters, hit `Start Finetuning` to begin the training process. You will need to wait about 15 mins for the model to load and start recording metadata on the UI. As the training progresses, information such as the loss, epoch and GRPO rewards will be recorded on a live table.
+After configuring all the parameters, hit `Start Finetuning` to begin the training process. You will need to wait about 15 mins for the model to load and start recording metadata on the UI. As the training progresses, information such as the loss, step, and GRPO rewards will be recorded on a live table.
+
+The default loaded configuration should give you reasonable accuracy, taking 100 steps of training over a period of upto 2 hours. We achieved our best accuracies with around 1000 steps of training, taking close to 16 hours.
+
+After training is complete, the script automatically merges lora weights into the base model. After the training process has reached the desired number of training steps, it can take 5 mins to merge the lora weights.
 
 ### 4.5 Stop training
 
-If you wish to stop training, just hit the `Stop Finetuning` button. Ensure that you stop the training with atleast 50 steps complete to ensure that a finetuned checkpoint is stored.
+If you wish to stop training, just hit the `Stop Finetuning` button. Please use this button only to interrupt training. This button does not guarantee that the checkpoints will be properly stored or merged with lora adapter layers.
 
 Once you stop training, the UI will automatically bring up the vLLM servers for the base model and the newly finetuned model.
 
@@ -168,7 +188,7 @@ Scroll down to the `Image Inference` section, and enter your prompt in the provi
 
 If you trained your model sufficiently enough, you should see that the finetuned model is able to perform reasoning and provide a concise, accurate answer to the prompt. The reasoning steps are provided in the markdown format, while the final answer is bolded and provided at the end of the model's response.
 
-For the image shown below, we have trained the model for 1000 steps, which took about 4 hours. 
+For the image shown below, we have trained the model for 1000 steps, which took about 16 hours. 
 
 ### 5.4 Further analysis
 
@@ -191,4 +211,19 @@ ui_image/
 ├── assets/
 │   └── inference_screenshot.png # UI demonstration screenshot
 └── saved_model/                 # Training checkpoints directory (update config to point here)
+```
+
+## Troubleshooting
+
+If you are facing VRAM issues where the model fails to load or offloads to cpu/meta device, ensure you bring down all docker containers and flush out dangling memory.
+
+```bash
+docker ps
+
+docker rm <CONTAINER_ID_1>
+docker rm <CONTAINER_ID_2>
+
+docker system prune
+
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 ```
