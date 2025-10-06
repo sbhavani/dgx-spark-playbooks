@@ -1,6 +1,6 @@
 # Use a NIM on Spark
 
-> Run a NIM on Spark
+> Run an LLM NIM on Spark
 
 ## Table of Contents
 
