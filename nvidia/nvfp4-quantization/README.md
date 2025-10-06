@@ -6,7 +6,7 @@
 
 - [Overview](#overview)
   - [NVFP4 on Blackwell](#nvfp4-on-blackwell)
-- [Desktop Access](#desktop-access)
+- [Instructions](#instructions)
 
 ---
 
@@ -40,11 +40,11 @@ inside a TensorRT-LLM container, producing an NVFP4 quantized model for deployme
 
 ## Prerequisites
 
-- [ ] NVIDIA Spark device with Blackwell architecture GPU
-- [ ] Docker installed with GPU support
-- [ ] NVIDIA Container Toolkit configured
-- [ ] At least 32GB of available storage for model files and outputs
-- [ ] Hugging Face account with access to the target model
+- NVIDIA Spark device with Blackwell architecture GPU
+- Docker installed with GPU support
+- NVIDIA Container Toolkit configured
+- At least 32GB of available storage for model files and outputs
+- Hugging Face account with access to the target model
 
 Verify your setup:
 ```bash
@@ -71,7 +71,7 @@ huggingface-cli whoami
 
 **Rollback**: Remove the output directory and any pulled Docker images to restore original state.
 
-## Desktop Access
+## Instructions
 
 ## Step 1. Prepare the environment
 

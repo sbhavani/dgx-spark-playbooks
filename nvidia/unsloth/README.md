@@ -36,10 +36,10 @@ parameter-efficient fine-tuning methods like LoRA and QLoRA.
 
 ## Prerequisites
 
-- [ ] NVIDIA Spark device with Blackwell GPU architecture
-- [ ] `nvidia-smi` shows a summary of GPU information
-- [ ] CUDA 13.0 installed: `nvcc --version`
-- [ ] Internet access for downloading models and datasets
+- NVIDIA Spark device with Blackwell GPU architecture
+- `nvidia-smi` shows a summary of GPU information
+- CUDA 13.0 installed: `nvcc --version`
+- Internet access for downloading models and datasets
 
 ##Ancillary files
 

@@ -54,13 +54,13 @@ inference through kernel-level optimizations, efficient memory layouts, and adva
 
 ## Prerequisites
 
-- [ ] NVIDIA Spark device with Blackwell architecture GPUs
-- [ ] NVIDIA drivers compatible with CUDA 12.x: `nvidia-smi`
-- [ ] Docker installed and GPU support configured: `docker run --rm --gpus all nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev nvidia-smi`
-- [ ] Hugging Face account with token for model access: `echo $HF_TOKEN`
-- [ ] Sufficient GPU VRAM (16GB+ recommended for 70B models)
-- [ ] Internet connectivity for downloading models and container images
-- [ ] Network: open TCP ports 8355 (LLM) and 8356 (VLM) on host for OpenAI-compatible serving
+- NVIDIA Spark device with Blackwell architecture GPUs
+- NVIDIA drivers compatible with CUDA 12.x: `nvidia-smi`
+- Docker installed and GPU support configured: `docker run --rm --gpus all nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev nvidia-smi`
+- Hugging Face account with token for model access: `echo $HF_TOKEN`
+- Sufficient GPU VRAM (16GB+ recommended for 70B models)
+- Internet connectivity for downloading models and container images
+- Network: open TCP ports 8355 (LLM) and 8356 (VLM) on host for OpenAI-compatible serving
 
 ## Model Support Matrix
 

@@ -30,23 +30,23 @@ RTX Pro 6000 or DGX Spark workstation.
 
 ## Prerequisites
 
-- [ ] NVIDIA GPU (RTX Pro 6000 or DGX Spark recommended)
+- NVIDIA GPU (RTX Pro 6000 or DGX Spark recommended)
   ```bash
   nvidia-smi  # Should show GPU with CUDA ≥12.9
   ```
-- [ ] NVIDIA drivers and CUDA toolkit installed
+- NVIDIA drivers and CUDA toolkit installed
   ```bash
   nvcc --version  # Should show CUDA 12.9 or higher
   ```
-- [ ] Docker with NVIDIA Container Toolkit
+- Docker with NVIDIA Container Toolkit
   ```bash
   docker run --rm --gpus all nvidia/cuda:12.9.0-base-ubuntu22.04 nvidia-smi
   ```
-- [ ] Python 3.8+ environment
+- Python 3.8+ environment
   ```bash
   python3 --version  # Should show 3.8 or higher
   ```
-- [ ] Sufficient disk space for databases (>3TB recommended)
+- Sufficient disk space for databases (>3TB recommended)
   ```bash
   df -h  # Check available space
   ```

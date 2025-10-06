@@ -43,14 +43,14 @@ You will deploy NVIDIA's VSS AI Blueprint on NVIDIA Spark hardware with Blackwel
 
 ## Prerequisites
 
-- [ ] NVIDIA Spark device with ARM64 architecture and Blackwell GPU
-- [ ] FastOS 1.81.38 or compatible ARM64 system
-- [ ] Driver version 580.82.09 installed: `nvidia-smi | grep "Driver Version"`
-- [ ] CUDA version 13.0 installed: `nvcc --version`
-- [ ] Docker installed and running: `docker --version && docker compose version`
-- [ ] Access to NVIDIA Container Registry with NGC API Key
-- [ ] [Optional] NVIDIA API Key for remote model endpoints (hybrid deployment only)
-- [ ] Sufficient storage space for video processing (>10GB recommended in `/tmp/`)
+- NVIDIA Spark device with ARM64 architecture and Blackwell GPU
+- FastOS 1.81.38 or compatible ARM64 system
+- Driver version 580.82.09 installed: `nvidia-smi | grep "Driver Version"`
+- CUDA version 13.0 installed: `nvcc --version`
+- Docker installed and running: `docker --version && docker compose version`
+- Access to NVIDIA Container Registry with NGC API Key
+- [Optional] NVIDIA API Key for remote model endpoints (hybrid deployment only)
+- Sufficient storage space for video processing (>10GB recommended in `/tmp/`)
 
 ## Ancillary files
 
