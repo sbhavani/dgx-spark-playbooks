@@ -6,18 +6,22 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
-  - [Navigate to Event Verification directory](#navigate-to-event-verification-directory)
-  - [Configure NGC API Key](#configure-ngc-api-key)
-  - [Start VSS Event Verification services](#start-vss-event-verification-services)
-  - [Navigate to CV Event Detector directory](#navigate-to-cv-event-detector-directory)
-  - [Start DeepStream CV pipeline](#start-deepstream-cv-pipeline)
-  - [Wait for service initialization](#wait-for-service-initialization)
-  - [Validate Event Reviewer deployment](#validate-event-reviewer-deployment)
-  - [Navigate to remote LLM deployment directory](#navigate-to-remote-llm-deployment-directory)
-  - [Configure environment variables](#configure-environment-variables)
-  - [Review model configuration](#review-model-configuration)
-  - [Launch Standard VSS deployment](#launch-standard-vss-deployment)
-  - [Validate Standard VSS deployment](#validate-standard-vss-deployment)
+  - [7.1 Navigate to Event Reviewer directory](#71-navigate-to-event-reviewer-directory)
+  - [7.2 Configure NGC API Key](#72-configure-ngc-api-key)
+  - [7.3 Update the VSS Image path](#73-update-the-vss-image-path)
+  - [7.4 Start VSS Event Reviewer services](#74-start-vss-event-reviewer-services)
+  - [7.5 Navigate to CV Event Detector directory](#75-navigate-to-cv-event-detector-directory)
+  - [7.6 Update the NV_CV_EVENT_DETECTOR_IMAGE Image path](#76-update-the-nvcveventdetectorimage-image-path)
+  - [7.7 Start DeepStream CV pipeline](#77-start-deepstream-cv-pipeline)
+  - [7.8 Wait for service initialization](#78-wait-for-service-initialization)
+  - [7.9 Validate Event Reviewer deployment](#79-validate-event-reviewer-deployment)
+  - [8.1 Obtain Nvidia API Key](#81-obtain-nvidia-api-key)
+  - [8.2 Navigate to remote LLM deployment directory](#82-navigate-to-remote-llm-deployment-directory)
+  - [8.3 Configure environment variables](#83-configure-environment-variables)
+  - [8.4 Update the VSS Image path](#84-update-the-vss-image-path)
+  - [8.5 Review model configuration](#85-review-model-configuration)
+  - [8.6 Launch Standard VSS deployment](#86-launch-standard-vss-deployment)
+  - [8.7 Validate Standard VSS deployment](#87-validate-standard-vss-deployment)
   - [For Event Reviewer deployment](#for-event-reviewer-deployment)
   - [For Standard VSS deployment](#for-standard-vss-deployment)
 
@@ -31,7 +35,7 @@ Deploy NVIDIA's Video Search and Summarization (VSS) AI Blueprint to build intel
 
 ## What you'll accomplish
 
-You will deploy NVIDIA's VSS AI Blueprint on NVIDIA Spark hardware with Blackwell architecture, choosing between two deployment scenarios: VSS Event Reviewer (completely local with VLM pipeline) or Standard VSS (hybrid deployment with remote LLM/embedding endpoints). This includes setting up Alert Bridge, VLM Pipeline, Alert Inspector UI, Video Storage Toolkit, and optional DeepStream CV pipeline for automated video analysis and event verification.
+You will deploy NVIDIA's VSS AI Blueprint on NVIDIA Spark hardware with Blackwell architecture, choosing between two deployment scenarios: VSS Event Reviewer (completely local with VLM pipeline) or Standard VSS (hybrid deployment with remote LLM/embedding endpoints). This includes setting up Alert Bridge, VLM Pipeline, Alert Inspector UI, Video Storage Toolkit, and optional DeepStream CV pipeline for automated video analysis and event review.
 
 ## What to know before starting
 
@@ -103,8 +107,9 @@ cd video-search-and-summarization
 Start the system cache cleaner to optimize memory usage during container operations.
 
 ```bash
-## Start the cache cleaner script in background
-sudo sh deploy/scripts/sys_cache_cleaner.sh &
+## In another terminal, start the cache cleaner script.
+## Alternatively, append " &" to the end of the command to run it in the background.
+sudo sh deploy/scripts/sys_cache_cleaner.sh
 ```
 
 ## Step 4. Set up Docker shared network
@@ -120,7 +125,7 @@ docker network create vss-shared-network
 
 ## Step 5. Authenticate with NVIDIA Container Registry
 
-Log in to NVIDIA's container registry using your NGC API Key.
+Log in to NVIDIA's container registry using your [NGC API Key](https://org.ngc.nvidia.com/setup/api-keys).
 
 ```bash
 ## Log in to NVIDIA Container Registry
@@ -140,37 +145,46 @@ Choose between two deployment options based on your requirements:
 
 Proceed with **Option A** for Event Reviewer or **Option B** for Standard VSS.
 
-## Step 7. Option A - VSS Event Reviewer (Completely Local)
+## Step 7. Option A - [VSS Event Reviewer](https://docs.nvidia.com/vss/latest/content/vss_event_reviewer.html) (Completely Local)
 
-### Navigate to Event Verification directory
+### 7.1 Navigate to Event Reviewer directory
 
-Change to the directory containing the Event Verification Docker Compose configuration.
+Change to the directory containing the Event Reviewer Docker Compose configuration.
 
 ```bash
 cd deploy/docker/event_reviewer/
 ```
 
-### Configure NGC API Key
+### 7.2 Configure NGC API Key
 
-Update the environment file with your NGC API Key.
+Update the environment file with your NGC API Key. You can do this by editing the `.env` file directly, or by running the following command:
 
 ```bash
 ## Edit the .env file and update NGC_API_KEY
 echo "NGC_API_KEY=<YOUR_NGC_API_KEY>" >> .env
 ```
 
-### Start VSS Event Verification services
+### 7.3 Update the VSS Image path
 
-Launch the complete VSS Event Verification stack including Alert Bridge, VLM Pipeline, Alert Inspector UI, and Video Storage Toolkit.
+Update `VSS_IMAGE` to `nvcr.io/nvidia/blueprint/vss-engine-sbsa:2.4.0` in `.env`.
 
 ```bash
-## Start VSS Event Verification with ARM64 and SBSA optimizations
+## Edit the .env file and update VSS_IMAGE
+echo "VSS_IMAGE=nvcr.io/nvidia/blueprint/vss-engine-sbsa:2.4.0" >> .env
+```
+
+### 7.4 Start VSS Event Reviewer services
+
+Launch the complete VSS Event Reviewer stack including Alert Bridge, VLM Pipeline, Alert Inspector UI, and Video Storage Toolkit.
+
+```bash
+## Start VSS Event Reviewer with ARM64 and SBSA optimizations
 IS_SBSA=1 IS_AARCH64=1 ALERT_REVIEW_MEDIA_BASE_DIR=/tmp/alert-media-dir docker compose up
 ```
 
 > **Note:** This step will take several minutes as containers are pulled and services initialize. The VSS backend requires additional startup time.
 
-### Navigate to CV Event Detector directory
+### 7.5 Navigate to CV Event Detector directory
 
 In a new terminal session, navigate to the computer vision event detector configuration.
 
@@ -178,16 +192,25 @@ In a new terminal session, navigate to the computer vision event detector config
 cd video-search-and-summarization/examples/cv-event-detector
 ```
 
-### Start DeepStream CV pipeline
+### 7.6 Update the NV_CV_EVENT_DETECTOR_IMAGE Image path
+
+Update `NV_CV_EVENT_DETECTOR_IMAGE` to `nvcr.io/nvidia/blueprint/nv-cv-event-detector-sbsa:2.4.0` in `.env`.
+
+```bash
+## Edit the .env file and update NV_CV_EVENT_DETECTOR_IMAGE
+echo "NV_CV_EVENT_DETECTOR_IMAGE=nvcr.io/nvidia/blueprint/nv-cv-event-detector-sbsa:2.4.0" >> .env
+```
+
+### 7.7 Start DeepStream CV pipeline
 
 Launch the DeepStream computer vision pipeline and CV UI services.
 
 ```bash
 ## Start CV pipeline with ARM64 and SBSA optimizations
-IS_SBSA=1 IS_AARCH64=1 ALERT_VERIFICATION_MEDIA_BASE_DIR=/tmp/alert-media-dir docker compose up
+IS_SBSA=1 IS_AARCH64=1 ALERT_REVIEW_MEDIA_BASE_DIR=/tmp/alert-media-dir docker compose up
 ```
 
-### Wait for service initialization
+### 7.8 Wait for service initialization
 
 Allow time for all containers to fully initialize before accessing the user interfaces.
 
@@ -197,7 +220,7 @@ docker ps
 ## Verify all containers show "Up" status and VSS backend logs show ready state
 ```
 
-### Validate Event Reviewer deployment
+### 7.9 Validate Event Reviewer deployment
 
 Access the web interfaces to confirm successful deployment and functionality.
 
@@ -213,19 +236,27 @@ curl -I http://<NODE_IP>:7860
 
 Open these URLs in your browser:
 - `http://<NODE_IP>:7862` - CV UI to launch and monitor CV pipeline
-- `http://<NODE_IP>:7860` - Alert Inspector UI to view clips and verification results
+- `http://<NODE_IP>:7860` - Alert Inspector UI to view clips and review VLM results
 
-## Step 8. Option B - Standard VSS (Hybrid Deployment)
+## Step 8. Option B - [Standard VSS](https://docs.nvidia.com/vss/latest/content/architecture.html) (Hybrid Deployment)
 
-### Navigate to remote LLM deployment directory
+In this hybrid deployment, we would use NIMs from [build.nvidia.com](https://build.nvidia.com/). Alternatively, you can configure your own hosted endpoints by following the instructions in the [VSS remote deployment guide](https://docs.nvidia.com/vss/latest/content/installation-remote-docker-compose.html).
+
+### 8.1 Obtain Nvidia API Key
+
+- Log in to https://build.nvidia.com/explore/discover.
+- Navigate to any NIM for example, https://build.nvidia.com/meta/llama3-70b.
+- Search for **Get API Key** on the page and click on it.
+
+### 8.2 Navigate to remote LLM deployment directory
 
 ```bash
 cd deploy/docker/remote_llm_deployment/
 ```
 
-### Configure environment variables
+### 8.3 Configure environment variables
 
-Update the environment file with your API keys and deployment preferences.
+Update the environment file with your API keys and deployment preferences. You can do this by editing the `.env` file directly, or by running the following commands:
 
 ```bash
 ## Edit .env file with required keys
@@ -235,23 +266,32 @@ echo "DISABLE_CV_PIPELINE=true" >> .env  # Set to false to enable CV
 echo "INSTALL_PROPRIETARY_CODECS=false" >> .env  # Set to true to enable CV
 ```
 
-### Review model configuration
+### 8.4 Update the VSS Image path
 
-Verify that the config.yaml file contains the correct remote endpoints.
+Update `VIA_IMAGE` to `nvcr.io/nvidia/blueprint/vss-engine-sbsa:2.4.0` in `.env`.
+
+```bash
+## Edit the .env file and update VIA_IMAGE
+echo "VIA_IMAGE=nvcr.io/nvidia/blueprint/vss-engine-sbsa:2.4.0" >> .env
+```
+
+### 8.5 Review model configuration
+
+Verify that the config.yaml file contains the correct remote endpoints. For NIMs, it should be set to `https://integrate.api.nvidia.com/v1 `.
 
 ```bash
 ## Check model server endpoints in config.yaml
-cat config.yaml | grep -A 10 "model_server"
+cat config.yaml | grep -A 10 "model"
 ```
 
-### Launch Standard VSS deployment
+### 8.6 Launch Standard VSS deployment
 
 ```bash
 ## Start Standard VSS with hybrid deployment
 docker compose up
 ```
 
-### Validate Standard VSS deployment
+### 8.7 Validate Standard VSS deployment
 
 Access the VSS UI to confirm successful deployment.
 
@@ -268,10 +308,12 @@ Open `http://<NODE_IP>:9100` in your browser to access the VSS interface.
 Run a basic test to verify the video analysis pipeline is functioning based on your deployment.
 
 ### For Event Reviewer deployment
+Follow the steps [here](https://docs.nvidia.com/vss/latest/content/vss_event_reviewer.html#vss-alert-inspector-ui) to access and use the Event Reviewer workflow.
 - Access CV UI at `http://<NODE_IP>:7862` to upload and process videos
 - Monitor results in Alert Inspector UI at `http://<NODE_IP>:7860`
 
 ### For Standard VSS deployment
+Follow the steps [here](https://docs.nvidia.com/vss/latest/content/ui_app.html) to navigate VSS UI - File Summarization, Q&A, and Alerts.
 - Access VSS interface at `http://<NODE_IP>:9100`
 - Upload videos and test summarization features
 
@@ -293,9 +335,9 @@ To completely remove the VSS deployment and free up system resources.
 ```bash
 ## For Event Reviewer deployment
 cd deploy/docker/event_reviewer/
-docker compose down
+IS_SBSA=1 IS_AARCH64=1 ALERT_REVIEW_MEDIA_BASE_DIR=/tmp/alert-media-dir docker compose down
 cd ../../examples/cv-event-detector/
-docker compose down
+IS_SBSA=1 IS_AARCH64=1 ALERT_REVIEW_MEDIA_BASE_DIR=/tmp/alert-media-dir docker compose down
 
 ## For Standard VSS deployment
 cd deploy/docker/remote_llm_deployment/
@@ -315,7 +357,7 @@ With VSS deployed, you can now:
 
 **Event Reviewer deployment:**
 - Upload video files through the CV UI at port 7862
-- Monitor automated event detection and verification
+- Monitor automated event detection and reviewing
 - Review analysis results in the Alert Inspector UI at port 7860
 - Configure custom event detection rules and thresholds
 

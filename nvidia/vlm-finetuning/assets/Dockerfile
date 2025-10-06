@@ -157,9 +157,10 @@ RUN git clone https://github.com/triton-lang/triton.git && \
     cd ..
 
 # install xformers from source for blackwell support
-RUN git clone --depth=1 https://github.com/facebookresearch/xformers --recursive && \
+RUN git clone https://github.com/facebookresearch/xformers && \
     cd xformers && \
     git checkout 5146f2ab37b2163985c19fb4e8fbf6183e82f8ce && \
+    git submodule update --init --recursive && \
     export TORCH_CUDA_ARCH_LIST="12.1" && \
     python setup.py install && \
     cd ..
