@@ -119,6 +119,7 @@ From the root directory of the multi-agent-chatbot project, run the following co
 docker compose -f docker-compose.yml -f docker-compose-models.yml down
 
 docker volume rm "$(basename "$PWD")_postgres_data"
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 ```
 You can optionally run `docker volume prune` to remove all unused volumes at the end of the demo.
 > **Note**: If you do not execute these commands containers, will continue to run and take up memory.

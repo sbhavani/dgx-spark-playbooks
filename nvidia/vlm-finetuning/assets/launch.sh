@@ -20,7 +20,12 @@ docker run -it \
     --gpus=all \
     --net=host \
     --ipc=host \
-    -w $HOME \
-    -v $HOME:$HOME \
+    --ulimit memlock=-1 \
+    --ulimit stack=67108864 \
+    -e HOST_HOME=$HOME \
+    -e HOST_PWD=$(pwd) \
+    -v $(pwd):/vlm_finetuning \
     -v $HOME/.cache/huggingface:/root/.cache/huggingface \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v /usr/bin/docker:/usr/bin/docker \
     vlm_demo

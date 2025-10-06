@@ -18,11 +18,15 @@
 from unsloth import FastVisionModel
 
 import re
+import sys
 import yaml
+import shutil
+import signal
 
 from PIL import ImageFile
 from datasets import load_dataset
 from trl import GRPOConfig, GRPOTrainer
+from transformers.trainer_utils import get_last_checkpoint
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -37,7 +41,7 @@ def load_model_for_train(config):
     model, tokenizer = FastVisionModel.from_pretrained(
         model_name=config["model"]["model_id"],
         max_seq_length=config["model"]["max_seq_length"],
-        load_in_4bit=config["model"]["use_qlora"],
+        load_in_4bit=False,
     )
 
     model = FastVisionModel.get_peft_model(
@@ -152,8 +156,6 @@ def correctness_reward_func(prompts, completions, answer, **kwargs) -> list[floa
 
 
 def start_train(config):
-    # load base model for finetuning
-    model, tokenizer = load_model_for_train(config)
 
     # load dataset
     train_dataset = load_wildfire_dataset(config, tokenizer)
@@ -171,17 +173,17 @@ def start_train(config):
         log_completions=False,
         per_device_train_batch_size=config["hyperparameters"]["batch_size"],
         gradient_accumulation_steps=1, 
-        num_generations=2,
+        num_generations=config["hyperparameters"]["num_generations"],
         max_prompt_length=config["model"]["max_seq_length"],
         max_completion_length=config["model"]["max_seq_length"],
-        num_train_epochs=config["hyperparameters"]["epochs"],
-        save_steps=100,
+        max_steps=config["hyperparameters"]["steps"],
+        save_steps=3,
         max_grad_norm=0.1,
         report_to="none",
         output_dir=config["hyperparameters"]["output_dir"],
-        # importance_sampling_level="sequence",
-        # mask_truncated_completions=False,
-        # loss_type="dr_grpo",
+        importance_sampling_level="sequence",
+        mask_truncated_completions=False,
+        loss_type="dr_grpo",
     )
 
     # start training
@@ -197,8 +199,29 @@ def start_train(config):
     )
     trainer.train()
 
+    handle_termination(None, None)
+
+
+def handle_termination(signum, frame):
+    latest_checkpoint = get_last_checkpoint(config["hyperparameters"]["output_dir"])
+    if latest_checkpoint:
+        if config["model"]["use_lora"]:
+            print("Merging LoRA weights and saving the model")
+            shutil.rmtree(latest_checkpoint)
+            model.save_pretrained_merged(latest_checkpoint, tokenizer, save_method="merged_16bit")
+
+    sys.exit(0)
+
+
+signal.signal(signal.SIGTERM, handle_termination)
+signal.signal(signal.SIGINT, handle_termination)
+
+
 if __name__ == "__main__":
     with open("src/train.yaml", "r") as f:
         config = yaml.safe_load(f)
+
+    # load base model for finetuning
+    model, tokenizer = load_model_for_train(config)
 
     start_train(config)

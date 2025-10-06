@@ -94,6 +94,15 @@ For the provided prompt and random seed, the base Flux model generated the follo
   <figcaption>Base FLUX.1 model workflow without custom concept knowledge</figcaption>
 </figure>
 
+After playing around with the base model, you have 2 possible next steps.
+* If you already have fine-tuned LoRAs placed inside `models/loras/`, please skip to [Load the finetuned workflow](#52-load-the-finetuned-workflow) section.
+* If you wish to train a LoRA for your custom concepts, first make sure that the ComfyUI inference container is brought down before proceeding to train. You can bring it by interrupting the terminal with `Ctrl+C` keystroke.
+
+> **Note**: To clear out any extra occupied memory from your system, execute the following command after interrupting the ComfyUI server.
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
+
 ## 3. Dataset Preparation
 
 Let's prepare our dataset to perform Dreambooth LoRA finetuning on the FLUX.1-dev 12B model. However, if you wish to continue with the provided dataset of Toy Jensen and DGX Spark, feel free to skip to the [Training](#training) section. This dataset is a collection of public assets accessible via Google Images.
@@ -136,8 +145,6 @@ Now, let's modify the `flux_data/data.toml` file to reflect the concepts chosen.
 ## 4. Training
 
 ### 4.1 Build the docker image
-
-Make sure that the ComfyUI inference container is brought down before proceeding to train. You can bring it by interrupting the terminal with `Ctrl+C` keystroke.
 
 ```bash
 # Build the inference docker image

@@ -159,10 +159,25 @@ RUN git clone https://github.com/triton-lang/triton.git && \
 # install xformers from source for blackwell support
 RUN git clone --depth=1 https://github.com/facebookresearch/xformers --recursive && \
     cd xformers && \
+    git checkout 5146f2ab37b2163985c19fb4e8fbf6183e82f8ce && \
     export TORCH_CUDA_ARCH_LIST="12.1" && \
     python setup.py install && \
     cd ..
 # install unsloth without depedencies so we can build them from source
-RUN pip install unsloth unsloth_zoo bitsandbytes==0.48.0
+RUN pip install unsloth==2025.9.11 unsloth_zoo==2025.9.14 bitsandbytes==0.48.0
 
 CMD ["/bin/bash"]
+
+
+# docker run \
+#     --rm \
+#     --gpus=all \
+#     --ipc=host \
+#     --net=host \
+#     --ulimit memlock=-1 \
+#     --ulimit stack=67108864 \
+#     -w $(pwd) \
+#     -v $(pwd):$(pwd) \
+#     -v $HOME/.cache/huggingface:/root/.cache/huggingface \
+#     nvcr.io/nvidia/vllm:25.09-py3 \
+#     vllm serve "unsloth/Qwen2.5-VL-7B-Instruct" --port "8000" --served-model-name "base-model" --max-model-len 16384 --gpu-memory-utilization 0.3 --async-scheduling --enable_prefix_caching

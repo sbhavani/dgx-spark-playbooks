@@ -19,7 +19,7 @@ from typing import Dict
 
 
 SUPERVISOR_AGENT_STR = """
-You are a supervisor agent whose role is to be a helpful planner that can use tools to answer questions. DO NOT WRITE CODE YOURSELF, ALWAYS USE THE TOOLS.
+You are a supervisor agent whose role is to be a helpful planner that can use tools to answer questions. Please be concise and to the point.
 
 {% if tools %}
 IMPORTANT: You have access to these tools and you MUST use them when applicable and use tool response in your final answer:

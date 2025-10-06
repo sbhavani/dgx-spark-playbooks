@@ -474,7 +474,7 @@ class ChatAgent:
         config = {"configurable": {"thread_id": chat_id}}
 
         try:
-            existing_messages = await self.conversation_store.get_messages(chat_id, limit=10)
+            existing_messages = await self.conversation_store.get_messages(chat_id, limit=1)
             
             base_system_prompt = self.system_prompt
             if image_data:

@@ -15,7 +15,7 @@
 # limitations under the License.
 */
 import type React from "react";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import styles from "@/styles/QuerySection.module.css";
 import ReactMarkdown from 'react-markdown'; // NEW
 import remarkGfm from 'remark-gfm'; // NEW
@@ -188,22 +188,16 @@ export default function QuerySection({
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [showButtons, setShowButtons] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
-  const [inferenceStats, setInferenceStats] = useState({
-    tokensReceived: 0,
-    startTime: Date.now(),
-    tokensPerSecond: 0
-  });
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
   const [toolOutput, setToolOutput] = useState("");
   const [graphStatus, setGraphStatus] = useState("");
   const [isPinnedToolOutputVisible, setPinnedToolOutputVisible] = useState(false);
   const [isToolContentVisible, setIsToolContentVisible] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
   const firstTokenReceived = useRef(false);
+  const hasAssistantContent = useRef(false);
+  const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -212,15 +206,6 @@ export default function QuerySection({
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    if (!isStreaming) {
-      setInferenceStats(prev => ({
-        ...prev,
-        tokensReceived: 0,
-        startTime: 0
-      }));
-    }
-  }, [isStreaming]);
 
   useEffect(() => {
     const fetchSelectedSources = async () => {
@@ -276,9 +261,8 @@ export default function QuerySection({
             case "token": {
               if (!text) break;
               if (!firstTokenReceived.current) {
-                console.log('TTFT: ', new Date().toISOString());
                 firstTokenReceived.current = true;
-                setIsStreaming(false);
+                hasAssistantContent.current = true;
               }
               setResponse(prev => {
                 try {
@@ -310,9 +294,6 @@ export default function QuerySection({
             case "tool_end":
             case "node_end": {
               console.log(type, msg.data);
-              if (msg.data === 'generate') {
-                console.log('generate complete. time: ', new Date().toISOString());
-              }
               setGraphStatus("");
               break;
             }
@@ -342,7 +323,6 @@ export default function QuerySection({
     return () => {
       if (wsRef.current) {
         wsRef.current.close();
-        setIsStreaming(false);
       }
     };
   }, [currentChatId]);
@@ -361,70 +341,90 @@ export default function QuerySection({
   useEffect(() => {
     if (graphStatus) {
       setPinnedToolOutputVisible(true);
-    } else if (isPinnedToolOutputVisible) {
+      // Trigger fade-in on next tick
+      if (fadeTimeoutRef.current) {
+        clearTimeout(fadeTimeoutRef.current);
+      }
+      setFadeIn(false);
+      fadeTimeoutRef.current = setTimeout(() => setFadeIn(true), 10);
+    } else {
       // Delay hiding to allow fade-out
+      setFadeIn(false);
       const timeout = setTimeout(() => {
         setPinnedToolOutputVisible(false);
       }, 800); // match CSS transition duration
-      return () => clearTimeout(timeout);
+      return () => {
+        clearTimeout(timeout);
+        if (fadeTimeoutRef.current) {
+          clearTimeout(fadeTimeoutRef.current);
+        }
+      };
     }
-  }, [graphStatus, isPinnedToolOutputVisible]);
-
-  // Replace the effect for fade logic with this minimal version
-  useEffect(() => {
-    if (isPinnedToolOutputVisible && graphStatus) {
-      setFadeIn(false);
-      const t = setTimeout(() => setFadeIn(true), 10); // next tick for fade-in
-      return () => clearTimeout(t);
-    } else {
-      setFadeIn(false);
-    }
-  }, [isPinnedToolOutputVisible, graphStatus]);
-
-  // Cleanup image preview URL on unmount
-  useEffect(() => {
-    return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-    };
-  }, [imagePreview]);
+  }, [graphStatus]);
 
   const programmaticScroll = useRef(false);
   const scrollTimeout = useRef<number | null>(null);
+  const isUserScrollingRef = useRef(false);
+  const isNearBottomRef = useRef(true);
 
-
-  const handleDragEnter = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setIsDragging(true); };
-  const handleDragLeave = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setIsDragging(false); };
-  const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); };
-  
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-    
-    const files = Array.from(e.dataTransfer.files);
-    const imageFile = files.find(file => file.type.startsWith('image/'));
-    
-    if (imageFile) {
-      const previewUrl = URL.createObjectURL(imageFile);
-      setImagePreview(previewUrl);
-      
-      const formData = new FormData();
-      formData.append('image', imageFile);
-      formData.append('chat_id', currentChatId || '');
-      
-      try {
-        const response = await fetch('/api/upload-image', { method: 'POST', body: formData });
-        const result = await response.json();
-        setUploadedImage(result.image_id);
-      } catch (error) {
-        console.error('Error uploading image:', error);
-        URL.revokeObjectURL(previewUrl);
-        setImagePreview(null);
-      }
+  // Check if user is near the bottom of the chat
+  const checkScrollPosition = useCallback(() => {
+    if (chatContainerRef.current) {
+      const container = chatContainerRef.current;
+      const threshold = 100; // pixels from bottom
+      const isNear = container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+      isNearBottomRef.current = isNear;
     }
-  };
+  }, []);
+
+  // Handle scroll events to detect user scrolling
+  useEffect(() => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+
+    let scrollTimer: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      isUserScrollingRef.current = true;
+      checkScrollPosition();
+      
+      // Reset user scrolling flag after scroll stops
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        isUserScrollingRef.current = false;
+      }, 150);
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimer);
+    };
+  }, [checkScrollPosition]);
+
+  // Auto-scroll to bottom when response changes
+  useEffect(() => {
+    // Only scroll if we have assistant content and user hasn't manually scrolled away
+    if (!hasAssistantContent.current || isUserScrollingRef.current || !isNearBottomRef.current) {
+      return;
+    }
+
+    const scrollToBottom = () => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'end'
+        });
+      }
+      
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }
+    };
+
+    scrollToBottom();
+  }, [response]);
 
   const handleQuerySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -434,13 +434,11 @@ export default function QuerySection({
     setQuery("");
     setIsStreaming(true);
     firstTokenReceived.current = false;
+    hasAssistantContent.current = false;
 
     try {
-      console.log('sending uploaded image: ', uploadedImage, ' with query: ', currentQuery)
-      console.log('current time: ', new Date().toISOString());
       wsRef.current.send(JSON.stringify({
-        message: currentQuery,
-        image_id: uploadedImage
+        message: currentQuery
       }));
  
       setResponse(prev => {
@@ -455,14 +453,6 @@ export default function QuerySection({
           return prev + `\n\nHuman: ${currentQuery}\n\nAssistant: `;
         }
       });
-      
-      // NEW CODE
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-      setUploadedImage(null);
-      setImagePreview(null);
-      // NEW CODE
     } catch (error) {
       console.error("Error sending message:", error);
       setIsStreaming(false);
@@ -581,36 +571,7 @@ export default function QuerySection({
       </div>
       
       <form onSubmit={handleQuerySubmit} className={styles.inputContainer}>
-        {/* NEW CODE - Image preview moved to the left of inputWrapper */}
-        {imagePreview && (
-          <div className={styles.imagePreview}>
-            <img 
-              src={imagePreview} 
-              alt="Image preview" 
-              className={styles.previewImage}
-            />
-            <button 
-              className={styles.removeImageButton}
-              onClick={() => {
-                if (imagePreview) {
-                  URL.revokeObjectURL(imagePreview);
-                }
-                setUploadedImage(null);
-                setImagePreview(null);
-              }}
-            >
-              ✕
-            </button>
-          </div>
-        )}
-        {/* NEW CODE */}
-        <div 
-          className={`${styles.inputWrapper} ${isDragging ? styles.dragging : ''}`}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        >
+        <div className={styles.inputWrapper}>
           <textarea
             rows={1}
             value={query}
@@ -648,14 +609,10 @@ export default function QuerySection({
       <div className={styles.disclaimer}>
         This is a concept demo to showcase multiple models and MCP use. It is not optimized for performance. Developers can customize and further optimize it for performance.
         <br />
+        <span className={styles.info}>Note: If a response is cut short, please start a new chat to continue.</span>
+        <br />
         <span className={styles.warning}>Don't forget to shutdown docker containers at the end of the demo.</span>
       </div>
-      
-      {inferenceStats.tokensPerSecond > 0 && (
-        <div className={styles.inferenceStats}>
-          {inferenceStats.tokensPerSecond} tokens/sec
-        </div>
-      )}
     </div>
   );
 }

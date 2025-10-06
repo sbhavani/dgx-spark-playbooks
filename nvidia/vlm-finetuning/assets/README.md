@@ -26,18 +26,13 @@ docker build --build-arg HF_TOKEN=$HF_TOKEN -t vlm_demo .
 ### 2. Launch the Container
 
 ```bash
-# Run the container with GPU support
-docker run -it \
-    --gpus=all \
-    --net=host \
-    --ipc=host \
-    --ulimit memlock=-1 \
-    --ulimit stack=67108864 \
-    -v $(pwd):/vlm_finetuning \
-    -v $HOME/.cache/huggingface:/root/.cache/huggingface \
-    vlm_demo
+# Enter the correct directory for building the image
+cd vlm-finetuning/assets
 
-# Enter the mounted directory
+# Run the container with GPU support
+sh launch.sh
+
+# Enter the mounted directory within the container
 cd /vlm_finetuning
 ```
 

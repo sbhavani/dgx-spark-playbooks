@@ -105,9 +105,7 @@ Install the package in editable mode with metrics support for training evaluatio
 pip install -e ".[metrics]"
 ```
 
-## Step 5. Configure PyTorch for CUDA 12.9 (if needed)
-
-*If using standalone Python (skip if using Docker container)*
+## Step 5. Configure PyTorch for CUDA 12.9 (skip if using Docker container from Step 2)
 
 In a python virtual environment, uninstall existing PyTorch and reinstall with CUDA 12.9 support for ARM64 architecture.
 

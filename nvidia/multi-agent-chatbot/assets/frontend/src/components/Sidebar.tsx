@@ -165,7 +165,7 @@ export default function Sidebar({
   }, [refreshTrigger, fetchSources]);
 
   // Add function to fetch chat metadata
-  const fetchChatMetadata = async (chatId: string) => {
+  const fetchChatMetadata = useCallback(async (chatId: string) => {
     try {
       const response = await fetch(`/api/chat/${chatId}/metadata`);
       if (response.ok) {
@@ -178,7 +178,7 @@ export default function Sidebar({
     } catch (error) {
       console.error(`Error fetching metadata for chat ${chatId}:`, error);
     }
-  };
+  }, []);
 
   // Update fetchChats to also fetch metadata
   const fetchChats = useCallback(async () => {
@@ -201,7 +201,7 @@ export default function Sidebar({
     } finally {
       setIsLoadingChats(false);
     }
-  }, []);
+  }, [fetchChatMetadata]);
 
   // Fetch chats when history section is expanded
   useEffect(() => {
