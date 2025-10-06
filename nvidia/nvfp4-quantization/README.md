@@ -6,7 +6,7 @@
 
 - [Overview](#overview)
   - [NVFP4 on Blackwell](#nvfp4-on-blackwell)
-- [Desktop Access](#desktop-access)
+- [Instructions](#instructions)
 
 ---
 
@@ -71,7 +71,7 @@ huggingface-cli whoami
 
 **Rollback**: Remove the output directory and any pulled Docker images to restore original state.
 
-## Desktop Access
+## Instructions
 
 ## Step 1. Prepare the environment
 
