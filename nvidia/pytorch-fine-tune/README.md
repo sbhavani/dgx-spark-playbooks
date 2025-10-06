@@ -13,101 +13,74 @@
 
 ## Basic Idea
 
-This playbook guides you through setting up and using Pytorch for fine-tuning large language models and vision-language models on NVIDIA Spark devices. NeMo AutoModel provides GPU-accelerated, end-to-end training for Hugging Face models with native PyTorch support, enabling instant fine-tuning without conversion delays. The framework supports distributed training across single GPU to multi-node clusters, with optimized kernels and memory-efficient recipes specifically designed for ARM64 architecture and Blackwell GPU systems.
+This playbook guides you through setting up and using Pytorch for fine-tuning large language models on NVIDIA Spark devices.
 
 ## What you'll accomplish
 
-You'll establish a complete fine-tuning environment for large language models (1-70B parameters) and vision-language models using NeMo AutoModel on your NVIDIA Spark device. By the end, you'll have a working installation that supports parameter-efficient fine-tuning (PEFT), supervised fine-tuning (SFT), and distributed training capabilities with FP8 precision optimizations, all while maintaining compatibility with the Hugging Face ecosystem.
-
+You'll establish a complete fine-tuning environment for large language models (1-70B parameters) on your NVIDIA Spark device. By the end, you'll have a working installation that supports parameter-efficient fine-tuning (PEFT) and supervised fine-tuning (SFT)
 ## What to know before starting
 
 
 
 ## Prerequisites
-
+recipes are specifically for DIGITS SPARK. Please make sure that OS and drivers are latest.
 
 
 ## Ancillary files
 
-
+ALl files required for finetuning are included.
 
 ## Time & risk
 
-**Time estimate:** 
+**Time estimate:** 30-45 mins for setup and runing finetuning. Finetuning run time varies depending on model size 
 
-**Risks:** Model downloads can be large (several GB), ARM64 package compatibility issues may require troubleshooting, distributed training setup complexity increases with multi-node configurations
+**Risks:** Model downloads can be large (several GB), ARM64 package compatibility issues may require troubleshooting.
 
 **Rollback:**
 
 ## Instructions
 
-## Step 1. Verify system requirements
-
-Check your NVIDIA Spark device meets the prerequisites for NeMo AutoModel installation. This step runs on the host system to confirm CUDA toolkit availability and Python version compatibility.
+## Step 1.  Pull the latest Pytorch container
 
 ```bash
-## Verify CUDA installation
-nvcc --version
-
-## Verify GPU accessibility
-nvidia-smi
-
-## Check available system memory
-free -h
+docker pull nvcr.io/nvidia/pytorch:25.09-py3
 ```
 
-## Step 2. Get the container image
+## Step 2. Launch Docker
 
 ```bash
-docker pull nvcr.io/nvidia/pytorch:25.08-py3
+docker run --gpus all -it --rm --ipc=host \
+-v $HOME/.cache/huggingface:/root/.cache/huggingface \
+-v ${PWD}:/workspace -w /workspace \
+nvcr.io/nvidia/pytorch:25.09-py3
+
 ```
 
-## Step 3. Launch Docker
+## Step 3. Install dependencies inside the contianer
 
 ```bash
-docker run \
-  --gpus all \
-  --ulimit memlock=-1 \
-  -it --ulimit stack=67108864 \
-  --entrypoint /usr/bin/bash \
-  --rm nvcr.io/nvidia/pytorch:25.08-py3
+pip install transformers peft datasets "trl==0.19.1" "bitsandbytes==0.48"
 ```
 
-
-
-
-
-## Step 10. Troubleshooting
-
-Common issues and solutions for NeMo AutoModel setup on NVIDIA Spark devices.
-
-| Symptom | Cause | Fix |
-|---------|--------|-----|
-| `nvcc: command not found` | CUDA toolkit not in PATH | Add CUDA toolkit to PATH: `export PATH=/usr/local/cuda/bin:$PATH` |
-| `pip install uv` permission denied | System-level pip restrictions | Use `pip3 install --user uv` and update PATH |
-| GPU not detected in training | CUDA driver/runtime mismatch | Verify driver compatibility: `nvidia-smi` and reinstall CUDA if needed |
-| Out of memory during training | Model too large for available GPU memory | Reduce batch size, enable gradient checkpointing, or use model parallelism |
-| ARM64 package compatibility issues | Package not available for ARM architecture | Use source installation or build from source with ARM64 flags |
-
-## Step 11. Cleanup and rollback
-
-Remove the installation and restore the original environment if needed. These commands safely remove all installed components.
-
-> **Warning:** This will delete all virtual environments and downloaded models. Ensure you have backed up any important training checkpoints.
+## Step 4: authenticate with huggingface
 
 ```bash
-## Remove virtual environment
-rm -rf .venv
+huggingface-cli login
+##<input your huggingface token.
+##<Enter n for git credential>
 
-## Remove cloned repository
-cd ..
-rm -rf Automodel
+```
+To run LoRA on Llama3 use the following command:
 
-## Remove uv (if installed with --user)
-pip3 uninstall uv
-
-## Clear Python cache
-rm -rf ~/.cache/pip
+```bash
+python Llama3_8B_LoRA_finetuning.py
 ```
 
-## Step 12. Next steps
+To run qLoRA finetuning on llama3-70B use the following command:
+```bash
+python Llama3_70B_qLoRA_finetuning.py
+```
+To run full finetuning on llama3-3B use the following command:
+```bash
+python Llama3_3B_full_finetuning.py
+```
