@@ -11,12 +11,13 @@
 
 ## Overview
 
-## Basic Idea
+## Basic idea
 
-This playbook shows you how to use DGX Spark to prototype, build and deploy a fully local multi-agent system. 
+This playbook shows you how to use DGX Spark to prototype, build, and deploy a fully local multi-agent system. 
 With 128GB of unified memory, DGX Spark can run multiple LLMs and VLMs in parallel — enabling interactions across agents.
 
-At the core is a supervisor agent powered by gpt-oss-120B, orchestrating specialized downstream agents for coding, retrieval-augmented generation (RAG), and image understanding. Thanks to DGX Spark's out-of-the-box support for popular AI frameworks and libraries, development and prototyping were fast and frictionless. 
+At the core is a supervisor agent powered by gpt-oss-120B, orchestrating specialized downstream agents for coding, retrieval-augmented generation (RAG), and image understanding. 
+Thanks to DGX Spark's out-of-the-box support for popular AI frameworks and libraries, development and prototyping are fast and frictionless. 
 Together, these components demonstrate how complex, multimodal workflows can be executed efficiently on local, high-performance hardware.
 
 ## What you'll accomplish
@@ -41,11 +42,13 @@ The setup includes:
 
 ## Time & risk
 
+**Estimated time**: 30 minutes to an hour
+
 **Risks**:
 - Docker permission issues may require user group changes and session restart
 - Setup includes downloading model files for gpt-oss-120B (~63GB), Deepseek-Coder:6.7B-Instruct (~7GB) and Qwen3-Embedding-4B (~4GB), which may take between 30 minutes to 2 hours depending on network speed
 
-**Rollback**: Stop and remove Docker containers using provided cleanup commands
+**Rollback**: Stop and remove Docker containers using provided cleanup commands.
 
 ## Instructions
 
@@ -94,7 +97,7 @@ This may take between 30 minutes to 2 hours depending on network speed.
 ```bash
   docker compose -f docker-compose.yml -f docker-compose-models.yml up -d --build
 ```
-This step builds the base llama cpp server image and starts all the required docker services to serve models, the backend API server as well as the frontend UI. 
+This step builds the base llama.cpp server image and starts all the required docker services to serve models, the backend API server as well as the frontend UI. 
 This step can take 10 to 20 minutes depending on network speed.
 Wait for all the containers to become ready and healthy.
 
@@ -106,7 +109,7 @@ watch 'docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Status}}"'
 
 Open your browser and go to: http://localhost:3000
 
-> **Note**: If you are running this on a remote GPU via an ssh connection, in a new terminal window, you need to run the following command to be able to access the UI at localhost:3000 and for the UI to be able to communicate to the backend at localhost:8000.
+> **Note**: If you are running this on a remote GPU via an SSH connection, in a new terminal window, you need to run the following command to be able to access the UI at localhost:3000 and for the UI to be able to communicate to the backend at localhost:8000.
 
 >```ssh -L 3000:localhost:3000 -L 8000:localhost:8000  username@IP-address```
 
@@ -115,7 +118,8 @@ Open your browser and go to: http://localhost:3000
 Click on any of the tiles on the frontend to try out the supervisor and the other agents.
 
 **RAG Agent**:
-Before trying out the example prompt for the RAG agent, upload the example PDF document [NVIDIA Blackwell Whitepaper](https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf) as context by going to the link, downloading the PDF to the local filesystem, clicking on the green "Upload Documents" button in the left sidebar under "Context" and then make sure to check the box in the "Select Sources" section.
+Before trying out the example prompt for the RAG agent, upload the example PDF document [NVIDIA Blackwell Whitepaper](https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf) 
+as context by going to the link, downloading the PDF to the local filesystem, clicking on the green "Upload Documents" button in the left sidebar under "Context", and then make sure to check the box in the "Select Sources" section.
 
 ## Step 8. Cleanup and rollback
 
