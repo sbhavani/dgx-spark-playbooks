@@ -45,6 +45,7 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [Stack two Sparks](nvidia/stack-sparks/)
 - [Setup Tailscale on your Spark](nvidia/tailscale/)
 - [TRT LLM for Inference](nvidia/trt-llm/)
+- [Text to Knowledge Graph](nvidia/txt2kg/)
 - [Unsloth on DGX Spark](nvidia/unsloth/)
 - [Install and use vLLM](nvidia/vllm/)
 - [Vision-Language Model Fine-tuning](nvidia/vlm-finetuning/)
