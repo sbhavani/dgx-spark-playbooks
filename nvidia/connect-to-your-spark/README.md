@@ -60,11 +60,8 @@ applications, and manage your DGX Spark remotely from your laptop.
 - Your laptop and DGX Spark are on the same network
 - You have your DGX Spark username and password
 - You have your device's mDNS hostname (printed on quick start guide) or IP address
-- For the manual SSH approach, SSH client available:
 
-  ```bash
-  ssh -V
-  ```
+
 
 ## Time & risk
 
