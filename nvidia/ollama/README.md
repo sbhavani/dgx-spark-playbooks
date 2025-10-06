@@ -6,7 +6,6 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
-- [Access with NVIDIA Sync](#access-with-nvidia-sync)
 
 ---
 
@@ -230,7 +229,3 @@ Monitor GPU and system usage during inference using the DGX Dashboard available 
 
 Build applications using the Ollama API by integrating with your preferred programming language's
 HTTP client libraries.
-
-## Access with NVIDIA Sync
-
-## Step 1. (DRAFT)
