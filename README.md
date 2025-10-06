@@ -22,7 +22,7 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 ### NVIDIA
 
 - [Comfy UI](nvidia/comfy-ui/)
-- [Connect to your Spark](nvidia/connect-to-your-spark/)
+- [Connect to Your Spark](nvidia/connect-to-your-spark/)
 - [DGX Dashboard](nvidia/dgx-dashboard/)
 - [FLUX.1 Dreambooth LoRA Fine-tuning](nvidia/flux-finetuning/)
 - [Optimized JAX](nvidia/jax/)
