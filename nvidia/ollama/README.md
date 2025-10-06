@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
+- [Access with NVIDIA Sync](#access-with-nvidia-sync)
 
 ---
 
@@ -35,9 +36,12 @@ the powerful GPU capabilities of your Spark device without complex network confi
 
 ## Prerequisites
 
-- DGX Spark device set up and connected to your network
-- NVIDIA Sync installed and connected to your Spark
-- Terminal access to your local machine for testing API calls
+- [ ] DGX Spark device set up and connected to your network
+  - Verify with: `nvidia-smi` (should show Blackwell GPU information)
+- [ ] NVIDIA Sync installed and connected to your Spark
+  - Verify connection status in NVIDIA Sync system tray application
+- [ ] Terminal access to your local machine for testing API calls
+  - Verify with: `curl --version`
 
 
 
@@ -229,3 +233,7 @@ Monitor GPU and system usage during inference using the DGX Dashboard available 
 
 Build applications using the Ollama API by integrating with your preferred programming language's
 HTTP client libraries.
+
+## Access with NVIDIA Sync
+
+## Step 1. (DRAFT)

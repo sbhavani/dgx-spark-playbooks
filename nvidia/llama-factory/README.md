@@ -5,20 +5,36 @@
 ## Table of Contents
 
 - [Overview](#overview)
+  - [What you'll accomplish](#what-youll-accomplish)
+  - [What to know before starting](#what-to-know-before-starting)
+  - [Prerequisites](#prerequisites)
+  - [Ancillary files](#ancillary-files)
+  - [Time & risk](#time-risk)
 - [Instructions](#instructions)
+  - [Step 1. Verify system prerequisites](#step-1-verify-system-prerequisites)
+  - [Step 2. Launch PyTorch container with GPU support](#step-2-launch-pytorch-container-with-gpu-support)
+  - [Step 3. Clone LLaMA Factory repository](#step-3-clone-llama-factory-repository)
   - [Step 4. Install LLaMA Factory with dependencies](#step-4-install-llama-factory-with-dependencies)
+  - [Step 5. Configure PyTorch for CUDA 12.9 (if needed)](#step-5-configure-pytorch-for-cuda-129-if-needed)
+  - [Step 6. Prepare training configuration](#step-6-prepare-training-configuration)
+  - [Step 7. Launch fine-tuning training](#step-7-launch-fine-tuning-training)
+  - [Step 8. Validate training completion](#step-8-validate-training-completion)
+  - [Step 9. Test inference with fine-tuned model](#step-9-test-inference-with-fine-tuned-model)
+  - [Step 10. Troubleshooting](#step-10-troubleshooting)
+  - [Step 11. Cleanup and rollback](#step-11-cleanup-and-rollback)
+  - [Step 12. Next steps](#step-12-next-steps)
 
 ---
 
 ## Overview
 
-## What you'll accomplish
+### What you'll accomplish
 
 You'll set up LLaMA Factory on NVIDIA Spark with Blackwell architecture to fine-tune large 
 language models using LoRA, QLoRA, and full fine-tuning methods. This enables efficient 
 model adaptation for specialized domains while leveraging hardware-specific optimizations.
 
-## What to know before starting
+### What to know before starting
 
 - Basic Python knowledge for editing config files and troubleshooting
 - Command line usage for running shell commands and managing environments  
@@ -28,7 +44,7 @@ model adaptation for specialized domains while leveraging hardware-specific opti
 - Dataset preparation: formatting text data into JSON structure for instruction tuning
 - Resource management: adjusting batch size and memory settings for GPU constraints
 
-## Prerequisites
+### Prerequisites
 
 - NVIDIA Spark device with Blackwell architecture
 
@@ -44,7 +60,7 @@ model adaptation for specialized domains while leveraging hardware-specific opti
 
 - Internet connection for downloading models from Hugging Face Hub
 
-## Ancillary files
+### Ancillary files
 
 - Official LLaMA Factory repository: https://github.com/hiyouga/LLaMA-Factory
 
@@ -54,7 +70,7 @@ model adaptation for specialized domains while leveraging hardware-specific opti
 
 - Documentation: https://llamafactory.readthedocs.io/en/latest/getting_started/data_preparation.html
 
-## Time & risk
+### Time & risk
 
 **Duration:** 30-60 minutes for initial setup, 1-7 hours for training depending on model size
 and dataset.
@@ -67,7 +83,7 @@ saved locally and can be deleted to reclaim storage space.
 
 ## Instructions
 
-## Step 1. Verify system prerequisites
+### Step 1. Verify system prerequisites
 
 Check that your NVIDIA Spark system has the required components installed and accessible.
 
@@ -79,7 +95,7 @@ python --version
 git --version
 ```
 
-## Step 2. Launch PyTorch container with GPU support
+### Step 2. Launch PyTorch container with GPU support
 
 Start the NVIDIA PyTorch container with GPU access and mount your workspace directory.
 > **Note:** This NVIDIA PyTorch container supports CUDA 13
@@ -88,7 +104,7 @@ Start the NVIDIA PyTorch container with GPU access and mount your workspace dire
 docker run --gpus all --ipc=host --ulimit memlock=-1 -it --ulimit stack=67108864 --rm -v "$PWD":/workspace nvcr.io/nvidia/pytorch:25.08-py3 bash
 ```
 
-## Step 3. Clone LLaMA Factory repository
+### Step 3. Clone LLaMA Factory repository
 
 Download the LLaMA Factory source code from the official repository.
 
@@ -105,7 +121,9 @@ Install the package in editable mode with metrics support for training evaluatio
 pip install -e ".[metrics]"
 ```
 
-## Step 5. Configure PyTorch for CUDA 12.9 (skip if using Docker container from Step 2)
+### Step 5. Configure PyTorch for CUDA 12.9 (if needed)
+
+#### If using standalone Python (skip if using Docker container)
 
 In a python virtual environment, uninstall existing PyTorch and reinstall with CUDA 12.9 support for ARM64 architecture.
 
@@ -114,7 +132,7 @@ pip uninstall torch torchvision torchaudio
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu129
 ```
 
-*If using Docker container*
+#### If using Docker container
 
 PyTorch is pre-installed with CUDA support. Verify installation:
 
@@ -122,7 +140,7 @@ PyTorch is pre-installed with CUDA support. Verify installation:
 python -c "import torch; print(f'PyTorch: {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
 ```
 
-## Step 6. Prepare training configuration
+### Step 6. Prepare training configuration
 
 Examine the provided LoRA fine-tuning configuration for Llama-3.
 
@@ -130,7 +148,7 @@ Examine the provided LoRA fine-tuning configuration for Llama-3.
 cat examples/train_lora/llama3_lora_sft.yaml
 ```
 
-## Step 7. Launch fine-tuning training
+### Step 7. Launch fine-tuning training
 
 > **Note:** Login to your hugging face hub to download the model if the model is gated
 Execute the training process using the pre-configured LoRA setup.
@@ -152,7 +170,7 @@ Example output:
 Figure saved at: saves/llama3-8b/lora/sft/training_loss.png
 ```
 
-## Step 8. Validate training completion
+### Step 8. Validate training completion
 
 Verify that training completed successfully and checkpoints were saved.
 
@@ -168,7 +186,7 @@ Expected output should show:
 - Training metrics showing decreasing loss values
 - Training loss plot saved as PNG file
 
-## Step 9. Test inference with fine-tuned model
+### Step 9. Test inference with fine-tuned model
 
 Run a simple inference test to verify the fine-tuned model loads correctly.
 
@@ -176,7 +194,7 @@ Run a simple inference test to verify the fine-tuned model loads correctly.
 llamafactory-cli chat examples/inference/llama3_lora_sft.yaml
 ```
 
-## Step 10. Troubleshooting
+### Step 10. Troubleshooting
 
 | Symptom | Cause | Fix |
 |---------|--------|-----|
@@ -184,7 +202,7 @@ llamafactory-cli chat examples/inference/llama3_lora_sft.yaml
 | Model download fails or is slow | Network connectivity or Hugging Face Hub issues | Check internet connection, try using `HF_HUB_OFFLINE=1` for cached models |
 | Training loss not decreasing | Learning rate too high/low or insufficient data | Adjust `learning_rate` parameter or check dataset quality |
 
-## Step 11. Cleanup and rollback
+### Step 11. Cleanup and rollback
 
 > **Warning:** This will delete all training progress and checkpoints.
 
@@ -202,7 +220,7 @@ exit  # Exit container
 docker container prune -f
 ```
 
-## Step 12. Next steps
+### Step 12. Next steps
 
 Test your fine-tuned model with custom prompts:
 

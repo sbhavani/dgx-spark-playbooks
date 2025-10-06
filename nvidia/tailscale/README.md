@@ -51,13 +51,13 @@ all traffic automatically encrypted and NAT traversal handled transparently.
 
 ## Prerequisites
 
-- NVIDIA Spark device running Ubuntu (ARM64/AArch64)
-- Client device (Mac, Windows, or Linux) for remote access
-- Internet connectivity on both devices
-- Valid email account for Tailscale authentication (Google, GitHub, Microsoft)
-- SSH server availability check: `systemctl status ssh`
-- Package manager working: `sudo apt update`
-- User account with sudo privileges on Spark device
+- [ ] NVIDIA Spark device running Ubuntu (ARM64/AArch64)
+- [ ] Client device (Mac, Windows, or Linux) for remote access
+- [ ] Internet connectivity on both devices
+- [ ] Valid email account for Tailscale authentication (Google, GitHub, Microsoft)
+- [ ] SSH server availability check: `systemctl status ssh`
+- [ ] Package manager working: `sudo apt update`
+- [ ] User account with sudo privileges on Spark device
 
 ## Time & risk
 

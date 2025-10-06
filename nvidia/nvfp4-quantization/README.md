@@ -40,11 +40,11 @@ inside a TensorRT-LLM container, producing an NVFP4 quantized model for deployme
 
 ## Prerequisites
 
-- NVIDIA Spark device with Blackwell architecture GPU
-- Docker installed with GPU support
-- NVIDIA Container Toolkit configured
-- At least 32GB of available storage for model files and outputs
-- Hugging Face account with access to the target model
+- [ ] NVIDIA Spark device with Blackwell architecture GPU
+- [ ] Docker installed with GPU support
+- [ ] NVIDIA Container Toolkit configured
+- [ ] At least 32GB of available storage for model files and outputs
+- [ ] Hugging Face account with access to the target model
 
 Verify your setup:
 ```bash

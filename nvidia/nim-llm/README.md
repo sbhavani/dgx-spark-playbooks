@@ -1,6 +1,6 @@
 # Use a NIM on Spark
 
-> Run an LLM NIM on Spark
+> Run a NIM on Spark
 
 ## Table of Contents
 
@@ -40,19 +40,19 @@ completions.
 
 ### Prerequisites
 
-- DGX Spark device with NVIDIA drivers installed
+- [ ] DGX Spark device with NVIDIA drivers installed
   ```bash
   nvidia-smi
   ```
-- Docker with NVIDIA Container Toolkit configured, instructions here: https://******.nvidia.com/dgx-docs/review/621/dgx-spark/latest/nvidia-container-runtime-for-docker.html
+- [ ] Docker with NVIDIA Container Toolkit configured, instructions here: https://******.nvidia.com/dgx-docs/review/621/dgx-spark/latest/nvidia-container-runtime-for-docker.html
   ```bash
   docker run -it --gpus=all nvcr.io/nvidia/cuda:13.0.1-devel-ubuntu24.04 nvidia-smi
   ```
-- NGC account with API key from https://ngc.nvidia.com/setup/api-key
+- [ ] NGC account with API key from https://ngc.nvidia.com/setup/api-key
   ```bash
   echo $NGC_API_KEY | grep -E '^[a-zA-Z0-9]{86}=='
   ```
-- Sufficient disk space for model caching (varies by model, typically 10-50GB)
+- [ ] Sufficient disk space for model caching (varies by model, typically 10-50GB)
   ```bash
   df -h ~
   ```

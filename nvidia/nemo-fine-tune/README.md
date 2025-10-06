@@ -35,22 +35,22 @@ You'll establish a complete fine-tuning environment for large language models (1
 
 ## Prerequisites
 
-- NVIDIA Spark device with Blackwell architecture GPU access
-- CUDA toolkit 12.0+ installed and configured
+- [ ] NVIDIA Spark device with Blackwell architecture GPU access
+- [ ] CUDA toolkit 12.0+ installed and configured
   ```bash
   nvcc --version
   ```
-- Python 3.10+ environment available
+- [ ] Python 3.10+ environment available
   ```bash
   python3 --version
   ```
-- Minimum 32GB system RAM for efficient model loading and training
-- Active internet connection for downloading models and packages
-- Git installed for repository cloning
+- [ ] Minimum 32GB system RAM for efficient model loading and training
+- [ ] Active internet connection for downloading models and packages
+- [ ] Git installed for repository cloning
   ```bash
   git --version
   ```
-- SSH access to your NVIDIA Spark device configured
+- [ ] SSH access to your NVIDIA Spark device configured
 
 ## Ancillary files
 

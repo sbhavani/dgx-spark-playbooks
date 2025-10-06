@@ -35,14 +35,14 @@ FP8, FP4).
 
 ## Prerequisites
 
-- NVIDIA Spark device with Blackwell GPU architecture
-- Docker installed and accessible to current user
-- NVIDIA Container Runtime configured
-- Hugging Face account with valid token
-- At least 48GB VRAM available for FP16 Flux.1 Schnell operations
-- Verify GPU access: `nvidia-smi`
-- Check Docker GPU integration: `docker run --rm --gpus all nvidia/cuda:12.0-base-ubuntu20.04 nvidia-smi`
-- Confirm HF token access with permissions to FLUX repos: `echo $HF_TOKEN`, Sign in to your huggingface account You can create the token from create your token here (make sure you provide permissions to the token): https://huggingface.co/settings/tokens , Note the permissions to be checked and the repos: black-forest-labs/FLUX.1-dev and black-forest-labs/FLUX.1-dev-onnx (search for these repos when creating the user token) to be added.
+- [ ] NVIDIA Spark device with Blackwell GPU architecture
+- [ ] Docker installed and accessible to current user
+- [ ] NVIDIA Container Runtime configured
+- [ ] Hugging Face account with valid token
+- [ ] At least 48GB VRAM available for FP16 Flux.1 Schnell operations
+- [ ] Verify GPU access: `nvidia-smi`
+- [ ] Check Docker GPU integration: `docker run --rm --gpus all nvidia/cuda:12.0-base-ubuntu20.04 nvidia-smi`
+- [ ] Confirm HF token access with permissions to FLUX repos: `echo $HF_TOKEN`, Sign in to your huggingface account You can create the token from create your token here (make sure you provide permissions to the token): https://huggingface.co/settings/tokens , Note the permissions to be checked and the repos: black-forest-labs/FLUX.1-dev and black-forest-labs/FLUX.1-dev-onnx (search for these repos when creating the user token) to be added.
 
 ## Ancillary files
 

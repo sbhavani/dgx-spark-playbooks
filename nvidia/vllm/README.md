@@ -5,9 +5,9 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Instructions](#instructions)
 - [Run on two Sparks](#run-on-two-sparks)
   - [Step 14. (Optional) Launch 405B inference server](#step-14-optional-launch-405b-inference-server)
+- [Access through terminal](#access-through-terminal)
 
 ---
 
@@ -29,14 +29,14 @@ support for ARM64.
 
 ## Prerequisites
 
-- DGX Spark device with ARM64 processor and Blackwell GPU architecture
-- CUDA 12.9 or CUDA 13.0 toolkit installed: `nvcc --version` shows CUDA toolkit version.  
-- Docker installed and configured: `docker --version` succeeds
-- NVIDIA Container Toolkit installed
-- Python 3.12 available: `python3.12 --version` succeeds
-- Git installed: `git --version` succeeds
-- Network access to download packages and container images
-
+- [ ] DGX Spark device with ARM64 processor and Blackwell GPU architecture
+- [ ] CUDA 12.9 or CUDA 13.0 toolkit installed: `nvcc --version` shows CUDA toolkit version.  
+- [ ] Docker installed and configured: `docker --version` succeeds
+- [ ] NVIDIA Container Toolkit installed
+- [ ] Python 3.12 available: `python3.12 --version` succeeds
+- [ ] Git installed: `git --version` succeeds
+- [ ] Network access to download packages and container images
+- [ ] > TODO: Verify memory and storage requirements for builds
 
 ## Time & risk
 
@@ -45,77 +45,6 @@ support for ARM64.
 **Risks:** Container registry access requires internal credentials
 
 **Rollback:** Container approach is non-destructive.
-
-## Instructions
-
-## Step 1. Pull vLLM container image 
-
-Find the latest container build from https://catalog.ngc.nvidia.com/orgs/nvidia/containers/vllm?version=25.09-py3
-```
-docker pull nvcr.io/nvidia/vllm:25.09-py3
-```
-
-## Step 2. Test vLLM in container
-
-Launch the container and start vLLM server with a test model to verify basic functionality.
-
-```bash
-docker run -it --gpus all -p 8000:8000 \
-nvcr.io/nvidia/vllm:25.09-py3 \
-vllm serve "Qwen/Qwen2.5-Math-1.5B-Instruct"
-```
-
-Expected output should include:
-- Model loading confirmation
-- Server startup on port 8000
-- GPU memory allocation details
-
-In another terminal, test the server:
-
-```bash
-curl http://localhost:8000/v1/chat/completions \
--H "Content-Type: application/json" \
--d '{
-    "model": "Qwen/Qwen2.5-Math-1.5B-Instruct",
-    "messages": [{"role": "user", "content": "12*17"}],
-    "max_tokens": 500
-}'
-```
-
-Expected response should contain `"content": "204"` or similar mathematical calculation.
-
-## Step 3. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|--------|-----|
-| CUDA version mismatch errors | Wrong CUDA toolkit version | Reinstall CUDA 12.9 using exact installer |
-| Container registry authentication fails | Invalid or expired GitLab token | Generate new auth token |
-| SM_121a architecture not recognized | Missing LLVM patches | Verify SM_121a patches applied to LLVM source |
-| Reduce MAX_JOBS to 1-2, add swap space |
-| Environment variables not set |
-
-## Step 4. Cleanup and rollback
-
-For container approach (non-destructive):
-
-```bash
-docker rm $(docker ps -aq --filter ancestor=******:5005/dl/dgx/vllm*)
-docker rmi ******:5005/dl/dgx/vllm:main-py3.31165712-devel
-```
-
-
-To remove CUDA 12.9:
-
-```bash
-sudo /usr/local/cuda-12.9/bin/cuda-uninstaller
-```
-
-## Step 5. Next steps
-
-- **Production deployment:** Configure vLLM with your specific model requirements
-- **Performance tuning:** Adjust batch sizes and memory settings for your workload  
-- **Monitoring:** Set up logging and metrics collection for production use
-- **Model management:** Explore additional model formats and quantization options
 
 ## Run on two Sparks
 
@@ -381,3 +310,74 @@ http://192.168.100.10:8265
 ## - Persistent model caching across restarts
 ## - Alternative quantization methods (FP8, INT4)
 ```
+
+## Access through terminal
+
+## Step 1. Pull vLLM container image 
+
+Find the latest container build from https://catalog.ngc.nvidia.com/orgs/nvidia/containers/vllm?version=25.09-py3
+```
+docker pull nvcr.io/nvidia/vllm:25.09-py3
+```
+
+## Step 2. Test vLLM in container
+
+Launch the container and start vLLM server with a test model to verify basic functionality.
+
+```bash
+docker run -it --gpus all -p 8000:8000 \
+nvcr.io/nvidia/vllm:25.09-py3 \
+vllm serve "Qwen/Qwen2.5-Math-1.5B-Instruct"
+```
+
+Expected output should include:
+- Model loading confirmation
+- Server startup on port 8000
+- GPU memory allocation details
+
+In another terminal, test the server:
+
+```bash
+curl http://localhost:8000/v1/chat/completions \
+-H "Content-Type: application/json" \
+-d '{
+    "model": "Qwen/Qwen2.5-Math-1.5B-Instruct",
+    "messages": [{"role": "user", "content": "12*17"}],
+    "max_tokens": 500
+}'
+```
+
+Expected response should contain `"content": "204"` or similar mathematical calculation.
+
+## Step 3. Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| CUDA version mismatch errors | Wrong CUDA toolkit version | Reinstall CUDA 12.9 using exact installer |
+| Container registry authentication fails | Invalid or expired GitLab token | Generate new auth token |
+| SM_121a architecture not recognized | Missing LLVM patches | Verify SM_121a patches applied to LLVM source |
+| Reduce MAX_JOBS to 1-2, add swap space |
+| Environment variables not set |
+
+## Step 4. Cleanup and rollback
+
+For container approach (non-destructive):
+
+```bash
+docker rm $(docker ps -aq --filter ancestor=******:5005/dl/dgx/vllm*)
+docker rmi ******:5005/dl/dgx/vllm:main-py3.31165712-devel
+```
+
+
+To remove CUDA 12.9:
+
+```bash
+sudo /usr/local/cuda-12.9/bin/cuda-uninstaller
+```
+
+## Step 5. Next steps
+
+- **Production deployment:** Configure vLLM with your specific model requirements
+- **Performance tuning:** Adjust batch sizes and memory settings for your workload  
+- **Monitoring:** Set up logging and metrics collection for production use
+- **Model management:** Explore additional model formats and quantization options
