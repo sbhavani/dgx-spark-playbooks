@@ -1,0 +1,140 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: deploy/app/Dockerfile
+    ports:
+      - '3001:3000'
+    environment:
+      - ARANGODB_URL=http://arangodb:8529
+      - ARANGODB_DB=txt2kg
+      - PINECONE_HOST=entity-embeddings
+      - PINECONE_PORT=5081
+      - PINECONE_API_KEY=pclocal
+      - PINECONE_ENVIRONMENT=local
+      - LANGCHAIN_TRACING_V2=true
+      - SENTENCE_TRANSFORMER_URL=http://sentence-transformers:80
+      - MODEL_NAME=all-MiniLM-L6-v2
+      - GRPC_SSL_CIPHER_SUITES=HIGH+ECDSA:HIGH+aRSA
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      # - XAI_API_KEY=${XAI_API_KEY}  # xAI integration removed
+      - OLLAMA_BASE_URL=http://ollama:11434/v1
+      - OLLAMA_MODEL=qwen3:1.7b
+      - S3_ENDPOINT=http://minio:9000
+      - S3_REGION=us-east-1
+      - S3_BUCKET=txt2kg
+      - S3_ACCESS_KEY=minioadmin
+      - S3_SECRET_KEY=minioadmin
+    networks:
+      - pinecone-net
+      - s3-net
+      - default
+    depends_on:
+      - arangodb
+      - entity-embeddings
+      - sentence-transformers
+      - minio
+
+  arangodb:
+    image: arangodb:latest
+    ports:
+      - '8529:8529'
+    environment:
+      - ARANGO_NO_AUTH=1
+    volumes:
+      - arangodb_data:/var/lib/arangodb3
+      - arangodb_apps_data:/var/lib/arangodb3-apps
+
+  arangodb-init:
+    image: arangodb:latest
+    depends_on:
+      arangodb:
+        condition: service_started
+    restart: on-failure
+    entrypoint: >
+      sh -c "
+        echo 'Waiting for ArangoDB to start...' &&
+        sleep 10 &&
+        echo 'Creating txt2kg database...' &&
+        arangosh --server.endpoint tcp://arangodb:8529 --server.authentication false --javascript.execute-string 'try { db._createDatabase(\"txt2kg\"); console.log(\"Database txt2kg created successfully!\"); } catch(e) { if(e.message.includes(\"duplicate\")) { console.log(\"Database txt2kg already exists\"); } else { throw e; } }'
+      "
+
+  entity-embeddings:
+    image: ghcr.io/pinecone-io/pinecone-index:latest
+    container_name: entity-embeddings
+    environment:
+      PORT: 5081
+      INDEX_TYPE: serverless
+      VECTOR_TYPE: dense
+      DIMENSION: 384
+      METRIC: cosine
+      INDEX_NAME: entity-embeddings
+    ports:
+      - "5081:5081"
+    platform: linux/amd64
+    networks:
+      - pinecone-net
+    restart: unless-stopped
+
+  sentence-transformers:
+    build:
+      context: ../../deploy/services/sentence-transformers
+      dockerfile: Dockerfile
+    ports:
+      - '8000:80'
+    environment:
+      - MODEL_NAME=all-MiniLM-L6-v2
+    networks:
+      - default
+
+  # MinIO S3-compatible storage
+  minio:
+    image: minio/minio:latest
+    container_name: txt2kg-minio
+    ports:
+      - "9000:9000"  # API endpoint
+      - "9001:9001"  # Web console
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - s3-net
+      - default
+
+  createbucket:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      /usr/bin/mc config host add myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc mb myminio/txt2kg;
+      /usr/bin/mc policy set public myminio/txt2kg;
+      exit 0;
+      "
+    networks:
+      - s3-net
+
+volumes:
+  arangodb_data:
+  arangodb_apps_data:
+  minio_data:
+
+networks:
+  pinecone-net:
+    name: pinecone
+  s3-net:
+    name: s3-network
+  default:
+    driver: bridge 
