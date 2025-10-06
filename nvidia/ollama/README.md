@@ -36,12 +36,9 @@ the powerful GPU capabilities of your Spark device without complex network confi
 
 ## Prerequisites
 
-- [ ] DGX Spark device set up and connected to your network
-  - Verify with: `nvidia-smi` (should show Blackwell GPU information)
-- [ ] NVIDIA Sync installed and connected to your Spark
-  - Verify connection status in NVIDIA Sync system tray application
-- [ ] Terminal access to your local machine for testing API calls
-  - Verify with: `curl --version`
+- DGX Spark device set up and connected to your network
+- NVIDIA Sync installed and connected to your Spark
+- Terminal access to your local machine for testing API calls
 
 
 

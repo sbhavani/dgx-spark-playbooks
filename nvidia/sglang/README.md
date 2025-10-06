@@ -35,12 +35,12 @@ vision-language tasks using models like DeepSeek-V2-Lite.
 
 ## Prerequisites
 
-- [ ] NVIDIA Spark device with Blackwell architecture
-- [ ] Docker Engine installed and running: `docker --version`
-- [ ] NVIDIA GPU drivers installed: `nvidia-smi`
-- [ ] NVIDIA Container Toolkit configured: `docker run --rm --gpus all nvidia/cuda:12.9-base nvidia-smi`
-- [ ] Sufficient disk space (>20GB available): `df -h`
-- [ ] Network connectivity for pulling NGC containers: `ping nvcr.io`
+- NVIDIA Spark device with Blackwell architecture
+- Docker Engine installed and running: `docker --version`
+- NVIDIA GPU drivers installed: `nvidia-smi`
+- NVIDIA Container Toolkit configured: `docker run --rm --gpus all nvidia/cuda:12.9-base nvidia-smi`
+- Sufficient disk space (>20GB available): `df -h`
+- Network connectivity for pulling NGC containers: `ping nvcr.io`
 
 ## Ancillary files
 

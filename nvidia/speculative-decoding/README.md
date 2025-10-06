@@ -40,17 +40,17 @@ These examples demonstrate how to accelerate large language model inference whil
 
 ## Prerequisites
 
-- [ ] NVIDIA Spark device with sufficient GPU memory available (80GB+ recommended for GPT-OSS 120B)
-- [ ] Docker with GPU support enabled
+- NVIDIA Spark device with sufficient GPU memory available (80GB+ recommended for GPT-OSS 120B)
+- Docker with GPU support enabled
   ```bash
   docker run --gpus all nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev nvidia-smi
   ```
-- [ ] Access to NVIDIA's internal container registry (for Eagle3 example)
-- [ ] HuggingFace authentication configured (if needed for model downloads)
+- Access to NVIDIA's internal container registry (for Eagle3 example)
+- HuggingFace authentication configured (if needed for model downloads)
   ```bash
   huggingface-cli login
   ```
-- [ ] Network connectivity for model downloads
+- Network connectivity for model downloads
 
 
 ## Time & risk
