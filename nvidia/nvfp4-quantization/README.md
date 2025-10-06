@@ -12,12 +12,12 @@
 
 ## Overview
 
-## Basic Idea
+## Basic idea
 
 ### NVFP4 on Blackwell
 
-- **What it is:** A new 4-bit floating-point format for NVIDIA Blackwell GPUs.
-- **How it works:** Uses two levels of scaling (local per-block + global tensor) to keep accuracy while using fewer bits.
+- **What it is:** A new 4-bit floating-point format for NVIDIA Blackwell GPUs
+- **How it works:** Uses two levels of scaling (local per-block + global tensor) to keep accuracy while using fewer bits
 - **Why it matters:**
   - Cuts memory use ~3.5x vs FP16 and ~1.8x vs FP8
   - Keeps accuracy close to FP8 (usually <1% loss)
@@ -130,7 +130,7 @@ docker run --rm -it --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=671
 ```
 
 Note: You may encounter this `pynvml.NVMLError_NotSupported: Not Supported`. This is expected in some environments, does not affect results, and will be fixed in an upcoming release.
-Note: If your model is too large, you may encounter an out of memory error. You can try quantizing a smaller model instead.
+Note: Please be aware that if your model is too large, you may encounter an out of memory error. You can try quantizing a smaller model instead.
 
 This command:
 - Runs the container with full GPU access and optimized shared memory settings
@@ -191,9 +191,9 @@ docker run \
 | Container exits with CUDA out of memory | Insufficient GPU memory | Reduce batch size or use a machine with more GPU memory |
 | Model files not found in output directory | Volume mount failed or wrong path | Verify `$(pwd)/output_models` resolves correctly |
 | Git clone fails inside container | Network connectivity issues | Check internet connection and retry |
-| Quantization process hangs | Container resource limits | Increase Docker memory limits or use --ulimit flags |
+| Quantization process hangs | Container resource limits | Increase Docker memory limits or use `--ulimit` flags |
 
-## Step 8. Cleanup and rollback
+## Step 9. Cleanup and rollback
 
 To clean up the environment and remove generated files:
 
@@ -210,10 +210,10 @@ rm -rf ~/.cache/huggingface
 docker rmi nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev
 ```
 
-## Step 9. Next steps
+## Step 10. Next steps
 
 The quantized model is now ready for deployment. Common next steps include:
-- Benchmarking inference performance compared to the original model
-- Integrating the quantized model into your inference pipeline
-- Deploying to NVIDIA Triton Inference Server for production serving
-- Running additional validation tests on your specific use cases
+- Benchmarking inference performance compared to the original model.
+- Integrating the quantized model into your inference pipeline.
+- Deploying to NVIDIA Triton Inference Server for production serving.
+- Running additional validation tests on your specific use cases.
