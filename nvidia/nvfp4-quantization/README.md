@@ -22,7 +22,6 @@
   - Cuts memory use ~3.5x vs FP16 and ~1.8x vs FP8
   - Keeps accuracy close to FP8 (usually <1% loss)
   - Improves speed and energy efficiency for inference
-- **Ecosystem:** Supported in NVIDIA tools (TensorRT, LLM Compressor, vLLM) and Hugging Face models.
 
 
 ## What you'll accomplish
@@ -43,7 +42,7 @@ inside a TensorRT-LLM container, producing an NVFP4 quantized model for deployme
 - NVIDIA Spark device with Blackwell architecture GPU
 - Docker installed with GPU support
 - NVIDIA Container Toolkit configured
-- At least 32GB of available storage for model files and outputs
+- Available storage for model files and outputs
 - Hugging Face account with access to the target model
 
 Verify your setup:
@@ -53,9 +52,6 @@ docker run --rm --gpus all nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-
 
 ## Verify sufficient disk space
 df -h .
-
-## Check Hugging Face CLI (install if needed: pip install huggingface_hub)
-huggingface-cli whoami
 ```
 
 ## Time & risk
@@ -133,7 +129,8 @@ docker run --rm -it --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=671
   "
 ```
 
-Warning: If your model is too large, you may encounter an out of memory error. You can try quantizing a smaller model instead.
+Note: You may encounter this `pynvml.NVMLError_NotSupported: Not Supported`. This is expected in some environments, does not affect results, and will be fixed in an upcoming release.
+Note: If your model is too large, you may encounter an out of memory error. You can try quantizing a smaller model instead.
 
 This command:
 - Runs the container with full GPU access and optimized shared memory settings
