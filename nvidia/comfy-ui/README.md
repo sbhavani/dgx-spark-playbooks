@@ -99,7 +99,7 @@ Verify the virtual environment is active by checking the command prompt shows `(
 Install PyTorch nightly build with CUDA 12.9 support optimized for ARM64 architecture.
 
 ```bash
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu129
+pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu129
 ```
 
 This installation targets CUDA 12.9 compatibility with Blackwell architecture GPUs.
@@ -187,7 +187,7 @@ Test the installation with a basic image generation workflow:
 
 1. Access the web interface at `http://<SPARK_IP>:8188`
 2. Load the default workflow (should appear automatically)
-3. Click "Queue Prompt" to generate your first image
+3. Click "Run" to generate your first image
 4. Monitor GPU usage with `nvidia-smi` in a separate terminal
 
 The image generation should complete within 30-60 seconds depending on your hardware configuration.
