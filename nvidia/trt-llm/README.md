@@ -17,13 +17,14 @@
   - [Step 9. Troubleshooting](#step-9-troubleshooting)
   - [Step 10. Cleanup and rollback](#step-10-cleanup-and-rollback)
 - [Run on two Sparks](#run-on-two-sparks)
-  - [Step 1. Verify connectivity and SSH setup](#step-1-verify-connectivity-and-ssh-setup)
-  - [Step 2. Install NVIDIA Container Toolkit](#step-2-install-nvidia-container-toolkit)
-  - [Step 3. Enable resource advertising](#step-3-enable-resource-advertising)
-  - [Step 4. Initialize Docker Swarm](#step-4-initialize-docker-swarm)
-  - [Step 5. Join worker nodes and deploy](#step-5-join-worker-nodes-and-deploy)
-  - [Step 6. Create hosts file](#step-6-create-hosts-file)
-  - [Step 7. Find your Docker container ID](#step-7-find-your-docker-container-id)
+  - [Step 1. Configure Docker permissions](#step-1-configure-docker-permissions)
+  - [Step 2. Configure network connectivity](#step-2-configure-network-connectivity)
+  - [Step 3. Install NVIDIA Container Toolkit](#step-3-install-nvidia-container-toolkit)
+  - [Step 4. Enable resource advertising](#step-4-enable-resource-advertising)
+  - [Step 5. Initialize Docker Swarm](#step-5-initialize-docker-swarm)
+  - [Step 6. Join worker nodes and deploy](#step-6-join-worker-nodes-and-deploy)
+  - [Step 7. Create hosts file](#step-7-create-hosts-file)
+  - [Step 8. Find your Docker container ID](#step-8-find-your-docker-container-id)
   - [Step 8. Generate configuration file](#step-8-generate-configuration-file)
   - [Step 9. Download model](#step-9-download-model)
   - [Step 10. Serve the model](#step-10-serve-the-model)
@@ -38,9 +39,9 @@
 
 ## Basic idea
 
-**NVIDIA TensorRT-LLM (TRT-LLM)** is an open-source library for optimizing and accelerating large language model (LLM) inference on NVIDIA GPUs. 
+**NVIDIA TensorRT-LLM (TRT-LLM)** is an open-source library for optimizing and accelerating large language model (LLM) inference on NVIDIA GPUs.
 
-It provides highly efficient kernels, memory management, and parallelism strategies—like tensor, pipeline, and sequence parallelism—so developers can serve LLMs with lower latency and higher throughput. 
+It provides highly efficient kernels, memory management, and parallelism strategies—like tensor, pipeline, and sequence parallelism—so developers can serve LLMs with lower latency and higher throughput.
 
 TRT-LLM integrates with frameworks like Hugging Face and PyTorch, making it easier to deploy state-of-the-art models at scale.
 
@@ -69,6 +70,14 @@ inference through kernel-level optimizations, efficient memory layouts, and adva
 - Internet connectivity for downloading models and container images
 - Network: open TCP ports 8355 (LLM) and 8356 (VLM) on host for OpenAI-compatible serving
 
+## Ancillary files
+
+All required assets can be found [here on GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main)
+
+- [**discover-sparks.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/discover-sparks.sh) — script to automatically discover and configure SSH between Spark nodes
+- [**trtllm-mn-entrypoint.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/trtllm-mn-entrypoint.sh) — container entrypoint script for multi-node setup
+- [**docker-compose.yml**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/docker-compose.yml) — Docker Compose configuration for multi-node deployment
+
 ## Model Support Matrix
 
 The following models are supported with TensorRT-LLM on Spark. All listed models are available and ready to use:
@@ -95,7 +104,7 @@ The following models are supported with TensorRT-LLM on Spark. All listed models
 | **Llama-4-Scout-17B-16E-Instruct** | NVFP4 | ✅ | `nvidia/Llama-4-Scout-17B-16E-Instruct-FP4` |
 | **Qwen3-235B-A22B (two Sparks only)** | NVFP4 | ✅ | `nvidia/Qwen3-235B-A22B-FP4` |
 
-**Note:** You can use the NVFP4 Quantization documentation to generate your own NVFP4-quantized checkpoints for your favorite models. This enables you to take advantage of the performance and memory benefits of NVFP4 quantization even for models not already published by NVIDIA. 
+**Note:** You can use the NVFP4 Quantization documentation to generate your own NVFP4-quantized checkpoints for your favorite models. This enables you to take advantage of the performance and memory benefits of NVFP4 quantization even for models not already published by NVIDIA.
 
 Reminder: not all model architectures are supported for NVFP4 quantization.
 
@@ -413,29 +422,113 @@ docker rmi nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev
 
 ## Run on two Sparks
 
-### Step 1. Verify connectivity and SSH setup
+### Step 1. Configure Docker permissions
 
-Verify that the two Spark nodes can communicate with each other using ping and that SSH passwordless authentication is properly configured.
+To easily manage containers without sudo, you must be in the `docker` group. If you choose to skip this step, you will need to run Docker commands with sudo.
 
-```bash
-## Test network connectivity between nodes (replace with your actual node IPs)
-ping -c 3 <other-node-ip>
-```
+Open a new terminal and test Docker access. In the terminal, run:
 
 ```bash
-## Test SSH passwordless authentication (replace with your actual node IP)
-ssh nvidia@<other-node-ip> hostname
+docker ps
 ```
 
-**Expected results:**
-- Ping should show successful packet transmission with 0% packet loss
-- SSH command should execute without prompting for a password and return the remote hostname
+If you see a permission denied error (something like `permission denied while trying to connect to the Docker daemon socket`), add your user to the docker group:
 
-### Step 2. Install NVIDIA Container Toolkit
+```bash
+sudo usermod -aG docker $USER
+```
+
+> **Warning**: After running usermod, you must log out and log back in to start a new
+> session with updated group permissions.
+
+### Step 2. Configure network connectivity
+
+You have two options for configuring network connectivity between your DGX Spark nodes:
+
+#### Option 1: Automatic IP assignment (recommended)
+
+Follow these steps on both DGX Spark nodes to configure network interfaces using netplan:
+
+```bash
+## Create the netplan configuration file
+sudo tee /etc/netplan/40-cx7.yaml > /dev/null <<EOF
+network:
+  version: 2
+  ethernets:
+    enp1s0f0np0:
+      link-local: [ ipv4 ]
+    enp1s0f1np1:
+      link-local: [ ipv4 ]
+EOF
+
+## Set appropriate permissions
+sudo chmod 600 /etc/netplan/40-cx7.yaml
+
+## Apply the configuration
+sudo netplan apply
+```
+
+#### Option 2: Manual IP assignment (advanced)
+
+First, identify which network ports are available and up:
+
+```bash
+## Check network port status
+ibdev2netdev
+```
+
+Example output:
+```
+roceP2p1s0f0 port 1 ==> enP2p1s0f0np0 (Up)
+roceP2p1s0f1 port 1 ==> enP2p1s0f1np1 (Down)
+rocep1s0f0 port 1 ==> enp1s0f0np0 (Up)
+rocep1s0f1 port 1 ==> enp1s0f1np1 (Down)
+```
+
+Use an interface that shows as "(Up)" in your output. In this example, we'll use enP2p1s0f0np0.
+
+On Node 1:
+```bash
+## Assign static IP and bring up interface
+sudo ip addr add 192.168.100.10/24 dev enp1s0f0np0
+sudo ip link set enp1s0f0np0 up
+```
+
+On Node 2:
+```bash
+## Assign static IP and bring up interface
+sudo ip addr add 192.168.100.11/24 dev enp1s0f0np0
+sudo ip link set enp1s0f0np0 up
+```
+
+
+#### Set up passwordless SSH authentication
+
+Run the DGX Spark [**discover-sparks.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/discover-sparks.sh) script on both nodes to automatically configure SSH:
+
+```bash
+bash ./discover-sparks.sh
+```
+
+Expected output similar to the below, with different IPs and node names. The first time you run the script, you'll be prompted for your password for each node.
+```
+Found: 192.168.100.10 (spark-1b3b.local)
+Found: 192.168.100.11 (spark-1d84.local)
+
+Copying your SSH public key to all discovered nodes using ssh-copy-id.
+You may be prompted for your password on each node.
+Copying SSH key to 192.168.100.10 ...
+Copying SSH key to 192.168.100.11 ...
+nvidia@192.168.100.11's password:
+
+SSH key copy process complete. These two sparks can now talk to each other.
+```
+
+### Step 3. Install NVIDIA Container Toolkit
 
 Ensure the NVIDIA drivers and the NVIDIA Container Toolkit are installed on each node (both manager and workers) that will provide GPU resources. This package enables Docker containers to access the host's GPU hardware. Ensure you complete the [installation steps](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html), including the [Docker configuration](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker) for NVIDIA Container Toolkit.
 
-### Step 3. Enable resource advertising
+### Step 4. Enable resource advertising
 
 Modify the NVIDIA Container Runtime to advertise the GPUs to the Swarm by uncommenting the swarm-resource line in the config.toml file. You can do this either with your preferred text editor (e.g., vim, nano...) or with the following command:
 ```bash
@@ -446,7 +539,7 @@ To apply the changes, restart the Docker daemon
 sudo systemctl restart docker
 ```
 
-### Step 4. Initialize Docker Swarm
+### Step 5. Initialize Docker Swarm
 
 On whichever node you want to use as primary, run the following swarm initialization command
 ```bash
@@ -464,34 +557,37 @@ To add a worker to this swarm, run the following command:
 To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
 ```
 
-### Step 5. Join worker nodes and deploy
+### Step 6. Join worker nodes and deploy
 
-Now we can proceed with setting up other nodes of your cluster:
+Now we can proceed with setting up other nodes of your cluster.
+
+Run the command suggested by the docker swarm init on each worker node to join the Docker swarm
+```bash
+docker swarm join --token <worker-token> <advertise-addr>:<port>
+```
+
+On your primary node, deploy the TRT-LLM multi-node stack by downloading the [**docker-compose.yml**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/docker-compose.yml) and [**trtllm-mn-entrypoint.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/trtllm-mn-entrypoint.sh) files into your home directory and running the following command:
 
 ```bash
-## Run the command suggested by the docker swarm init on each worker node to join the Docker swarm
-docker swarm join --token <worker-token> <advertise-addr>:<port>
+chmod +x $HOME/trtllm-mn-entrypoint.sh
+docker stack deploy -c $HOME/docker-compose.yml trtllm-multinode
+```
+Note: Ensure you download both files into the same directory from which you are running the command.
 
-## On your primary node, deploy the stack using the following command
-## Note: You'll need a docker-compose.yml file for TRT-LLM deployment
-docker stack deploy -c docker-compose.yml trtllm-multinode
-
-## You can verify the status of your worker nodes using the following
+You can verify the status of your worker nodes using the following
+```bash
 docker stack ps trtllm-multinode
-
-## In case you see any errors reported by docker ps for any node, you can verify using
-docker service logs <ID>
 ```
 
 If everything is healthy, you should see a similar output to the following:
 ```
-nvidia@spark-1b3b:~/draft-playbooks/trt-llm-on-stacked-spark$ docker stack ps trtllm-multinode
+nvidia@spark-1b3b:~$ docker stack ps trtllm-multinode
 ID             NAME                            IMAGE                                          NODE         DESIRED STATE   CURRENT STATE             ERROR     PORTS
-oe9k5o6w41le   trtllm-multinode_trtllm.1       nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev   spark-1d84   Running         Running 2 minutes ago
-phszqzk97p83   trtllm-multinode_trtllm.2       nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev   spark-1b3b   Running         Running 2 minutes ago
+oe9k5o6w41le   trtllm-multinode_trtllm.1       nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3   spark-1d84   Running         Running 2 minutes ago
+phszqzk97p83   trtllm-multinode_trtllm.2       nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3   spark-1b3b   Running         Running 2 minutes ago
 ```
 
-### Step 6. Create hosts file
+### Step 7. Create hosts file
 
 You can check the available nodes using `docker node ls`
 ```
@@ -507,7 +603,7 @@ docker node ls --format '{{.ID}}' | xargs -n1 docker node inspect --format '{{ .
 docker cp ~/openmpi-hostfile $(docker ps -q -f name=trtllm-multinode):/etc/openmpi-hostfile
 ```
 
-### Step 7. Find your Docker container ID
+### Step 8. Find your Docker container ID
 
 You can use `docker ps` to find your Docker container ID. Alternatively, you can save the container ID in a variable:
 ```bash
@@ -592,7 +688,7 @@ curl -X POST http://localhost:8000/v1/chat/completions \
 | MPI hostname test returns single hostname | Network connectivity issues | Verify both nodes are on reachable IP addresses |
 | "Permission denied" on HuggingFace download | Invalid or missing HF_TOKEN | Set valid token: `export HF_TOKEN=<TOKEN>` |
 | "CUDA out of memory" errors | Insufficient GPU memory | Reduce `--max_batch_size` or `--max_num_tokens` |
-| Container exits immediately | Missing entrypoint script | Ensure `trtllm-mn-entrypoint.sh` download succeeded and has executable permissions |
+| Container exits immediately | Missing entrypoint script | Ensure `trtllm-mn-entrypoint.sh` download succeeded and has executable permissions, also ensure you are not running the container already on your node. If port 2233 is already utilized, the entrypoint script will not start. |
 
 ### Step 14. Cleanup and rollback
 
