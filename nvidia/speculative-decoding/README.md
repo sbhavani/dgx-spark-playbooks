@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [How to run inference with speculative decoding](#how-to-run-inference-with-speculative-decoding)
+- [Instructions](#instructions)
   - [Step 1. Configure Docker permissions](#step-1-configure-docker-permissions)
   - [Step 2. Run Draft-Target Speculative Decoding](#step-2-run-draft-target-speculative-decoding)
   - [Step 3. Test the Draft-Target setup](#step-3-test-the-draft-target-setup)
@@ -57,7 +57,7 @@ These examples demonstrate how to accelerate large language model inference whil
 
 **Rollback:** Stop Docker containers and optionally clean up downloaded model cache
 
-## How to run inference with speculative decoding
+## Instructions
 
 ## Traditional Draft-Target Speculative Decoding
 
@@ -169,3 +169,4 @@ docker stop <container_id>
 - Experiment with different `max_draft_len` values (1, 2, 3, 4, 8)
 - Monitor token acceptance rates and throughput improvements
 - Test with different prompt lengths and generation parameters
+- Read more on Speculative Decoding [here](https://nvidia.github.io/TensorRT-LLM/advanced/speculative-decoding.html)
