@@ -127,7 +127,9 @@ Choose between two deployment options based on your requirements:
 
 Proceed with **Option A** for Event Reviewer or **Option B** for Standard VSS.
 
-## Step 7. Option A - [VSS Event Reviewer](https://docs.nvidia.com/vss/latest/content/vss_event_reviewer.html) (Completely Local)
+## Step 7. Option A
+
+**[VSS Event Reviewer](https://docs.nvidia.com/vss/latest/content/vss_event_reviewer.html) (Completely Local)**
 
 **7.1 Navigate to Event Reviewer directory**
 
@@ -220,7 +222,9 @@ Open these URLs in your browser:
 - `http://<NODE_IP>:7862` - CV UI to launch and monitor CV pipeline
 - `http://<NODE_IP>:7860` - Alert Inspector UI to view clips and review VLM results
 
-## Step 8. Option B - [Standard VSS](https://docs.nvidia.com/vss/latest/content/architecture.html) (Hybrid Deployment)
+## Step 8. Option B 
+
+**[Standard VSS](https://docs.nvidia.com/vss/latest/content/architecture.html) (Hybrid Deployment)**
 
 In this hybrid deployment, we would use NIMs from [build.nvidia.com](https://build.nvidia.com/). Alternatively, you can configure your own hosted endpoints by following the instructions in the [VSS remote deployment guide](https://docs.nvidia.com/vss/latest/content/installation-remote-docker-compose.html).
 
