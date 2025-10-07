@@ -40,13 +40,32 @@ ALl files required for finetuning are included.
 
 ## Instructions
 
-## Step 1.  Pull the latest Pytorch container
+## Step 1. Configure Docker permissions
+
+To easily manage containers without sudo, you must be in the `docker` group. If you choose to skip this step, you will need to run Docker commands with sudo.
+
+Open a new terminal and test Docker access. In the terminal, run:
+
+```bash
+docker ps
+```
+
+If you see a permission denied error (something like `permission denied while trying to connect to the Docker daemon socket`), add your user to the docker group:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+> **Warning**: After running usermod, you must log out and log back in to start a new
+> session with updated group permissions.
+
+## Step 2.  Pull the latest Pytorch container
 
 ```bash
 docker pull nvcr.io/nvidia/pytorch:25.09-py3
 ```
 
-## Step 2. Launch Docker
+## Step 3. Launch Docker
 
 ```bash
 docker run --gpus all -it --rm --ipc=host \
@@ -54,15 +73,18 @@ docker run --gpus all -it --rm --ipc=host \
 -v ${PWD}:/workspace -w /workspace \
 nvcr.io/nvidia/pytorch:25.09-py3
 
+    -v $HOME/.cache/huggingface:/root/.cache/huggingface \
+    -v ${PWD}:/workspace -w /workspace \
+    nvcr.io/nvidia/pytorch:25.09-py3
 ```
 
-## Step 3. Install dependencies inside the contianer
+## Step 4. Install dependencies inside the contianer
 
 ```bash
 pip install transformers peft datasets "trl==0.19.1" "bitsandbytes==0.48"
 ```
 
-## Step 4: authenticate with huggingface
+## Step 5: authenticate with huggingface
 
 ```bash
 huggingface-cli login
@@ -70,7 +92,7 @@ huggingface-cli login
 ##<Enter n for git credential>
 
 ```
-To run LoRA on Llama3 use the following command:
+To run LoRA on Llama3-8B use the following command:
 
 ```bash
 python Llama3_8B_LoRA_finetuning.py
@@ -80,6 +102,7 @@ To run qLoRA finetuning on llama3-70B use the following command:
 ```bash
 python Llama3_70B_qLoRA_finetuning.py
 ```
+
 To run full finetuning on llama3-3B use the following command:
 ```bash
 python Llama3_3B_full_finetuning.py
