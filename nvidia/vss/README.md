@@ -74,7 +74,36 @@ nvcc --version
 docker --version && docker compose version
 ```
 
-## Step 2. Clone the VSS repository
+## Step 2. Configure Docker
+
+To easily manage containers without sudo, you must be in the `docker` group. If you choose to skip this step, you will need to run Docker commands with sudo.
+Open a new terminal and test Docker access. In the terminal, run:
+
+```bash
+docker ps
+```
+
+If you see a permission denied error (something like `permission denied while trying to connect to the Docker daemon socket`), add your user to the docker group:
+
+```bash
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+> **Warning**: After running usermod, you must log out and log back in to start a new
+> session with updated group permissions.
+
+Additionally, configure Docker so that it can use the NVIDIA Container Runtime.
+
+```bash
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+
+##Run a sample workload to verify the setup
+sudo docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi
+```
+
+## Step 3. Clone the VSS repository
 
 Clone the Video Search and Summarization repository from NVIDIA's public GitHub.
 
@@ -84,7 +113,7 @@ git clone https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization
 cd video-search-and-summarization
 ```
 
-## Step 3. Run the cache cleaner script
+## Step 4. Run the cache cleaner script
 
 Start the system cache cleaner to optimize memory usage during container operations.
 
@@ -94,7 +123,7 @@ Start the system cache cleaner to optimize memory usage during container operati
 sudo sh deploy/scripts/sys_cache_cleaner.sh
 ```
 
-## Step 4. Set up Docker shared network
+## Step 5. Set up Docker shared network
 
 Create a Docker network that will be shared between VSS services and CV pipeline containers.
 
@@ -105,7 +134,7 @@ docker network create vss-shared-network
 
 > **Warning:** If the network already exists, you may see an error. Remove it first with `docker network rm vss-shared-network` if needed.
 
-## Step 5. Authenticate with NVIDIA Container Registry
+## Step 6. Authenticate with NVIDIA Container Registry
 
 Log in to NVIDIA's container registry using your [NGC API Key](https://org.ngc.nvidia.com/setup/api-keys).
 
@@ -116,7 +145,7 @@ docker login nvcr.io
 ## Password: <PASTE_NGC_API_KEY_HERE>
 ```
 
-## Step 6. Choose deployment scenario
+## Step 7. Choose deployment scenario
 
 Choose between two deployment options based on your requirements:
 
@@ -127,11 +156,11 @@ Choose between two deployment options based on your requirements:
 
 Proceed with **Option A** for Event Reviewer or **Option B** for Standard VSS.
 
-## Step 7. Option A
+## Step 8. Option A
 
 **[VSS Event Reviewer](https://docs.nvidia.com/vss/latest/content/vss_event_reviewer.html) (Completely Local)**
 
-**7.1 Navigate to Event Reviewer directory**
+**8.1 Navigate to Event Reviewer directory**
 
 Change to the directory containing the Event Reviewer Docker Compose configuration.
 
@@ -139,7 +168,7 @@ Change to the directory containing the Event Reviewer Docker Compose configurati
 cd deploy/docker/event_reviewer/
 ```
 
-**7.2 Configure NGC API Key**
+**8.2 Configure NGC API Key**
 
 Update the environment file with your NGC API Key. You can do this by editing the `.env` file directly, or by running the following command:
 
@@ -148,7 +177,7 @@ Update the environment file with your NGC API Key. You can do this by editing th
 echo "NGC_API_KEY=<YOUR_NGC_API_KEY>" >> .env
 ```
 
-**7.3 Update the VSS Image path**
+**8.3 Update the VSS Image path**
 
 Update `VSS_IMAGE` to `nvcr.io/nvidia/blueprint/vss-engine-sbsa:2.4.0` in `.env`.
 
@@ -157,7 +186,7 @@ Update `VSS_IMAGE` to `nvcr.io/nvidia/blueprint/vss-engine-sbsa:2.4.0` in `.env`
 echo "VSS_IMAGE=nvcr.io/nvidia/blueprint/vss-engine-sbsa:2.4.0" >> .env
 ```
 
-**7.4 Start VSS Event Reviewer services**
+**8.4 Start VSS Event Reviewer services**
 
 Launch the complete VSS Event Reviewer stack including Alert Bridge, VLM Pipeline, Alert Inspector UI, and Video Storage Toolkit.
 
@@ -168,7 +197,7 @@ IS_SBSA=1 IS_AARCH64=1 ALERT_REVIEW_MEDIA_BASE_DIR=/tmp/alert-media-dir docker c
 
 > **Note:** This step will take several minutes as containers are pulled and services initialize. The VSS backend requires additional startup time.
 
-**7.5 Navigate to CV Event Detector directory**
+**8.5 Navigate to CV Event Detector directory**
 
 In a new terminal session, navigate to the computer vision event detector configuration.
 
@@ -176,7 +205,7 @@ In a new terminal session, navigate to the computer vision event detector config
 cd video-search-and-summarization/examples/cv-event-detector
 ```
 
-**7.6 Update the NV_CV_EVENT_DETECTOR_IMAGE Image path**
+**8.6 Update the NV_CV_EVENT_DETECTOR_IMAGE Image path**
 
 Update `NV_CV_EVENT_DETECTOR_IMAGE` to `nvcr.io/nvidia/blueprint/nv-cv-event-detector-sbsa:2.4.0` in `.env`.
 
@@ -185,7 +214,7 @@ Update `NV_CV_EVENT_DETECTOR_IMAGE` to `nvcr.io/nvidia/blueprint/nv-cv-event-det
 echo "NV_CV_EVENT_DETECTOR_IMAGE=nvcr.io/nvidia/blueprint/nv-cv-event-detector-sbsa:2.4.0" >> .env
 ```
 
-**7.7 Start DeepStream CV pipeline**
+**8.7 Start DeepStream CV pipeline**
 
 Launch the DeepStream computer vision pipeline and CV UI services.
 
@@ -194,7 +223,7 @@ Launch the DeepStream computer vision pipeline and CV UI services.
 IS_SBSA=1 IS_AARCH64=1 ALERT_REVIEW_MEDIA_BASE_DIR=/tmp/alert-media-dir docker compose up
 ```
 
-**7.8 Wait for service initialization**
+**8.8 Wait for service initialization**
 
 Allow time for all containers to fully initialize before accessing the user interfaces.
 
@@ -204,7 +233,7 @@ docker ps
 ## Verify all containers show "Up" status and VSS backend logs show ready state
 ```
 
-**7.9 Validate Event Reviewer deployment**
+**8.9 Validate Event Reviewer deployment**
 
 Access the web interfaces to confirm successful deployment and functionality.
 
@@ -222,24 +251,24 @@ Open these URLs in your browser:
 - `http://<NODE_IP>:7862` - CV UI to launch and monitor CV pipeline
 - `http://<NODE_IP>:7860` - Alert Inspector UI to view clips and review VLM results
 
-## Step 8. Option B 
+## Step 9. Option B 
 
 **[Standard VSS](https://docs.nvidia.com/vss/latest/content/architecture.html) (Hybrid Deployment)**
 
 In this hybrid deployment, we would use NIMs from [build.nvidia.com](https://build.nvidia.com/). Alternatively, you can configure your own hosted endpoints by following the instructions in the [VSS remote deployment guide](https://docs.nvidia.com/vss/latest/content/installation-remote-docker-compose.html).
 
-**8.1 Get NVIDIA API Key**
+**9.1 Get NVIDIA API Key**
 
 - Log in to https://build.nvidia.com/explore/discover.
 - Search for **Get API Key** on the page and click on it.
 
-**8.2 Navigate to remote LLM deployment directory**
+**9.2 Navigate to remote LLM deployment directory**
 
 ```bash
 cd deploy/docker/remote_llm_deployment/
 ```
 
-**8.3 Configure environment variables**
+**9.3 Configure environment variables**
 
 Update the environment file with your API keys and deployment preferences. You can do this by editing the `.env` file directly, or by running the following commands:
 
@@ -251,7 +280,7 @@ echo "DISABLE_CV_PIPELINE=true" >> .env  # Set to false to enable CV
 echo "INSTALL_PROPRIETARY_CODECS=false" >> .env  # Set to true to enable CV
 ```
 
-**8.4 Update the VSS Image path**
+**9.4 Update the VSS Image path**
 
 Update `VIA_IMAGE` to `nvcr.io/nvidia/blueprint/vss-engine-sbsa:2.4.0` in `.env`.
 
@@ -260,7 +289,7 @@ Update `VIA_IMAGE` to `nvcr.io/nvidia/blueprint/vss-engine-sbsa:2.4.0` in `.env`
 echo "VIA_IMAGE=nvcr.io/nvidia/blueprint/vss-engine-sbsa:2.4.0" >> .env
 ```
 
-**8.5 Review model configuration**
+**9.5 Review model configuration**
 
 Verify that the config.yaml file contains the correct remote endpoints. For NIMs, it should be set to `https://integrate.api.nvidia.com/v1 `.
 
@@ -269,14 +298,14 @@ Verify that the config.yaml file contains the correct remote endpoints. For NIMs
 cat config.yaml | grep -A 10 "model"
 ```
 
-**8.6 Launch Standard VSS deployment**
+**9.6 Launch Standard VSS deployment**
 
 ```bash
 ## Start Standard VSS with hybrid deployment
 docker compose up
 ```
 
-**8.7 Validate Standard VSS deployment**
+**9.7 Validate Standard VSS deployment**
 
 Access the VSS UI to confirm successful deployment.
 
@@ -288,7 +317,7 @@ curl -I http://<NODE_IP>:9100
 
 Open `http://<NODE_IP>:9100` in your browser to access the VSS interface.
 
-## Step 9. Test video processing workflow
+## Step 10. Test video processing workflow
 
 Run a basic test to verify the video analysis pipeline is functioning based on your deployment.
 
@@ -304,7 +333,7 @@ Follow the steps [here](https://docs.nvidia.com/vss/latest/content/ui_app.html) 
 - Access VSS interface at `http://<NODE_IP>:9100`
 - Upload videos and test summarization features
 
-## Step 10. Troubleshooting
+## Step 11. Troubleshooting
 
 | Symptom | Cause | Fix |
 |---------|--------|-----|
@@ -313,7 +342,7 @@ Follow the steps [here](https://docs.nvidia.com/vss/latest/content/ui_app.html) 
 | Services fail to communicate | Incorrect environment variables | Verify `IS_SBSA=1 IS_AARCH64=1` are set correctly |
 | Web interfaces not accessible | Services still starting or port conflicts | Wait 2-3 minutes, check `docker ps` for container status |
 
-## Step 11. Cleanup and rollback
+## Step 12. Cleanup and rollback
 
 To completely remove the VSS deployment and free up system resources:
 
@@ -338,7 +367,7 @@ rm -rf /tmp/alert-media-dir
 sudo pkill -f sys_cache_cleaner.sh
 ```
 
-## Step 12. Next steps
+## Step 13. Next steps
 
 With VSS deployed, you can now:
 
