@@ -62,7 +62,6 @@ All required assets can be found [in the ComfyUI repository on GitHub](https://g
 
 **Risk level:** Medium
 - Model downloads are large (~2GB) and may fail due to network issues
-- PyTorch nightly builds may have compatibility issues with ARM64 architecture
 - Port 8188 must be accessible for web interface functionality
 
 **Rollback:** Virtual environment can be deleted to remove all installed packages. Downloaded models 
@@ -96,7 +95,7 @@ Verify the virtual environment is active by checking the command prompt shows `(
 
 ## Step 3. Install PyTorch with CUDA support
 
-Install PyTorch nightly build with CUDA 12.9 support optimized for ARM64 architecture.
+Install PyTorch with CUDA 12.9 support.
 
 ```bash
 pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu129
