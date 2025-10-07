@@ -120,7 +120,7 @@ sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 
 ## Step 5. Dataset preparation
 
-Let's prepare our dataset to perform Dreambooth LoRA fine-tuning on the FLUX.1-dev 12B model. However, if you wish to continue with the provided dataset of Toy Jensen and DGX Spark, feel free to skip to the [Training](#training) section. This dataset is a collection of public assets accessible via Google Images.
+Let's prepare our dataset to perform Dreambooth LoRA fine-tuning on the FLUX.1-dev 12B model. However, if you wish to continue with the provided dataset of Toy Jensen and DGX Spark, feel free to skip to the Training section below. This dataset is a collection of public assets accessible via Google Images.
 
 You will need to prepare a dataset of all the concepts you would like to generate and about 5-10 images for each concept. For this example, we would like to generate images with 2 concepts.
 
