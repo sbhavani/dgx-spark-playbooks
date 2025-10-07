@@ -196,7 +196,7 @@ When you access the streamlit demo for the first time, the backend triggers Hugg
 
 First, let's select a video from our dashcam gallery. Upon clicking the green file open icon near a video, you should see the video render and play automatically for our reference.
 
-If you are proceeding to train a fine-tuned model, ensure that the streamlit demo UI is brought down before proceeding to train. You can bring it up by interrupting the terminal with `Ctrl+C` keystroke.
+If you are proceeding to train a fine-tuned model, ensure that the streamlit demo UI is brought down before proceeding to train. You can bring it down by interrupting the terminal with `Ctrl+C` keystroke.
 
 > **Note**: To clear out any extra occupied memory from your system, execute the following command outside the container after interrupting the ComfyUI server.
 ```bash
