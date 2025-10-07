@@ -22,6 +22,9 @@ By the end, you'll have a working installation that supports parameter-efficient
 
 ## What to know before starting
 
+- Previous experience with fine-tuning in Pytorch
+- Working with Docker
+
 
 
 ## Prerequisites
