@@ -110,7 +110,7 @@ Find the workflow section on the left-side panel of ComfyUI (or press `w`). Upon
 Provide your prompt in the `CLIP Text Encode (Prompt)` block. For example, we will use `Toy Jensen holding a DGX Spark in a datacenter`. You can expect the generation to take ~3 mins since it is compute intesive to create high-resolution 1024px images.
 
 After playing around with the base model, you have 2 possible next steps.
-* If you already have fine-tuned LoRAs placed inside `models/loras/`, please skip to `Step 7. Fine-tuned Model Inference` section.
+* If you already have fine-tuned LoRAs placed inside `models/loras/`, please skip to `Step 7. Fine-tuned model inference` section.
 * If you wish to train a LoRA for your custom concepts, first make sure that the ComfyUI inference container is brought down before proceeding to train. You can bring it down by interrupting the terminal with `Ctrl+C` keystroke.
 
 > **Note**: To clear out any extra occupied memory from your system, execute the following command outside the container after interrupting the ComfyUI server.
@@ -120,7 +120,7 @@ sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 
 ## Step 5. Dataset preparation
 
-Let's prepare our dataset to perform Dreambooth LoRA finetuning on the FLUX.1-dev 12B model. However, if you wish to continue with the provided dataset of Toy Jensen and DGX Spark, feel free to skip to the [Training](#training) section. This dataset is a collection of public assets accessible via Google Images.
+Let's prepare our dataset to perform Dreambooth LoRA fine-tuning on the FLUX.1-dev 12B model. However, if you wish to continue with the provided dataset of Toy Jensen and DGX Spark, feel free to skip to the [Training](#training) section. This dataset is a collection of public assets accessible via Google Images.
 
 You will need to prepare a dataset of all the concepts you would like to generate and about 5-10 images for each concept. For this example, we would like to generate images with 2 concepts.
 
@@ -136,7 +136,7 @@ You will need to prepare a dataset of all the concepts you would like to generat
 
 Create a folder for each concept with its corresponding name and place it inside the `flux_data` directory. In our case, we have used `sparkgpu` and `tjtoy` as our concepts, and placed a few images inside each of them.
 
-Now, let's modify the `flux_data/data.toml` file to reflect the concepts chosen. Ensure that you update/create entries for each of your concept by modifying the `image_dir` and `class_tokens` fields under `[[datasets.subsets]]`. For better performance in finetuning, it is good practice to append a class token to your concept name (like `toy` or `gpu`).
+Now, let's modify the `flux_data/data.toml` file to reflect the concepts chosen. Ensure that you update/create entries for each of your concept by modifying the `image_dir` and `class_tokens` fields under `[[datasets.subsets]]`. For better performance in fine-tuning, it is good practice to append a class token to your concept name (like `toy` or `gpu`).
 
 ## Step 6. Training
 
@@ -165,6 +165,4 @@ Find the workflow section on the left-side panel of ComfyUI (or press `w`). Upon
 
 Provide your prompt in the `CLIP Text Encode (Prompt)` block. Now let's incorporate our custom concepts into our prompt for the fine-tuned model. For example, we will use `tjtoy toy holding sparkgpu gpu in a datacenter`. You can expect the generation to take ~3 mins since it is compute intesive to create high-resolution 1024px images.
 
-For the provided prompt and random seed, the fine-tuned Flux model generated the following image. 
-Unlike the base model, we can see that the fine-tuned model can generate multiple concepts in a single image. 
-Additionally, ComfyUI exposes several fields to tune and change the look and feel of the generated images.
+Unlike the base model, we can see that the fine-tuned model can generate multiple concepts in a single image. Additionally, ComfyUI exposes several fields to tune and change the look and feel of the generated images.

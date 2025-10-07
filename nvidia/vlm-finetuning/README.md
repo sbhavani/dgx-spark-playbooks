@@ -183,7 +183,7 @@ hf download OpenGVLab/InternVL3-8B
 
 #### 6.3. Base model inference
 
-Before going ahead to finetune our video VLM for this task, let's see how the base InternVL3-8B does.
+Before going ahead to fine-tune our video VLM for this task, let's see how the base InternVL3-8B does.
 
 ```bash
 ## cd into vlm_finetuning/assets/ui_video if you haven't already
