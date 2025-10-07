@@ -11,32 +11,32 @@
 
 ## Overview
 
-## Basic Idea
+## Basic idea
 
 This playbook guides you through setting up and using Pytorch for fine-tuning large language models on NVIDIA Spark devices.
 
 ## What you'll accomplish
 
-You'll establish a complete fine-tuning environment for large language models (1-70B parameters) on your NVIDIA Spark device. By the end, you'll have a working installation that supports parameter-efficient fine-tuning (PEFT) and supervised fine-tuning (SFT)
+You'll establish a complete fine-tuning environment for large language models (1-70B parameters) on your NVIDIA Spark device. 
+By the end, you'll have a working installation that supports parameter-efficient fine-tuning (PEFT) and supervised fine-tuning (SFT).
+
 ## What to know before starting
 
 
 
 ## Prerequisites
-recipes are specifically for DIGITS SPARK. Please make sure that OS and drivers are latest.
+Recipes are specifically for DIGITS SPARK. Please make sure that OS and drivers are latest.
 
 
 ## Ancillary files
 
-ALl files required for finetuning are included.
+ALl files required for fine-tuning are included.
 
 ## Time & risk
 
-**Time estimate:** 30-45 mins for setup and runing finetuning. Finetuning run time varies depending on model size 
+**Time estimate:** 30-45 mins for setup and runing fine-tuning. Fine-tuning run time varies depending on model size 
 
 **Risks:** Model downloads can be large (several GB), ARM64 package compatibility issues may require troubleshooting.
-
-**Rollback:**
 
 ## Instructions
 
@@ -78,13 +78,13 @@ nvcr.io/nvidia/pytorch:25.09-py3
     nvcr.io/nvidia/pytorch:25.09-py3
 ```
 
-## Step 4. Install dependencies inside the contianer
+## Step 4. Install dependencies inside the container
 
 ```bash
 pip install transformers peft datasets "trl==0.19.1" "bitsandbytes==0.48"
 ```
 
-## Step 5: authenticate with huggingface
+## Step 5: Authenticate with Huggingface
 
 ```bash
 huggingface-cli login
@@ -92,26 +92,26 @@ huggingface-cli login
 ##<Enter n for git credential>
 ```
 
-## Step6:  Clone the git repo with finetuning recipes
+## Step6:  Clone the git repo with fine-tuning recipes
 
 ```bash
 git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}
 cd ${MODEL}/assets
 ```
 
-##Step7: Run the finetuning recipes
+## Step7: Run the fine-tuning recipes
 
 To run LoRA on Llama3-8B use the following command:
 ```bash
 python Llama3_8B_LoRA_finetuning.py
 ```
 
-To run qLoRA finetuning on llama3-70B use the following command:
+To run qLoRA fine-uning on llama3-70B use the following command:
 ```bash
 python Llama3_70B_qLoRA_finetuning.py
 ```
 
-To run full finetuning on llama3-3B use the following command:
+To run full fine-tuning on llama3-3B use the following command:
 ```bash
 python Llama3_3B_full_finetuning.py
 ```
