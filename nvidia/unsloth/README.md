@@ -13,11 +13,11 @@
 
 ## Basic idea
 
-- **Performance-first**: It claims to speed up training (e.g. 2× faster on single GPU, up to 30× in multi-GPU setups) and reduce memory usage compared to standard methods. :contentReference[oaicite:0]{index=0}  
-- **Kernel-level optimizations**: Core compute is built with custom kernels (e.g. with Triton) and hand-optimized math to boost throughput and efficiency. :contentReference[oaicite:1]{index=1}  
-- **Quantization & model formats**: Supports dynamic quantization (4-bit, 16-bit) and GGUF formats to reduce footprint, while aiming to retain accuracy. :contentReference[oaicite:2]{index=2}  
-- **Broad model support**: Works with many LLMs (LLaMA, Mistral, Qwen, DeepSeek, etc.) and allows training, fine-tuning, exporting to formats like Ollama, vLLM, GGUF, Hugging Face. :contentReference[oaicite:3]{index=3}  
-- **Simplified interface**: Provides easy-to-use notebooks and tools so users can fine-tune models with minimal boilerplate. :contentReference[oaicite:4]{index=4}  
+- **Performance-first**: It claims to speed up training (e.g. 2× faster on single GPU, up to 30× in multi-GPU setups) and reduce memory usage compared to standard methods.   
+- **Kernel-level optimizations**: Core compute is built with custom kernels (e.g. with Triton) and hand-optimized math to boost throughput and efficiency.  
+- **Quantization & model formats**: Supports dynamic quantization (4-bit, 16-bit) and GGUF formats to reduce footprint, while aiming to retain accuracy.    
+- **Broad model support**: Works with many LLMs (LLaMA, Mistral, Qwen, DeepSeek, etc.) and allows training, fine-tuning, exporting to formats like Ollama, vLLM, GGUF, Hugging Face.   
+- **Simplified interface**: Provides easy-to-use notebooks and tools so users can fine-tune models with minimal boilerplate.  
 
 ## What you'll accomplish
 
@@ -41,19 +41,22 @@ parameter-efficient fine-tuning methods like LoRA and QLoRA.
 - CUDA 13.0 installed: `nvcc --version`
 - Internet access for downloading models and datasets
 
-##Ancillary files
+## Ancillary files
 
-The python test script can be found [here on GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/test_unsloth.py)
+The Python test script can be found [here on GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/test_unsloth.py)
 
 
 ## Time & risk
 
-- **Duration**: 30-60 minutes for initial setup and test run
-- **Risks**: 
+**Duration**: 30-60 minutes for initial setup and test run
+
+**Risks**: 
+
 - Triton compiler version mismatches may cause compilation errors
 - CUDA toolkit configuration issues may prevent kernel compilation
 - Memory constraints on smaller models require batch size adjustments
-- **Rollback**: Uninstall packages with `pip uninstall unsloth torch torchvision`
+
+**Rollback**: Uninstall packages with `pip uninstall unsloth torch torchvision`.
 
 ## Instructions
 
