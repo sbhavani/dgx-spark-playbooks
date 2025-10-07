@@ -85,7 +85,7 @@ Start the NVIDIA PyTorch container with GPU access and mount your workspace dire
 > **Note:** This NVIDIA PyTorch container supports CUDA 13
 
 ```bash
-docker run --gpus all --ipc=host --ulimit memlock=-1 -it --ulimit stack=67108864 --rm -v "$PWD":/workspace nvcr.io/nvidia/pytorch:25.08-py3 bash
+docker run --gpus all --ipc=host --ulimit memlock=-1 -it --ulimit stack=67108864 --rm -v "$PWD":/workspace nvcr.io/nvidia/pytorch:25.09-py3 bash
 ```
 
 ## Step 3. Clone LLaMA Factory repository
@@ -105,16 +105,7 @@ Install the package in editable mode with metrics support for training evaluatio
 pip install -e ".[metrics]"
 ```
 
-## Step 5. Configure PyTorch for CUDA 12.9 (skip if using Docker container from Step 2)
-
-In a python virtual environment, uninstall existing PyTorch and reinstall with CUDA 12.9 support for ARM64 architecture.
-
-```bash
-pip uninstall torch torchvision torchaudio
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu129
-```
-
-*If using Docker container*
+## Step 5. Verify Pytorch CUDA support. 
 
 PyTorch is pre-installed with CUDA support. Verify installation:
 
@@ -158,7 +149,6 @@ Verify that training completed successfully and checkpoints were saved.
 
 ```bash
 ls -la saves/llama3-8b/lora/sft/
-cat saves/llama3-8b/lora/sft/training_loss.png
 ```
 
 
@@ -170,13 +160,20 @@ Expected output should show:
 
 ## Step 9. Test inference with fine-tuned model
 
-Run a simple inference test to verify the fine-tuned model loads correctly.
+Test your fine-tuned model with custom prompts:
 
 ```bash
 llamafactory-cli chat examples/inference/llama3_lora_sft.yaml
+## Type: "Hello, how can you help me today?"
+## Expect: Response showing fine-tuned behavior
 ```
 
-## Step 10. Troubleshooting
+## Step 10. For production deployment, export your model
+```bash
+llamafactory-cli export examples/merge_lora/llama3_lora_sft.yaml
+```
+
+## Step 11. Troubleshooting
 
 | Symptom | Cause | Fix |
 |---------|--------|-----|
@@ -184,7 +181,7 @@ llamafactory-cli chat examples/inference/llama3_lora_sft.yaml
 | Model download fails or is slow | Network connectivity or Hugging Face Hub issues | Check internet connection, try using `HF_HUB_OFFLINE=1` for cached models |
 | Training loss not decreasing | Learning rate too high/low or insufficient data | Adjust `learning_rate` parameter or check dataset quality |
 
-## Step 11. Cleanup and rollback
+## Step 12. Cleanup and rollback
 
 > **Warning:** This will delete all training progress and checkpoints.
 
@@ -200,19 +197,4 @@ To rollback Docker container changes:
 ```bash
 exit  # Exit container
 docker container prune -f
-```
-
-## Step 12. Next steps
-
-Test your fine-tuned model with custom prompts:
-
-```bash
-llamafactory-cli chat examples/inference/llama3_lora_sft.yaml
-## Type: "Hello, how can you help me today?"
-## Expect: Response showing fine-tuned behavior
-```
-
-For production deployment, export your model:
-```bash
-llamafactory-cli export examples/merge_lora/llama3_lora_sft.yaml
 ```

@@ -76,12 +76,12 @@ The output should show a summary of GPU information.
 
 ## Step 2. Get the container image
 ```bash
-docker pull nvcr.io/nvidia/pytorch:25.08-py3
+docker pull nvcr.io/nvidia/pytorch:25.09-py3
 ```
 
 ## Step 3. Launch Docker
 ```bash
-docker run --gpus all --ulimit memlock=-1 -it --ulimit stack=67108864 --entrypoint /usr/bin/bash --rm nvcr.io/nvidia/pytorch:25.08-py3
+docker run --gpus all --ulimit memlock=-1 -it --ulimit stack=67108864 --entrypoint /usr/bin/bash --rm nvcr.io/nvidia/pytorch:25.09-py3
 ```
 
 ## Step 4. Install dependencies inside Docker
@@ -93,13 +93,7 @@ pip install --no-deps unsloth unsloth_zoo
 
 ## Step 5. Build and install bitsandbytes inside Docker
 ```bash
-git clone https://github.com/bitsandbytes-foundation/bitsandbytes.git
-cd bitsandbytes
-cmake -S . -B build -DCOMPUTE_BACKEND=cuda -DCOMPUTE_CAPABILITY="80;86;87;89;90"
-cd build
-make -j
-cd ..
-pip install .
+pip install --no-deps bitsandbytes
 ```
 
 ## Step 6. Create Python test script
@@ -107,8 +101,8 @@ pip install .
 Curl the test script [here](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/test_unsloth.py) into the container.
 
 ```bash
-
 curl -O https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/test_unsloth.py
+```
 
 We will use this test script to validate the installation with a simple fine-tuning task.
 
