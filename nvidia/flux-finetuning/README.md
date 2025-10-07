@@ -1,6 +1,6 @@
 # FLUX.1 Dreambooth LoRA Fine-tuning
 
-> Fine-tune FLUX.1-dev 11B model using multi-concept Dreambooth LoRA for custom image generation
+> Fine-tune FLUX.1-dev 12B model using multi-concept Dreambooth LoRA for custom image generation
 
 ## Table of Contents
 
@@ -11,13 +11,13 @@
 
 ## Overview
 
-## Basic Idea
+## Basic idea
 
-This playbook demonstrates how to fine-tune the FLUX.1-dev 11B model using multi-concept Dreambooth LoRA (Low-Rank Adaptation) for custom image generation on DGX Spark. 
+This playbook demonstrates how to fine-tune the FLUX.1-dev 12B model using multi-concept Dreambooth LoRA (Low-Rank Adaptation) for custom image generation on DGX Spark. 
 With 128GB of unified memory and powerful GPU acceleration, DGX Spark provides an ideal environment for training an image generation model with multiple models loaded in memory, such as the Diffusion Transformer, CLIP Text Encoder, T5 Text Encoder, and the Autoencoder.
 
 Multi-concept Dreambooth LoRA fine-tuning allows you to teach FLUX.1 new concepts, characters, and styles. The trained LoRA weights can be easily integrated into existing ComfyUI workflows, making it perfect for prototyping and experimentation.
-Moreover, this playbook demonstrates how DGX Spark can not only load several models in memory, but also run train and generate high-resolution images such as 1024px and higher.
+Moreover, this playbook demonstrates how DGX Spark can not only load several models in memory, but also train and generate high-resolution images such as 1024px and higher.
 
 ## What you'll accomplish
 
@@ -41,13 +41,13 @@ The setup includes:
 
 **Duration**:
 - 15 minutes for initial setup model download time
-- 1-2 hours for dreambooth lora training
+- 1-2 hours for dreambooth LoRA training
 
 **Risks**:
 - Docker permission issues may require user group changes and session restart
 - The recipe would require hyperparameter tuning and a high-quality dataset for the best results
 
-**Rollback**: Stop and remove Docker containers, delete downloaded models if needed
+**Rollback**: Stop and remove Docker containers, delete downloaded models if needed.
 
 ## Instructions
 
@@ -78,110 +78,91 @@ In a terminal, clone the repository and navigate to the flux-finetuning director
 git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main dgx-spark-playbooks
 ```
 
-## Step 3. Build the Docker container
+## Step 3. Model Download
 
-This docker image will download the required models and set up the environment for training and inference.
-- `flux1-dev.safetensors`
-- `ae.safetensors`
-- `clip_l.safetensors`
-- `t5xxl_fp16.safetensors`
+You will have to be granted access to the FLUX.1-dev model since it is gated. Go to their [model card](https://huggingface.co/black-forest-labs/FLUX.1-dev), to accept the terms and gain access to the checkpoints.
+If you do not have a `HF_TOKEN` already, follow the instructions [here](https://huggingface.co/docs/hub/en/security-tokens) to generate one. Authenticate your system by replacing your generated token in the following command.
 
 ```bash
-docker build -f Dockerfile.train --build-arg HF_TOKEN=$HF_TOKEN -t flux-training .
+export HF_TOKEN=<YOUR_HF_TOKEN>
+cd flux-finetuning/assets
+sh download.sh
 ```
 
-## Step 4. Run the Docker container
+If you already have fine-tuned LoRAs, place them inside `models/loras`. If you do not have one yet, proceed to the `Step 6. Training` section for more details.
+
+## Step 4. Base Model Inference
+
+Let's begin by generating an image using the base FLUX.1 model on 2 concepts we are interested in, Toy Jensen and DGX Spark. 
 
 ```bash
-## Run with GPU support and mount current directory
-docker run -it \
-    --gpus all \
-    --ipc=host \
-    --ulimit memlock=-1 \
-    --ulimit stack=67108864 \
-    --net=host \
-    flux-training
+## Build the inference docker image
+docker build -f Dockerfile.inference -t flux-comfyui .
+
+## Launch the ComfyUI container (ensure you are inside flux-finetuning/assets)
+## You can ignore any import errors for `torchaudio`
+sh launch_comfyui.sh
+```
+Access ComfyUI at `http://localhost:8188` to generate images with the base model. Do not select any pre-existing template.
+
+Find the workflow section on the left-side panel of ComfyUI (or press `w`). Upon opening it, you should find two existing workflows loaded up. For the base Flux model, let's load the `base_flux.json` workflow. After loading the json, you should see ComfyUI load up the workflow.
+
+Provide your prompt in the `CLIP Text Encode (Prompt)` block. For example, we will use `Toy Jensen holding a DGX Spark in a datacenter`. You can expect the generation to take ~3 mins since it is compute intesive to create high-resolution 1024px images.
+
+After playing around with the base model, you have 2 possible next steps.
+* If you already have fine-tuned LoRAs placed inside `models/loras/`, please skip to `Step 7. Finetuned Model Inference` section.
+* If you wish to train a LoRA for your custom concepts, first make sure that the ComfyUI inference container is brought down before proceeding to train. You can bring it by interrupting the terminal with `Ctrl+C` keystroke.
+
+> **Note**: To clear out any extra occupied memory from your system, execute the following command outside the container after interrupting the ComfyUI server.
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 ```
 
-## Step 5. Train the model
+## Step 5. Dataset Preparation
 
-Inside the container, navigate to the sd-scripts directory and run the training script:
+Let's prepare our dataset to perform Dreambooth LoRA finetuning on the FLUX.1-dev 12B model. However, if you wish to continue with the provided dataset of Toy Jensen and DGX Spark, feel free to skip to the [Training](#training) section. This dataset is a collection of public assets accessible via Google Images.
+
+You will need to prepare a dataset of all the concepts you would like to generate, and about 5-10 images for each concept. For this example, we would like to generate images with 2 concepts.
+
+**TJToy Concept**
+- **Trigger phrase**: `tjtoy toy`
+- **Training images**: 6 high-quality images of custom toy figures
+- **Use case**: Generate images featuring the specific toy character in various scenes
+
+**SparkGPU Concept**
+- **Trigger phrase**: `sparkgpu gpu`
+- **Training images**: 7 images of custom GPU hardware
+- **Use case**: Generate images featuring the specific GPU design in different contexts
+
+Create a folder for each concept with it's corresponding name, and place it inside the `flux_data` directory. In our case, we have used `sparkgpu` and `tjtoy` as our concepts, and placed a few images inside each of them.
+
+Now, let's modify the `flux_data/data.toml` file to reflect the concepts chosen. Ensure that you update/create entries for each of your concept, by modifying the `image_dir` and `class_tokens` fields under `[[datasets.subsets]]`. For better performance in finetuning, it is a good practice to append a class token to your concept name (like `toy` or `gpu`).
+
+## Step 6. Training
+
+ Launch training by executing the follow command. The training script is setup to use a default configuration that can generate reasonable images for your dataset, in about ~90 mins of training. This train command will automatically store checkpoints in the `models/loras/` directory.
 
 ```bash
-cd /workspace/sd-scripts
-sh train.sh
+## Build the inference docker image
+docker build -f Dockerfile.train -t flux-train .
+
+## Trigger the training
+sh launch_train.sh
 ```
 
-The training will:
-- Use LoRA with dimension 256
-- Train for 100 epochs (saves every 25 epochs)
-- Learn custom concepts: "tjtoy toy" and "sparkgpu gpu"
-- Output trained LoRA weights to `saved_models/flux_dreambooth.safetensors`
+## Step 7. Finetuned Model Inference
 
-## Step 6. Generate images with command-line inference
-
-After training completes, generate sample images:
+Now let's generate images using our finetuned LoRAs!
 
 ```bash
-sh inference.sh
+## Launch the ComfyUI container (ensure you are inside flux-finetuning/assets)
+## You can ignore any import errors for `torchaudio`
+sh launch_comfyui.sh
 ```
+Access ComfyUI at `http://localhost:8188` to generate images with the finetuned model. Do not select any pre-existing template.
 
-This will generate several images demonstrating the learned concepts, stored in the `outputs` directory.
+Find the workflow section on the left-side panel of ComfyUI (or press `w`). Upon opening it, you should find two existing workflows loaded up. For the finetuned Flux model, let's load the `finetuned_flux.json` workflow. After loading the json, you should see ComfyUI load up the workflow.
 
-## Step 7. Spin up ComfyUI for visual workflows
+Provide your prompt in the `CLIP Text Encode (Prompt)` block. Now let's incorporate our custom concepts into our prompt for the finetuned model. For example, we will use `tjtoy toy holding sparkgpu gpu in a datacenter`. You can expect the generation to take ~3 mins since it is compute intesive to create high-resolution 1024px images.
 
-Build the Docker image for ComfyUI:
-
-```bash
-## Build the Docker image (this will download FLUX models automatically)
-docker build -f Dockerfile.inference --build-arg HF_TOKEN=$HF_TOKEN -t flux-comfyui .
-```
-
-Run the ComfyUI container:
-
-```bash
-docker run -it \
-    --gpus all \
-    --ipc=host \
-    --ulimit memlock=-1 \
-    --ulimit stack=67108864 \
-    --net=host \
-    flux-comfyui
-```
-
-Start ComfyUI for an intuitive interface:
-
-```bash
-cd /workspace/ComfyUI
-python main.py 
-```
-
-Access ComfyUI at `http://localhost:8188`
-
-## Step 8. Deploy the trained LoRA in ComfyUI
-
-Feel free to deploy the trained LoRA in ComfyUI in existing or custom workflows.
-Use your trained concepts in prompts:
-- `"tjtoy toy"` - Your custom toy concept
-- `"sparkgpu gpu"` - Your custom GPU concept
-- `"tjtoy toy holding sparkgpu gpu"` - Combined concepts
-
-## Step 9. Cleanup
-
-Exit the container and optionally remove the Docker image:
-
-```bash
-## Exit container
-exit
-
-## Remove Docker image (optional)
-docker stop <container_id>
-docker rmi flux-training
-```
-
-## Step 10. Next steps
-
-- Experiment with different LoRA strengths (0.8-1.2) in ComfyUI
-- Train on your own custom concepts by replacing images in the `data/` directory
-- Combine multiple LoRA models for complex compositions
-- Integrate the trained LoRA into other FLUX workflows
+For the provided prompt and random seed, the finetuned Flux model generated the following image. Unlike the base model, we can see that the finetuned model can generate multiple concepts in a single image. Additionally,ComfyUI exposes several fields to tune and change the look and feel of the generated images.
