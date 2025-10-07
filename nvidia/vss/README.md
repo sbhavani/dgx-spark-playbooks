@@ -11,7 +11,7 @@
 
 ## Overview
 
-## Basic Idea
+## Basic idea
 
 Deploy NVIDIA's Video Search and Summarization (VSS) AI Blueprint to build intelligent video analytics systems that combine vision language models, large language models, and retrieval-augmented generation. The system transforms raw video content into real-time actionable insights with video summarization, Q&A, and real-time alerts. You'll set up either a completely local Event Reviewer deployment or a hybrid deployment using remote model endpoints.
 
@@ -231,7 +231,6 @@ In this hybrid deployment, we would use NIMs from [build.nvidia.com](https://bui
 **8.1 Get NVIDIA API Key**
 
 - Log in to https://build.nvidia.com/explore/discover.
-- Navigate to any NIM for example, https://build.nvidia.com/meta/llama3-70b.
 - Search for **Get API Key** on the page and click on it.
 
 **8.2 Navigate to remote LLM deployment directory**
@@ -316,7 +315,7 @@ Follow the steps [here](https://docs.nvidia.com/vss/latest/content/ui_app.html) 
 
 ## Step 11. Cleanup and rollback
 
-To completely remove the VSS deployment and free up system resources.
+To completely remove the VSS deployment and free up system resources:
 
 > **Warning:** This will destroy all processed video data and analysis results.
 
