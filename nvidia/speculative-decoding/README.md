@@ -7,8 +7,8 @@
 - [Overview](#overview)
 - [Instructions](#instructions)
   - [Step 1. Configure Docker permissions](#step-1-configure-docker-permissions)
-  - [Step 2. Run Draft-Target Speculative Decoding](#step-2-run-draft-target-speculative-decoding)
-  - [Step 3. Test the Draft-Target setup](#step-3-test-the-draft-target-setup)
+  - [Step 2. Run draft-target speculative decoding](#step-2-run-draft-target-speculative-decoding)
+  - [Step 3. Test the draft-target setup](#step-3-test-the-draft-target-setup)
   - [Troubleshooting](#troubleshooting)
   - [Cleanup](#cleanup)
   - [Next Steps](#next-steps)
@@ -39,10 +39,12 @@ These examples demonstrate how to accelerate large language model inference whil
 
 - NVIDIA Spark device with sufficient GPU memory available
 - Docker with GPU support enabled
+
   ```bash
   docker run --gpus all nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev nvidia-smi
   ```
 - HuggingFace authentication configured (if needed for model downloads)
+
   ```bash
   huggingface-cli login
   ```
@@ -55,13 +57,9 @@ These examples demonstrate how to accelerate large language model inference whil
 
 **Risks:** GPU memory exhaustion with large models, container registry access issues, network timeouts during downloads
 
-**Rollback:** Stop Docker containers and optionally clean up downloaded model cache
+**Rollback:** Stop Docker containers and optionally clean up downloaded model cache.
 
 ## Instructions
-
-## Traditional Draft-Target Speculative Decoding
-
-This example demonstrates traditional speculative decoding using a smaller draft model to accelerate a larger target model.
 
 ### Step 1. Configure Docker permissions
 
@@ -82,7 +80,7 @@ sudo usermod -aG docker $USER
 > **Warning**: After running usermod, you must log out and log back in to start a new
 > session with updated group permissions.
 
-### Step 2. Run Draft-Target Speculative Decoding
+### Step 2. Run draft-target speculative decoding
 
 Execute the following command to set up and run traditional speculative decoding:
 
@@ -118,7 +116,7 @@ EOF
   "
 ```
 
-### Step 3. Test the Draft-Target setup
+### Step 3. Test the draft-target setup
 
 Once the server is running, test it by making an API call from another terminal:
 
@@ -134,7 +132,7 @@ curl -X POST http://localhost:8000/v1/completions \
   }'
 ```
 
-#### Key Features of Draft-Target:
+#### Key features of draft-target:
 - **Efficient resource usage**: 8B draft model accelerates 70B target model
 - **Flexible configuration**: Adjustable draft token length for optimization
 - **Memory efficient**: Uses FP4 quantized models for reduced memory footprint
@@ -169,4 +167,4 @@ docker stop <container_id>
 - Experiment with different `max_draft_len` values (1, 2, 3, 4, 8)
 - Monitor token acceptance rates and throughput improvements
 - Test with different prompt lengths and generation parameters
-- Read more on Speculative Decoding [here](https://nvidia.github.io/TensorRT-LLM/advanced/speculative-decoding.html)
+- Read more on Speculative Decoding [here](https://nvidia.github.io/TensorRT-LLM/advanced/speculative-decoding.html).
