@@ -90,10 +90,18 @@ pip install transformers peft datasets "trl==0.19.1" "bitsandbytes==0.48"
 huggingface-cli login
 ##<input your huggingface token.
 ##<Enter n for git credential>
-
 ```
-To run LoRA on Llama3-8B use the following command:
 
+## Step6:  Clone the git repo with finetuning recipes
+
+```bash
+git clone <github link>
+cd assets
+```
+
+##Step7: Run the finetuning recipes
+
+To run LoRA on Llama3-8B use the following command:
 ```bash
 python Llama3_8B_LoRA_finetuning.py
 ```
