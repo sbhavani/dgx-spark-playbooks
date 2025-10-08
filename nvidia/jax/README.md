@@ -95,7 +95,7 @@ sudo systemctl restart docker
 ## Step 2. Clone the playbook repository
 
 ```bash
-git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main
+git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets
 ```
 
 ## Step 3. Build the Docker image

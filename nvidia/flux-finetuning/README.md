@@ -75,7 +75,7 @@ sudo usermod -aG docker $USER
 In a terminal, clone the repository and navigate to the flux-finetuning directory.
 
 ```bash
-git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main dgx-spark-playbooks
+git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets dgx-spark-playbooks
 ```
 
 ## Step 3. Model download
