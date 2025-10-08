@@ -13,6 +13,14 @@
 
 ## Overview
 
+## Basic idea
+
+vLLM is an inference engine designed to run large language models efficiently. The key idea is **maximizing throughput and minimizing memory waste** when serving LLMs.  
+
+- It uses a memory-efficient attention algoritm called **PagedAttention** to handle long sequences without running out of GPU memory.  
+- New requests can be added to a batch already in process through **continuous batching** to keep GPUs fully utilized.  
+- It has an **OpenAI-compatible API** so applications built for the OpenAI API can switch to a vLLM backend with little or no modification.  
+
 ## What you'll accomplish
 
 You'll set up vLLM high-throughput LLM serving on DGX Spark with Blackwell architecture, 
@@ -40,7 +48,7 @@ support for ARM64.
 
 ## Time & risk
 
-**Time estimate:** 30 minutes for Docker approach
+**Duration:** 30 minutes for Docker approach
 
 **Risks:** Container registry access requires internal credentials
 
