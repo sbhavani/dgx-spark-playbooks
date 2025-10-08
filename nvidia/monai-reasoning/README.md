@@ -78,15 +78,14 @@ uname -m
 
 * **Estimated time:** 20-35 minutes (not including model download)
 * **Risk level:** Low. All steps use publicly available containers and models
-* **Rollback:** The entire deployment is containerized. To roll back, you can simply stop 
-and remove the Docker containers
-
-## Instructions
-
-> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+* **Rollback:** The entire deployment is containerized. To roll back, you can simply stop and remove the Docker containers
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
 ```bash
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 ```
+
+## Instructions
+
 ## Step 1. Create the Project Directory
 
 First, create a dedicated directory to store your model weights and configuration files. This 
