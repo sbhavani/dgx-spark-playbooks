@@ -62,15 +62,16 @@ all traffic automatically encrypted and NAT traversal handled transparently.
 
 ## Time & risk
 
-**Duration**: 15-30 minutes for initial setup, 5 minutes per additional device
-
-**Risks**:
-- Potential SSH service configuration conflicts
-- Network connectivity issues during initial setup
-- Authentication provider service dependencies
-
-**Rollback**: Tailscale can be completely removed with `sudo apt remove tailscale`
-and all network routing automatically reverts to default settings.
+* **Duration**: 15-30 minutes for initial setup, 5 minutes per additional device
+* **Risks**:
+  * Potential SSH service configuration conflicts
+  * Network connectivity issues during initial setup
+  * Authentication provider service dependencies
+* **Rollback**: Tailscale can be completely removed with `sudo apt remove tailscale` and all network routing automatically reverts to default settings.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 

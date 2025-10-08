@@ -43,18 +43,20 @@ The setup includes:
 
 ## Time & risk
 
-**Duration**:
-- 15-20 minutes for initial setup and model downloads
-- 30-60 minutes for image VLM training (depending on dataset size)
-- 1-2 hours for video VLM training (depending on video dataset size)
-
-**Risks**:
-- Docker permission issues may require user group changes and a session restart
-- Large model downloads and datasets may require significant disk space and time
-- Training requires sustained GPU usage and memory
-- Dataset preparation may require manual steps (Kaggle downloads, video processing)
-
-**Rollback**: Stop and remove Docker containers, delete downloaded models and datasets if needed.
+* **Duration**:
+  * 15-20 minutes for initial setup and model downloads
+  * 30-60 minutes for image VLM training (depending on dataset size)
+  * 1-2 hours for video VLM training (depending on video dataset size)
+* **Risks**:
+  * Docker permission issues may require user group changes and a session restart
+  * Large model downloads and datasets may require significant disk space and time
+  * Training requires sustained GPU usage and memory
+  * Dataset preparation may require manual steps (Kaggle downloads, video processing)
+* **Rollback**: Stop and remove Docker containers, delete downloaded models and datasets if needed.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 

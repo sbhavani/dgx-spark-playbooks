@@ -48,15 +48,16 @@ The Python test script can be found [here on GitHub](https://gitlab.com/nvidia/d
 
 ## Time & risk
 
-**Duration**: 30-60 minutes for initial setup and test run
-
-**Risks**: 
-
-- Triton compiler version mismatches may cause compilation errors
-- CUDA toolkit configuration issues may prevent kernel compilation
-- Memory constraints on smaller models require batch size adjustments
-
-**Rollback**: Uninstall packages with `pip uninstall unsloth torch torchvision`.
+* **Duration**: 30-60 minutes for initial setup and test run
+* **Risks**: 
+  * Triton compiler version mismatches may cause compilation errors
+  * CUDA toolkit configuration issues may prevent kernel compilation
+  * Memory constraints on smaller models require batch size adjustments
+* **Rollback**: Uninstall packages with `pip uninstall unsloth torch torchvision`.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 

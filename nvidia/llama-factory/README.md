@@ -63,14 +63,13 @@ model adaptation for specialized domains while leveraging hardware-specific opti
 
 ## Time & risk
 
-**Duration:** 30-60 minutes for initial setup, 1-7 hours for training depending on model size
-and dataset.
-
-**Risks:** Model downloads require significant bandwidth and storage. Training may consume 
-substantial GPU memory and require parameter tuning for hardware constraints.
-
-**Rollback:** Remove Docker containers and cloned repositories. Training checkpoints are 
-saved locally and can be deleted to reclaim storage space.
+* **Duration:** 30-60 minutes for initial setup, 1-7 hours for training depending on model size and dataset.
+* **Risks:** Model downloads require significant bandwidth and storage. Training may consume substantial GPU memory and require parameter tuning for hardware constraints.
+* **Rollback:** Remove Docker containers and cloned repositories. Training checkpoints are saved locally and can be deleted to reclaim storage space.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 

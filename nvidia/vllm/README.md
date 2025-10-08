@@ -48,11 +48,13 @@ support for ARM64.
 
 ## Time & risk
 
-**Duration:** 30 minutes for Docker approach
-
-**Risks:** Container registry access requires internal credentials
-
-**Rollback:** Container approach is non-destructive.
+* **Duration:** 30 minutes for Docker approach
+* **Risks:** Container registry access requires internal credentials
+* **Rollback:** Container approach is non-destructive. 
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 

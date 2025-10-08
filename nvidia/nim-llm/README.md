@@ -60,14 +60,16 @@ completions.
 
 ### Time & risk
 
-**Estimated time:** 15-30 minutes for setup and validation
-
-**Risks:**
-- Large model downloads may take significant time depending on network speed
-- GPU memory requirements vary by model size
-- Container startup time depends on model loading
-
-**Rollback:** Stop and remove containers with `docker stop <CONTAINER_NAME> && docker rm <CONTAINER_NAME>`. Remove cached models from `~/.cache/nim` if disk space recovery is needed.
+* **Estimated time:** 15-30 minutes for setup and validation
+* **Risks:**
+  * Large model downloads may take significant time depending on network speed
+  * GPU memory requirements vary by model size
+  * Container startup time depends on model loading
+* **Rollback:** Stop and remove containers with `docker stop <CONTAINER_NAME> && docker rm <CONTAINER_NAME>`. Remove cached models from `~/.cache/nim` if disk space recovery is needed.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 

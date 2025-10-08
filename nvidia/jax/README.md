@@ -59,13 +59,15 @@ All required assets can be found [here on GitHub](https://gitlab.com/nvidia/dgx-
 
 ## Time & risk
 
-**Duration:** 2-3 hours including setup, tutorial completion, and validation
-
-**Risks:** 
-- Package dependency conflicts in Python environment
-- Performance validation may require architecture-specific optimizations
-
+* **Duration:** 2-3 hours including setup, tutorial completion, and validation
+* **Risks:** 
+  * Package dependency conflicts in Python environment
+  * Performance validation may require architecture-specific optimizations
 **Rollback:** Container environments provide isolation; remove containers and restart to reset state.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 

@@ -42,13 +42,15 @@ The setup includes:
 
 ## Time & risk
 
-**Estimated time**: 30 minutes to an hour
-
-**Risks**:
-- Docker permission issues may require user group changes and session restart
-- Setup includes downloading model files for gpt-oss-120B (~63GB), Deepseek-Coder:6.7B-Instruct (~7GB) and Qwen3-Embedding-4B (~4GB), which may take between 30 minutes to 2 hours depending on network speed
-
-**Rollback**: Stop and remove Docker containers using provided cleanup commands.
+* **Estimated time**: 30 minutes to an hour
+* **Risks**:
+  * Docker permission issues may require user group changes and session restart
+  * Setup includes downloading model files for gpt-oss-120B (~63GB), Deepseek-Coder:6.7B-Instruct (~7GB) and Qwen3-Embedding-4B (~4GB), which may take between 30 minutes to 2 hours depending on network speed
+* **Rollback**: Stop and remove Docker containers using provided cleanup commands.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 

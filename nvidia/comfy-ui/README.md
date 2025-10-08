@@ -58,14 +58,15 @@ All required assets can be found [in the ComfyUI repository on GitHub](https://g
 
 ## Time & risk
 
-**Estimated time:** 30-45 minutes (including model download)
-
-**Risk level:** Medium
-- Model downloads are large (~2GB) and may fail due to network issues
-- Port 8188 must be accessible for web interface functionality
-
-**Rollback:** Virtual environment can be deleted to remove all installed packages. Downloaded models 
-can be removed manually from the checkpoints directory.
+* **Estimated time:** 30-45 minutes (including model download)
+* **Risk level:** Medium
+  * Model downloads are large (~2GB) and may fail due to network issues
+  * Port 8188 must be accessible for web interface functionality
+* **Rollback:** Virtual environment can be deleted to remove all installed packages. Downloaded models can be removed manually from the checkpoints directory.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 

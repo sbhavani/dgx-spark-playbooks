@@ -39,15 +39,17 @@ The setup includes:
 
 ## Time & risk
 
-**Duration**:
-- 30-45 minutes for initial setup model download time
-- 1-2 hours for dreambooth LoRA training
-
-**Risks**:
-- Docker permission issues may require user group changes and session restart
-- The recipe would require hyperparameter tuning and a high-quality dataset for the best results
-
+* **Duration**:
+  * 30-45 minutes for initial setup model download time
+  * 1-2 hours for dreambooth LoRA training
+* **Risks**:
+  * Docker permission issues may require user group changes and session restart
+  * The recipe would require hyperparameter tuning and a high-quality dataset for the best results
 **Rollback**: Stop and remove Docker containers, delete downloaded models if needed.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 

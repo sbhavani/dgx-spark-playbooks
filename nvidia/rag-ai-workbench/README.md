@@ -50,12 +50,13 @@ architectures.
 
 ## Time & risk
 
-**Estimated time:** 30-45 minutes (including AI Workbench installation if needed)
-
-**Risk level:** Low - Uses pre-built containers and established APIs
-
-**Rollback:** Simply delete the cloned project from AI Workbench to remove all components. No system
-changes are made outside the AI Workbench environment.
+* **Estimated time:** 30-45 minutes (including AI Workbench installation if needed)
+* **Risk level:** Low - Uses pre-built containers and established APIs
+* **Rollback:** Simply delete the cloned project from AI Workbench to remove all components. No system changes are made outside the AI Workbench environment.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 

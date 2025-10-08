@@ -110,11 +110,13 @@ Reminder: not all model architectures are supported for NVFP4 quantization.
 
 ## Time & risk
 
-**Duration**: 45-60 minutes for setup and API server deployment
-
-**Risk level**: Medium - container pulls and model downloads may fail due to network issues
-
-**Rollback**: Stop inference servers and remove downloaded models to free resources.
+* **Duration**: 45-60 minutes for setup and API server deployment
+* **Risk level**: Medium - container pulls and model downloads may fail due to network issues
+* **Rollback**: Stop inference servers and remove downloaded models to free resources.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Single Spark
 

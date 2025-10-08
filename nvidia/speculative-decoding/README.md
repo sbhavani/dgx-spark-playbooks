@@ -52,11 +52,13 @@ These examples demonstrate how to accelerate large language model inference whil
 
 ## Time & risk
 
-**Duration:** 10-20 minutes for setup, additional time for model downloads (varies by network speed)
-
-**Risks:** GPU memory exhaustion with large models, container registry access issues, network timeouts during downloads
-
-**Rollback:** Stop Docker containers and optionally clean up downloaded model cache.
+* **Duration:** 10-20 minutes for setup, additional time for model downloads (varies by network speed)
+* **Risks:** GPU memory exhaustion with large models, container registry access issues, network timeouts during downloads
+* **Rollback:** Stop Docker containers and optionally clean up downloaded model cache.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 

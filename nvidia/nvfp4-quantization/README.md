@@ -58,14 +58,16 @@ df -h .
 
 ## Time & risk
 
-**Estimated duration**: 45-90 minutes depending on network speed and model size
-
-**Risks**:
-- Model download may fail due to network issues or Hugging Face authentication problems
-- Quantization process is memory-intensive and may fail on systems with insufficient GPU memory
-- Output files are large (several GB) and require adequate storage space
-
-**Rollback**: Remove the output directory and any pulled Docker images to restore original state.
+* **Estimated duration**: 45-90 minutes depending on network speed and model size
+* **Risks**:
+  * Model download may fail due to network issues or Hugging Face authentication problems
+  * Quantization process is memory-intensive and may fail on systems with insufficient GPU memory
+  * Output files are large (several GB) and require adequate storage space
+* **Rollback**: Remove the output directory and any pulled Docker images to restore original state.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 

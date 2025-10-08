@@ -45,14 +45,16 @@ You will deploy NVIDIA's VSS AI Blueprint on NVIDIA Spark hardware with Blackwel
 
 ## Time & risk
 
-**Duration:** 30-45 minutes for initial setup, additional time for video processing validation
-
-**Risks:**
-- Container startup can be resource-intensive and time-consuming with large model downloads
-- Network configuration conflicts if shared network already exists
-- Remote API endpoints may have rate limits or connectivity issues (hybrid deployment)
-
-**Rollback:** Stop all containers with `docker compose down`, remove shared network with `docker network rm vss-shared-network`, and clean up temporary media directories.
+* **Duration:** 30-45 minutes for initial setup, additional time for video processing validation
+* **Risks:**
+  * Container startup can be resource-intensive and time-consuming with large model downloads
+  * Network configuration conflicts if shared network already exists
+  * Remote API endpoints may have rate limits or connectivity issues (hybrid deployment)
+* **Rollback:** Stop all containers with `docker compose down`, remove shared network with `docker network rm vss-shared-network`, and clean up temporary media directories.
+* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
 
 ## Instructions
 
