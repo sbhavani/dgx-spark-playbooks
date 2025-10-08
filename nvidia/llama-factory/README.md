@@ -1,6 +1,6 @@
-# Llama Factory
+# LLaMA Factory
 
-> Install and fine-tune models with LLama Factory
+> Install and fine-tune models with LLaMA Factory
 
 ## Table of Contents
 
@@ -11,6 +11,13 @@
 ---
 
 ## Overview
+
+## Basic idea
+LLaMA Factory is an open-source framework that simplifies the process of training and fine 
+tuning large language models. It offers a unified interface for a variety of cutting edge 
+methods such as SFT, RLHF, and QLoRA techniques. It also supports a wide range of LLM 
+architectures such as LLaMA, Mistral and Qwen. This playbook demonstrates how to fine-tune 
+large language models using LLaMA Factory CLI on your NVIDIA Spark device.
 
 ## What you'll accomplish
 
@@ -107,7 +114,9 @@ pip install -e ".[metrics]"
 
 ## Step 5. Verify Pytorch CUDA support. 
 
-PyTorch is pre-installed with CUDA support. Verify installation:
+PyTorch is pre-installed with CUDA support.
+
+To verify installation:
 
 ```bash
 python -c "import torch; print(f'PyTorch: {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
@@ -123,7 +132,8 @@ cat examples/train_lora/llama3_lora_sft.yaml
 
 ## Step 7. Launch fine-tuning training
 
-> **Note:** Login to your hugging face hub to download the model if the model is gated
+> **Note:** Login to your hugging face hub to download the model if the model is gated.
+
 Execute the training process using the pre-configured LoRA setup.
 
 ```bash

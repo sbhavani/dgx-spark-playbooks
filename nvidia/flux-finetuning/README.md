@@ -40,7 +40,7 @@ The setup includes:
 ## Time & risk
 
 **Duration**:
-- 15 minutes for initial setup model download time
+- 30-45 minutes for initial setup model download time
 - 1-2 hours for dreambooth LoRA training
 
 **Risks**:
@@ -85,9 +85,10 @@ If you do not have a `HF_TOKEN` already, follow the instructions [here](https://
 
 ```bash
 export HF_TOKEN=<YOUR_HF_TOKEN>
-cd flux-finetuning/assets
+cd dgx-spark-playbooks/nvidia/flux-finetuning/assets
 sh download.sh
 ```
+The download script can take about 30-45 minutes to complete based on your internet speed.
 
 If you already have fine-tuned LoRAs, place them inside `models/loras`. If you do not have one yet, proceed to the `Step 6. Training` section for more details.
 
@@ -120,27 +121,29 @@ sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 
 ## Step 5. Dataset preparation
 
-Let's prepare our dataset to perform Dreambooth LoRA fine-tuning on the FLUX.1-dev 12B model. However, if you wish to continue with the provided dataset of Toy Jensen and DGX Spark, feel free to skip to the Training section below. This dataset is a collection of public assets accessible via Google Images.
+Let's prepare our dataset to perform Dreambooth LoRA fine-tuning on the FLUX.1-dev 12B model.
 
-You will need to prepare a dataset of all the concepts you would like to generate and about 5-10 images for each concept. For this example, we would like to generate images with 2 concepts.
+For this playbook, we have already prepared a dataset of 2 concepts - Toy Jensen and DGX Spark. This dataset is a collection of public assets accessible via Google Images. If you wish to generate images with these concepts, you do not need to modify the `data.toml` file.
 
 **TJToy Concept**
 - **Trigger phrase**: `tjtoy toy`
-- **Training images**: 6 high-quality images of custom toy figures
+- **Training images**: 6 high-quality images of Toy Jensen figures available in the public domain
 - **Use case**: Generate images featuring the specific toy character in various scenes
 
 **SparkGPU Concept**
 - **Trigger phrase**: `sparkgpu gpu`
-- **Training images**: 7 images of custom GPU hardware
+- **Training images**: 7 images of DGX Spark GPU available in the public domain
 - **Use case**: Generate images featuring the specific GPU design in different contexts
+
+If you wish to generate images with custom concepts, you would need to prepare a dataset of all the concepts you would like to generate and about 5-10 images for each concept. 
 
 Create a folder for each concept with its corresponding name and place it inside the `flux_data` directory. In our case, we have used `sparkgpu` and `tjtoy` as our concepts, and placed a few images inside each of them.
 
-Now, let's modify the `flux_data/data.toml` file to reflect the concepts chosen. Ensure that you update/create entries for each of your concept by modifying the `image_dir` and `class_tokens` fields under `[[datasets.subsets]]`. For better performance in fine-tuning, it is good practice to append a class token to your concept name (like `toy` or `gpu`).
+Now, let's modify the `flux_data/data.toml` file to reflect the concepts chosen. Ensure that you update/create entries for each of your concepts by modifying the `image_dir` and `class_tokens` fields under `[[datasets.subsets]]`. For better performance in fine-tuning, it is good practice to append a class token to your concept name (like `toy` or `gpu`).
 
 ## Step 6. Training
 
- Launch training by executing the follow command. The training script is set up to use a default configuration that can generate reasonable images for your dataset, in about ~90 mins of training. This train command will automatically store checkpoints in the `models/loras/` directory.
+Launch training by executing the following command. The training script uses a default configuration that produces images that capture your DreamBooth concepts effectively after about 90 minutes of training. This train command will automatically store checkpoints in the `models/loras/` directory.
 
 ```bash
 ## Build the inference docker image

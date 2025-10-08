@@ -1,4 +1,4 @@
-# Connect to Your Spark
+# Connect to Your Spark from Another Computer
 
 > Use NVIDIA Sync or manual SSH to connect to your Spark
 

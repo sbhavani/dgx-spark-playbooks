@@ -1,6 +1,6 @@
 # Quantize to NVFP4
 
-> Quantize a model to NVFP4 to run on Spark
+> Quantize a model to NVFP4 to run on Spark using TensorRT Model Optimizer
 
 ## Table of Contents
 
@@ -29,6 +29,8 @@
 You'll quantize the DeepSeek-R1-Distill-Llama-8B model using NVIDIA's TensorRT Model Optimizer
 inside a TensorRT-LLM container, producing an NVFP4 quantized model for deployment on NVIDIA DGX Spark.
 
+The examples use NVIDIA FP4 quantized models which help reduce model size by approximately 2x by reducing the precision of model layers.
+This quantization approach aims to preserve accuracy while providing significant throughput improvements. However, it's important to note that quantization can potentially impact model accuracy - we recommend running evaluations to verify if the quantized model maintains acceptable performance for your use case.
 
 ## What to know before starting
 
@@ -162,12 +164,16 @@ You should see model weight files, configuration files, and tokenizer files in t
 
 ## Step 7. Test model loading
 
-Verify the quantized model can be loaded properly using a simple Python test.
+First, set the path to your quantized model:
 
 ```bash
-
+## Set path to quantized model directory
 export MODEL_PATH="./output_models/saved_models_DeepSeek-R1-Distill-Llama-8B_nvfp4_hf/"
+```
 
+Now verify the quantized model can be loaded properly using a simple test:
+
+```bash
 docker run \
   -e HF_TOKEN=$HF_TOKEN \
   -v $HOME/.cache/huggingface/:/root/.cache/huggingface/ \
@@ -183,7 +189,41 @@ docker run \
     '
 ```
 
-## Step 8. Troubleshooting
+## Step 8. Serve the model with OpenAI-compatible API
+Start the TensorRT-LLM OpenAI-compatible API server with the quantized model.
+First, set the path to your quantized model:
+
+```bash
+## Set path to quantized model directory
+export MODEL_PATH="./output_models/saved_models_DeepSeek-R1-Distill-Llama-8B_nvfp4_hf/"
+
+docker run \
+  -e HF_TOKEN=$HF_TOKEN \
+  -v "$MODEL_PATH:/workspace/model" \
+  --rm -it --ulimit memlock=-1 --ulimit stack=67108864 \
+  --gpus=all --ipc=host --network host \
+  nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
+  trtllm-serve /workspace/model \
+    --backend pytorch \
+    --max_batch_size 4 \
+    --port 8000
+```
+
+Run the following to test the server with a client CURL request:
+
+```bash
+curl -X POST http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+    "prompt": "What is artificial intelligence?",
+    "max_tokens": 100,
+    "temperature": 0.7,
+    "stream": false
+  }'
+```
+
+## Step 9. Troubleshooting
 
 | Symptom | Cause | Fix |
 |---------|--------|-----|
@@ -193,7 +233,7 @@ docker run \
 | Git clone fails inside container | Network connectivity issues | Check internet connection and retry |
 | Quantization process hangs | Container resource limits | Increase Docker memory limits or use `--ulimit` flags |
 
-## Step 9. Cleanup and rollback
+## Step 10. Cleanup and rollback
 
 To clean up the environment and remove generated files:
 
@@ -210,7 +250,7 @@ rm -rf ~/.cache/huggingface
 docker rmi nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev
 ```
 
-## Step 10. Next steps
+## Step 11. Next steps
 
 The quantized model is now ready for deployment. Common next steps include:
 - Benchmarking inference performance compared to the original model.

@@ -485,7 +485,7 @@ rocep1s0f0 port 1 ==> enp1s0f0np0 (Up)
 rocep1s0f1 port 1 ==> enp1s0f1np1 (Down)
 ```
 
-Use an interface that shows as "(Up)" in your output. In this example, we'll use enP2p1s0f0np0.
+Use an interface that shows as "(Up)" in your output. In this example, we'll use **enp1s0f0np0**.
 
 On Node 1:
 ```bash
