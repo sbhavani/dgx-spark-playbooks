@@ -82,7 +82,7 @@ sudo usermod -aG docker $USER
 In a terminal, clone the repository and navigate to the VLM fine-tuning directory.
 
 ```bash
-git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/
+git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main
 ```
 
 ## Step 3. Build the Docker container
