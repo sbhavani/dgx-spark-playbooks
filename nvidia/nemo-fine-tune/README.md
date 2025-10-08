@@ -6,18 +6,13 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
-  - [If system installation fails](#if-system-installation-fails)
-  - [Install from wheel package (recommended)](#install-from-wheel-package-recommended)
-  - [Full Fine-tuning example:](#full-fine-tuning-example)
-  - [LoRA fine-tuning example:](#lora-fine-tuning-example)
-  - [QLoRA fine-tuning example:](#qlora-fine-tuning-example)
   - [Step 9. Configure distributed training (optional)](#step-9-configure-distributed-training-optional)
 
 ---
 
 ## Overview
 
-## Basic Idea
+## Basic idea
 
 This playbook guides you through setting up and using NVIDIA NeMo AutoModel for fine-tuning large language models and vision-language models on NVIDIA Spark devices. NeMo AutoModel provides GPU-accelerated, end-to-end training for Hugging Face models with native PyTorch support, enabling instant fine-tuning without conversion delays. The framework supports distributed training across single GPU to multi-node clusters, with optimized kernels and memory-efficient recipes specifically designed for ARM64 architecture and Blackwell GPU systems.
 
@@ -36,20 +31,11 @@ You'll establish a complete fine-tuning environment for large language models (1
 ## Prerequisites
 
 - NVIDIA Spark device with Blackwell architecture GPU access
-- CUDA toolkit 12.0+ installed and configured
-  ```bash
-  nvcc --version
-  ```
-- Python 3.10+ environment available
-  ```bash
-  python3 --version
-  ```
+- CUDA toolkit 12.0+ installed and configured: `nvcc --version`
+- Python 3.10+ environment available: `python3 --version`
 - Minimum 32GB system RAM for efficient model loading and training
 - Active internet connection for downloading models and packages
-- Git installed for repository cloning
-  ```bash
-  git --version
-  ```
+- Git installed for repository cloning: `git --version`
 - SSH access to your NVIDIA Spark device configured
 
 ## Ancillary files
@@ -58,11 +44,11 @@ All necessary files for the playbook can be found [here on GitHub](https://githu
 
 ## Time & risk
 
-**Time estimate:** 45-90 minutes for complete setup and initial model fine-tuning
+**Duration:** 45-90 minutes for complete setup and initial model fine-tuning
 
 **Risks:** Model downloads can be large (several GB), ARM64 package compatibility issues may require troubleshooting, distributed training setup complexity increases with multi-node configurations
 
-**Rollback:** Virtual environments can be completely removed; no system-level changes are made to the host system beyond package installations
+**Rollback:** Virtual environments can be completely removed; no system-level changes are made to the host system beyond package installations.
 
 ## Instructions
 
@@ -113,7 +99,7 @@ pip3 install uv
 uv --version
 ```
 
-### If system installation fails
+#### If system installation fails
 
 ```bash
 ## Install for current user only
@@ -139,7 +125,7 @@ cd Automodel
 
 Set up the virtual environment and install NeMo AutoModel. Choose between wheel package installation for stability or source installation for latest features.
 
-### Install from wheel package (recommended)
+#### Install from wheel package (recommended)
 
 ```bash
 ## Initialize virtual environment
@@ -209,7 +195,7 @@ export HF_TOKEN=<your_huggingface_token>
 ```
 > **Note:** Please Replace `<your_huggingface_token>` with your Hugging Face access token to access gated models (e.g., Llama).
 
-### Full Fine-tuning example:
+#### Full Fine-tuning example:
 Once inside the `Automodel` directory you git cloned from github, run:
 ```bash
 uv run --frozen --no-sync \
@@ -224,7 +210,7 @@ These overrides ensure the Qwen3-8B SFT run behaves as expected:
 - `--loss_fn._target_`: uses the TransformerEngine-parallel cross-entropy loss variant compatible with tensor-parallel training for large LLMs.
 - `--step_scheduler.local_batch_size`: sets the per-GPU micro-batch size to 1 to fit in memory; overall effective batch size is still driven by gradient accumulation and data/tensor parallel settings from the recipe.
 
-### LoRA fine-tuning example:
+#### LoRA fine-tuning example:
 Execute a basic fine-tuning example to validate the complete setup. This demonstrates parameter-efficient fine-tuning using a small model suitable for testing.
 
 ```bash
@@ -234,7 +220,7 @@ examples/llm_finetune/finetune.py \
 -c examples/llm_finetune/llama3_2/llama3_2_1b_squad_peft.yaml \
 --model.pretrained_model_name_or_path meta-llama/Llama-3.1-8B
 ```
-### QLoRA fine-tuning example:
+#### QLoRA fine-tuning example:
 We can use QLoRA to fine-tune large models in a memory-efficient manner.
 ```bash
 uv run --frozen --no-sync \
