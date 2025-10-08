@@ -9,9 +9,9 @@
   - [Step 1. Configure Docker permissions](#step-1-configure-docker-permissions)
   - [Step 2. Run draft-target speculative decoding](#step-2-run-draft-target-speculative-decoding)
   - [Step 3. Test the draft-target setup](#step-3-test-the-draft-target-setup)
-  - [Step 4. Troubleshooting](#step-4-troubleshooting)
-  - [Step 5.  Cleanup](#step-5-cleanup)
-  - [Step 6. Next Steps](#step-6-next-steps)
+  - [Troubleshooting](#troubleshooting)
+  - [Cleanup](#cleanup)
+  - [Next Steps](#next-steps)
 
 ---
 
@@ -25,6 +25,7 @@ This way, the big model doesn't need to predict every token step-by-step, reduci
 ## What you'll accomplish
 
 You'll explore speculative decoding using TensorRT-LLM on NVIDIA Spark using the traditional Draft-Target approach.
+
 These examples demonstrate how to accelerate large language model inference while maintaining output quality.
 
 ## What to know before starting
@@ -131,14 +132,13 @@ curl -X POST http://localhost:8000/v1/completions \
   }'
 ```
 
-**Key features of draft-target:**
-
+#### Key features of draft-target:
 - **Efficient resource usage**: 8B draft model accelerates 70B target model
 - **Flexible configuration**: Adjustable draft token length for optimization
 - **Memory efficient**: Uses FP4 quantized models for reduced memory footprint
 - **Compatible models**: Uses Llama family models with consistent tokenization
 
-### Step 4. Troubleshooting
+### Troubleshooting
 
 Common issues and solutions:
 
@@ -149,7 +149,7 @@ Common issues and solutions:
 | Model download fails | Network or authentication issues | Check HuggingFace authentication and network connectivity |
 | Server doesn't respond | Port conflicts or firewall | Check if port 8000 is available and not blocked |
 
-### Step 5.  Cleanup
+### Cleanup
 
 Stop the Docker container when finished:
 
@@ -162,7 +162,7 @@ docker stop <container_id>
 ## rm -rf $HOME/.cache/huggingface/hub/models--*gpt-oss*
 ```
 
-### Step 6. Next Steps
+### Next Steps
 
 - Experiment with different `max_draft_len` values (1, 2, 3, 4, 8)
 - Monitor token acceptance rates and throughput improvements

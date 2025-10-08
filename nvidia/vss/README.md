@@ -24,16 +24,17 @@ You will deploy NVIDIA's VSS AI Blueprint on NVIDIA Spark hardware with Blackwel
 - Working with NVIDIA Docker containers and container registries
 - Setting up Docker Compose environments with shared networks
 - Managing environment variables and authentication tokens
+- Working with NVIDIA DeepStream and computer vision pipelines
 - Basic understanding of video processing and analysis workflows
 
 ## Prerequisites
 
 - NVIDIA Spark device with ARM64 architecture and Blackwell GPU
 - FastOS 1.81.38 or compatible ARM64 system
-- Driver version 580.82.09 or higher installed: `nvidia-smi | grep "Driver Version"`
+- Driver version 580.82.09 installed: `nvidia-smi | grep "Driver Version"`
 - CUDA version 13.0 installed: `nvcc --version`
 - Docker installed and running: `docker --version && docker compose version`
-- Access to NVIDIA Container Registry with [NGC API Key](https://org.ngc.nvidia.com/setup/api-keys)
+- Access to NVIDIA Container Registry with NGC API Key
 - [Optional] NVIDIA API Key for remote model endpoints (hybrid deployment only)
 - Sufficient storage space for video processing (>10GB recommended in `/tmp/`)
 
@@ -63,7 +64,7 @@ Check that your system meets the hardware and software prerequisites.
 ```bash
 ## Verify driver version
 nvidia-smi | grep "Driver Version"
-## Expected output: Driver Version: 580.82.09 or higher
+## Expected output: Driver Version: 580.82.09
 
 ## Verify CUDA version
 nvcc --version
@@ -90,9 +91,7 @@ newgrp docker
 ```
 
 > **Warning**: After running usermod, you must log out and log back in to start a new
-> session with updated group permissions, or in rare cases restart their spark for the 
-> changes to take effect.
-
+> session with updated group permissions.
 
 Additionally, configure Docker so that it can use the NVIDIA Container Runtime.
 
@@ -138,8 +137,6 @@ docker network create vss-shared-network
 ## Step 6. Authenticate with NVIDIA Container Registry
 
 Log in to NVIDIA's container registry using your [NGC API Key](https://org.ngc.nvidia.com/setup/api-keys).
-
-> **Note:** If you don’t have an NVIDIA account already, you’ll have to create one and register for the [developer program](https://developer.nvidia.com/nvidia-developer-program).
 
 ```bash
 ## Log in to NVIDIA Container Registry
@@ -198,7 +195,7 @@ Launch the complete VSS Event Reviewer stack including Alert Bridge, VLM Pipelin
 IS_SBSA=1 IS_AARCH64=1 ALERT_REVIEW_MEDIA_BASE_DIR=/tmp/alert-media-dir docker compose up
 ```
 
-> **Note:** This step will take several minutes as containers are pulled and services initialize. The VSS backend requires additional startup time. Proceed to the next step in a new terminal in the meantime.
+> **Note:** This step will take several minutes as containers are pulled and services initialize. The VSS backend requires additional startup time.
 
 **8.5 Navigate to CV Event Detector directory**
 
@@ -233,16 +230,7 @@ Allow time for all containers to fully initialize before accessing the user inte
 ```bash
 ## Monitor container status
 docker ps
-## Verify all containers show "Up" status and VSS backend logs (vss-engine-sbsa:2.4.0) show ready state "Uvicorn running on http://0.0.0.0:7860"
-## In total, there should be 8 containers:
-## nvcr.io/nvidia/blueprint/nv-cv-event-detector-ui:2.4.0
-## nvcr.io/nvidia/blueprint/nv-cv-event-detector-sbsa:2.4.0
-## nginx:alpine
-## nvcr.io/nvidia/blueprint/vss-alert-inspector-ui:2.4.0
-## nvcr.io/nvidia/blueprint/alert-bridge:0.19.0-multiarch
-## nvcr.io/nvidia/blueprint/vss-engine-sbsa:2.4.0
-## nvcr.io/nvidia/blueprint/vst-storage:2.1.0-25.07.1
-## redis/redis-stack-server:7.2.0-v9
+## Verify all containers show "Up" status and VSS backend logs show ready state
 ```
 
 **8.9 Validate Event Reviewer deployment**
@@ -250,28 +238,18 @@ docker ps
 Access the web interfaces to confirm successful deployment and functionality.
 
 ```bash
-## Test CV UI accessibility (default: localhost)
-curl -I http://localhost:7862
+## Test CV UI accessibility (replace <NODE_IP> with your system's IP)
+curl -I http://<NODE_IP>:7862
 ## Expected: HTTP 200 response
 
-## Test Alert Inspector UI accessibility (default: localhost)
-curl -I http://localhost:7860
+## Test Alert Inspector UI accessibility
+curl -I http://<NODE_IP>:7860
 ## Expected: HTTP 200 response
-
-## If you are running your Spark in Remote or Accessory mode, replace 'localhost' with the IP address or hostname of your Spark device.
-## To find your Spark's IP address, run the following command on the Spark system:
-hostname -I
-## Or to get the hostname:
-hostname
-## Then use the IP/hostname in place of 'localhost', for example:
-## curl -I http://<SPARK_IP_OR_HOSTNAME>:7862
 ```
 
 Open these URLs in your browser:
-- `http://localhost:7862` - CV UI to launch and monitor CV pipeline
-- `http://localhost:7860` - Alert Inspector UI to view clips and review VLM results
-
-> **Note:** You may now proceed to step 10.
+- `http://<NODE_IP>:7862` - CV UI to launch and monitor CV pipeline
+- `http://<NODE_IP>:7860` - Alert Inspector UI to view clips and review VLM results
 
 ## Step 9. Option B 
 
@@ -327,43 +305,32 @@ cat config.yaml | grep -A 10 "model"
 docker compose up
 ```
 
-> **Note:** This step will take several minutes as containers are pulled and services initialize. The VSS backend requires additional startup time. 
-
 **9.7 Validate Standard VSS deployment**
 
 Access the VSS UI to confirm successful deployment.
 
 ```bash
-## Test VSS UI accessibility
-## If running locally on your Spark device, use localhost:
-curl -I http://localhost:9100
+## Test VSS UI accessibility (replace <NODE_IP> with your system's IP)
+curl -I http://<NODE_IP>:9100
 ## Expected: HTTP 200 response
-
-## If your Spark is running in Remote/Accessory mode, replace 'localhost' with the IP address or hostname of your Spark device.
-## To find your Spark's IP address, run the following command on the Spark terminal:
-hostname -I
-## Or to get the hostname:
-hostname
-## Then test accessibility (replace <SPARK_IP_OR_HOSTNAME> with the actual value):
-curl -I http://<SPARK_IP_OR_HOSTNAME>:9100
 ```
 
-Open `http://localhost:9100` in your browser to access the VSS interface.
+Open `http://<NODE_IP>:9100` in your browser to access the VSS interface.
 
 ## Step 10. Test video processing workflow
 
-Run a basic test to verify the video analysis pipeline is functioning based on your deployment. The UI comes with a few example videos pre-populated for uploading and testing
+Run a basic test to verify the video analysis pipeline is functioning based on your deployment.
 
 **For Event Reviewer deployment**
 
 Follow the steps [here](https://docs.nvidia.com/vss/latest/content/vss_event_reviewer.html#vss-alert-inspector-ui) to access and use the Event Reviewer workflow.
-- Access CV UI at `http://localhost:7862` to upload and process videos
-- Monitor results in Alert Inspector UI at `http://localhost:7860`
+- Access CV UI at `http://<NODE_IP>:7862` to upload and process videos
+- Monitor results in Alert Inspector UI at `http://<NODE_IP>:7860`
 
 **For Standard VSS deployment**
 
 Follow the steps [here](https://docs.nvidia.com/vss/latest/content/ui_app.html) to navigate VSS UI - File Summarization, Q&A, and Alerts.
-- Access VSS interface at `http://localhost:9100`
+- Access VSS interface at `http://<NODE_IP>:9100`
 - Upload videos and test summarization features
 
 ## Step 11. Troubleshooting

@@ -13,14 +13,6 @@
 
 ## Overview
 
-## Basic idea
-
-vLLM is an inference engine designed to run large language models efficiently. The key idea is **maximizing throughput and minimizing memory waste** when serving LLMs.  
-
-- It uses a memory-efficient attention algoritm called **PagedAttention** to handle long sequences without running out of GPU memory.  
-- New requests can be added to a batch already in process through **continuous batching** to keep GPUs fully utilized.  
-- It has an **OpenAI-compatible API** so applications built for the OpenAI API can switch to a vLLM backend with little or no modification.  
-
 ## What you'll accomplish
 
 You'll set up vLLM high-throughput LLM serving on DGX Spark with Blackwell architecture, 
@@ -48,7 +40,7 @@ support for ARM64.
 
 ## Time & risk
 
-**Duration:** 30 minutes for Docker approach
+**Time estimate:** 30 minutes for Docker approach
 
 **Risks:** Container registry access requires internal credentials
 
@@ -99,7 +91,8 @@ Expected response should contain `"content": "204"` or similar mathematical calc
 | CUDA version mismatch errors | Wrong CUDA toolkit version | Reinstall CUDA 12.9 using exact installer |
 | Container registry authentication fails | Invalid or expired GitLab token | Generate new auth token |
 | SM_121a architecture not recognized | Missing LLVM patches | Verify SM_121a patches applied to LLVM source |
-
+| Reduce MAX_JOBS to 1-2, add swap space |
+| Environment variables not set |
 
 ## Step 4. Cleanup and rollback
 
@@ -191,11 +184,11 @@ sudo usermod -aG docker $USER
 newgrp docker
 ```
 
-After this, you should be able to run docker commands without using `sudo`. 
+You can now run docker commands without running `sudo`
+Next, ensure you have an NGC API Key to be able to pull containers from NGC
+## More info on setup of --  https://docs.nvidia.com/ngc/latest/ngc-private-registry-user-guide.html#accessing-the-ngc-container-registry
 
-Next, create an  NGC API Key [here](https://ngc.nvidia.com/setup/api-key) so that you can pull containers from NGC.
-
-Once you have the API key, you can configure docker to pull from NGC and pull down the VLLM image:
+With your API key ready, configure docker to pull from NGC and pull down the VLLM Image
 
 ```bash
 docker login nvcr.io

@@ -1,4 +1,4 @@
-# Connect to Your Spark from Another Computer
+# Connect to Your Spark
 
 > Use NVIDIA Sync or manual SSH to connect to your Spark
 
@@ -131,10 +131,18 @@ require installation on your laptop.
 
 ## Step 3. Add your DGX Spark device
 
+> **Find Your Hostname or IP**
+> 
+> You must know either your hostname or IP address to connect.
+>
+> - The default hostname can be found on the Quick Start Guide included in the box. For example, `spark-abcd.local`
+> - If you have a display connected to your device, you can find the hostname on the Settings page of the [DGX Dashboard](http://localhost:11000).
+> - If `.local` (mDNS) hostnames don't work on your network you must use your IP address. This can be found in Ubuntu's network settings or by logging into the admin console of your router.
+
 Finally, connect your DGX Spark by filling out the form:
 
 - **Name**: A descriptive name (e.g., "My DGX Spark")
-- **Hostname or IP**: The mDNS hostname from your quick start guide (e.g. `spark-abcd.local`) or an IP address
+- **Hostname or IP**: The mDNS hostname (e.g. `spark-abcd.local`) or IP address of your Spark
 - **Username**: Your DGX Spark user account name
 - **Password**: Your DGX Spark user account password
 

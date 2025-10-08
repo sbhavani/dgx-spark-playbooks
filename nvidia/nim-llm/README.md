@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
-  - [Basic idea](#basic-idea)
+  - [Basic Idea](#basic-idea)
   - [What you'll accomplish](#what-youll-accomplish)
   - [What to know before starting](#what-to-know-before-starting)
   - [Prerequisites](#prerequisites)
@@ -17,7 +17,7 @@
 
 ## Overview
 
-### Basic idea
+### Basic Idea
 
 NVIDIA Inference Microservices (NIMs) provide optimized containers for deploying large language
 models with simplified APIs. This playbook demonstrates how to run LLM NIMs on DGX Spark devices,
@@ -44,11 +44,11 @@ completions.
   ```bash
   nvidia-smi
   ```
-- Docker with NVIDIA Container Toolkit configured, instructions [here](https://******.nvidia.com/dgx-docs/review/621/dgx-spark/latest/nvidia-container-runtime-for-docker.html)
+- Docker with NVIDIA Container Toolkit configured, instructions here: https://******.nvidia.com/dgx-docs/review/621/dgx-spark/latest/nvidia-container-runtime-for-docker.html
   ```bash
   docker run -it --gpus=all nvcr.io/nvidia/cuda:13.0.1-devel-ubuntu24.04 nvidia-smi
   ```
-- NGC account with API key from [here](https://ngc.nvidia.com/setup/api-key)
+- NGC account with API key from https://ngc.nvidia.com/setup/api-key
   ```bash
   echo $NGC_API_KEY | grep -E '^[a-zA-Z0-9]{86}=='
   ```

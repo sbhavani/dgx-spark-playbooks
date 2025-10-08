@@ -1,4 +1,4 @@
-# Set up Tailscale on your Spark
+# Setup Tailscale on your Spark
 
 > Use Tailscale to connect to your Spark on your home network no matter where you are
 
@@ -25,7 +25,7 @@
 
 ## Overview
 
-## Basic idea
+## Basic Idea
 
 Tailscale creates an encrypted peer-to-peer mesh network that allows secure access
 to your NVIDIA Spark device from anywhere without complex firewall configurations
@@ -51,9 +51,8 @@ all traffic automatically encrypted and NAT traversal handled transparently.
 
 ## Prerequisites
 
-- NVIDIA Spark device running DGX OS (ARM64/AArch64)
+- NVIDIA Spark device running Ubuntu (ARM64/AArch64)
 - Client device (Mac, Windows, or Linux) for remote access
-- Client device and DGX Spark not on the same network when testing connectivity
 - Internet connectivity on both devices
 - Valid email account for Tailscale authentication (Google, GitHub, Microsoft)
 - SSH server availability check: `systemctl status ssh`
@@ -62,7 +61,7 @@ all traffic automatically encrypted and NAT traversal handled transparently.
 
 ## Time & risk
 
-**Duration**: 15-30 minutes for initial setup, 5 minutes per additional device
+**Time estimate**: 15-30 minutes for initial setup, 5 minutes per additional device
 
 **Risks**:
 - Potential SSH service configuration conflicts
@@ -99,10 +98,10 @@ the Spark device.
 
 ```bash
 ## Check if SSH is running
-systemctl status ssh --no-pager
+systemctl status ssh
 ```
 
-**If SSH is not installed or running:**
+#### If SSH is not installed or running
 
 ```bash
 ## Install OpenSSH server
@@ -110,10 +109,10 @@ sudo apt update
 sudo apt install -y openssh-server
 
 ## Enable and start SSH service
-sudo systemctl enable ssh --now --no-pager
+sudo systemctl enable ssh --now
 
 ## Verify SSH is running
-systemctl status ssh --no-pager
+systemctl status ssh
 ```
 
 ### Step 3. Install Tailscale on NVIDIA Spark
@@ -154,7 +153,7 @@ with authentication.
 tailscale version
 
 ## Check Tailscale service status
-sudo systemctl status tailscaled --no-pager
+sudo systemctl status tailscaled
 ```
 
 ### Step 5. Connect Spark device to Tailscale network
@@ -173,44 +172,31 @@ sudo tailscale up
 ### Step 6. Install Tailscale on client devices
 
 Install Tailscale on the devices you'll use to connect to your Spark remotely.
-
 Choose the appropriate method for your client operating system.
 
-**On macOS:**
-- Option 1: Install from Mac App Store by searching for "Tailscale" and then clicking Get → Install
-- Option 2: Download the .pkg installer from the [Tailscale website](https://tailscale.com/download)
-
-
-**On Windows:**
-- Download installer from the [Tailscale website](https://tailscale.com/download)
-- Run the .msi file and follow installation prompts
-- Launch Tailscale from Start Menu or system tray
-
-
-**On Linux:**
-
-Use the same instructions as were done for installing on your DGX Spark.
+#### On macOS
 
 ```bash
-## Update package list
-sudo apt update
+## Option 1: Install from Mac App Store
+## Search for "Tailscale" and click Get → Install
 
-## Install required tools for adding external repositories
-sudo apt install -y curl gnupg
+## Option 2: Download from website
+## Visit https://tailscale.com/download and download .pkg installer
+```
 
-## Add Tailscale signing key
-curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg | \
-  sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
+#### On Windows
 
-## Add Tailscale repository
-curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.tailscale-keyring.list | \
-  sudo tee /etc/apt/sources.list.d/tailscale.list
+```bash
+## Download installer from https://tailscale.com/download
+## Run the .msi file and follow installation prompts
+## Launch Tailscale from Start Menu or system tray
+```
 
-## Update package list with new repository
-sudo apt update
+#### On Linux
 
-## Install Tailscale
-sudo apt install -y tailscale
+```bash
+## Use same installation steps as Spark device (Steps 3-4)
+## Adjust repository URLs for your specific distribution if needed
 ```
 
 ### Step 7. Connect client devices to tailnet
@@ -218,13 +204,12 @@ sudo apt install -y tailscale
 Log in to Tailscale on each client device using the same identity provider
 account you used for the Spark device.
 
-**On macOS/Windows (GUI):**
+#### On macOS/Windows (GUI)
 - Launch Tailscale app
 - Click "Log in" button
 - Sign in with same account used on Spark
 
-**On Linux (CLI):**
-
+#### On Linux (CLI)
 ```bash
 ## Start Tailscale on client
 sudo tailscale up
@@ -252,7 +237,7 @@ tailscale ping <SPARK_HOSTNAME>
 Set up SSH key authentication for secure access to your Spark device. This
 step runs on your client device and Spark device.
 
-**Generate SSH key on client (if not already done):**
+#### Generate SSH key on client (if not already done)
 
 ```bash
 ## Generate new SSH key pair
@@ -262,7 +247,7 @@ ssh-keygen -t ed25519 -f ~/.ssh/tailscale_spark
 cat ~/.ssh/tailscale_spark.pub
 ```
 
-**Add public key to Spark device:**
+#### Add public key to Spark device
 
 ```bash
 ## On Spark device, add client's public key
@@ -297,9 +282,6 @@ Verify that Tailscale is working correctly and your SSH connection is stable.
 ## From client device, check connection status
 tailscale status
 
-## Create a test file on the client device
-echo "test file for the spark" > test.txt
-
 ## Test file transfer over SSH
 scp -i ~/.ssh/tailscale_spark test.txt <USERNAME>@<SPARK_HOSTNAME>:~/
 
@@ -307,7 +289,7 @@ scp -i ~/.ssh/tailscale_spark test.txt <USERNAME>@<SPARK_HOSTNAME>:~/
 ssh -i ~/.ssh/tailscale_spark <USERNAME>@<SPARK_HOSTNAME> 'nvidia-smi'
 ```
 
-Expected output:
+Expected output should show:
 - Tailscale status displaying both devices as "active"
 - Successful file transfers
 - Remote command execution working
@@ -319,7 +301,7 @@ Common issues and their solutions:
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | `tailscale up` auth fails | Network issues | Check internet, try `curl -I login.tailscale.com` |
-| SSH connection refused | SSH not running | Run `sudo systemctl start ssh --no-pager` on Spark |
+| SSH connection refused | SSH not running | Run `sudo systemctl start ssh` on Spark |
 | SSH auth failure | Wrong SSH keys | Check public key in `~/.ssh/authorized_keys` |
 | Cannot ping hostname | DNS issues | Use IP from `tailscale status` instead |
 | Devices missing | Different accounts | Use same identity provider for all devices |
@@ -355,5 +337,5 @@ Your Tailscale setup is complete. You can now:
 
 - Access your Spark device from any network with: `ssh <USERNAME>@<SPARK_HOSTNAME>`
 - Transfer files securely: `scp file.txt <USERNAME>@<SPARK_HOSTNAME>:~/`
-- Open the DGX Dashboard and start JupyterLab, then connect with:
-  `ssh -L 8888:localhost:1102 <USERNAME>@<SPARK_HOSTNAME>`
+- Run Jupyter notebooks remotely by SSH tunneling:
+  `ssh -L 8888:localhost:8888 <USERNAME>@<SPARK_HOSTNAME>`
