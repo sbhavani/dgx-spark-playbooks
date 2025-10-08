@@ -1,6 +1,6 @@
-# Llama Factory
+# LLaMA Factory
 
-> Install and fine-tune models with LLama Factory
+> Install and fine-tune models with LLaMA Factory
 
 ## Table of Contents
 

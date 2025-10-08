@@ -1,4 +1,4 @@
-# Setup Tailscale on your Spark
+# Set up Tailscale on your Spark
 
 > Use Tailscale to connect to your Spark on your home network no matter where you are
 

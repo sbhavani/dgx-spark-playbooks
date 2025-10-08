@@ -1,4 +1,4 @@
-# Fine tune with Nemo
+# Fine-tune with NeMo
 
 > Use NVIDIA NeMo to fine-tune models locally
 
