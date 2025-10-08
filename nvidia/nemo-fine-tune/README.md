@@ -6,7 +6,6 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
-  - [Step 9. Configure distributed training (optional)](#step-9-configure-distributed-training-optional)
 
 ---
 
@@ -99,7 +98,7 @@ pip3 install uv
 uv --version
 ```
 
-#### If system installation fails
+**If system installation fails:**
 
 ```bash
 ## Install for current user only
@@ -125,7 +124,7 @@ cd Automodel
 
 Set up the virtual environment and install NeMo AutoModel. Choose between wheel package installation for stability or source installation for latest features.
 
-#### Install from wheel package (recommended)
+**Install from wheel package (recommended):**
 
 ```bash
 ## Initialize virtual environment
@@ -173,7 +172,7 @@ uv run --frozen --no-sync python -c "import nemo_automodel; print('✅ NeMo Auto
 ls -la examples/
 ```
 
-## Step 6. Explore available examples
+## Step 8. Explore available examples
 
 Review the pre-configured training recipes available for different model types and training scenarios. These recipes provide optimized configurations for ARM64 and Blackwell architecture.
 
@@ -185,18 +184,21 @@ ls examples/llm_finetune/
 cat examples/llm_finetune/finetune.py | head -20
 ```
 
-## Step 7. Run sample fine-tuning
+## Step 9. Run sample fine-tuning
 The following commands show how to perform full fine-tuning (SFT), parameter-efficient fine-tuning (PEFT) with LoRA and QLoRA.
 
-First, you need to export your HF_TOKEN so that gated models can be downloaded.
+First, export your HF_TOKEN so that gated models can be downloaded.
+
 ```bash
 ## Run basic LLM fine-tuning example
 export HF_TOKEN=<your_huggingface_token>
 ```
 > **Note:** Please Replace `<your_huggingface_token>` with your Hugging Face access token to access gated models (e.g., Llama).
 
-#### Full Fine-tuning example:
-Once inside the `Automodel` directory you git cloned from github, run:
+**Full Fine-tuning example:**
+
+Once inside the `Automodel` directory you cloned from github, run:
+
 ```bash
 uv run --frozen --no-sync \
 examples/llm_finetune/finetune.py \
@@ -210,7 +212,8 @@ These overrides ensure the Qwen3-8B SFT run behaves as expected:
 - `--loss_fn._target_`: uses the TransformerEngine-parallel cross-entropy loss variant compatible with tensor-parallel training for large LLMs.
 - `--step_scheduler.local_batch_size`: sets the per-GPU micro-batch size to 1 to fit in memory; overall effective batch size is still driven by gradient accumulation and data/tensor parallel settings from the recipe.
 
-#### LoRA fine-tuning example:
+**LoRA fine-tuning example:**
+
 Execute a basic fine-tuning example to validate the complete setup. This demonstrates parameter-efficient fine-tuning using a small model suitable for testing.
 
 ```bash
@@ -220,8 +223,10 @@ examples/llm_finetune/finetune.py \
 -c examples/llm_finetune/llama3_2/llama3_2_1b_squad_peft.yaml \
 --model.pretrained_model_name_or_path meta-llama/Llama-3.1-8B
 ```
-#### QLoRA fine-tuning example:
+**QLoRA fine-tuning example:**
+
 We can use QLoRA to fine-tune large models in a memory-efficient manner.
+
 ```bash
 uv run --frozen --no-sync \
 examples/llm_finetune/finetune.py \
@@ -236,7 +241,7 @@ These overrides ensure the 70B QLoRA run behaves as expected:
 - `--loss_fn._target_`: uses the TransformerEngine-parallel cross-entropy loss variant compatible with tensor-parallel training for large LLMs.
 - `--step_scheduler.local_batch_size`: sets the per-GPU micro-batch size to 1 to fit 70B in memory; overall effective batch size is still driven by gradient accumulation and data/tensor parallel settings from the recipe. 
 
-## Step 8. Validate training output
+## Step 10. Validate training output
 
 Check that fine-tuning completed successfully and inspect the generated model artifacts. This confirms the training pipeline works correctly on your Spark device.
 
@@ -254,26 +259,8 @@ print('GPU available:', torch.cuda.is_available())
 print('GPU count:', torch.cuda.device_count())
 "
 ```
-<!-- 
-### Step 9. Configure distributed training (optional)
 
-Set up multi-GPU training configuration for larger models. This step is optional but recommended for models requiring more computational resources.
-
-```bash
-## Check available GPUs
-nvidia-smi -L
-
-## Configure distributed training environment
-export CUDA_VISIBLE_DEVICES=0,1
-
-## Run distributed training example
-uv run torchrun --nproc_per_node=2 \
-  recipes/llm_finetune/finetune.py \
-  --model_id meta-llama/Llama-2-7b-hf \
-  --distributed
-``` -->
-
-## Step 9. Validate complete setup
+## Step 11. Validate complete setup
 
 Perform final validation to ensure all components are working correctly. This comprehensive check confirms the environment is ready for production fine-tuning workflows.
 
@@ -289,7 +276,7 @@ print('✅ Setup complete')
 "
 ```
 
-## Step 10. Troubleshooting
+## Step 12. Troubleshooting
 
 Common issues and solutions for NeMo AutoModel setup on NVIDIA Spark devices.
 
@@ -301,7 +288,7 @@ Common issues and solutions for NeMo AutoModel setup on NVIDIA Spark devices.
 | Out of memory during training | Model too large for available GPU memory | Reduce batch size, enable gradient checkpointing, or use model parallelism |
 | ARM64 package compatibility issues | Package not available for ARM architecture | Use source installation or build from source with ARM64 flags |
 
-## Step 11. Cleanup and rollback
+## Step 13. Cleanup and rollback
 
 Remove the installation and restore the original environment if needed. These commands safely remove all installed components.
 
@@ -322,7 +309,7 @@ pip3 uninstall uv
 rm -rf ~/.cache/pip
 ```
 
-## Step 12. Next steps
+## Step 14. Next steps
 
 Begin using NeMo AutoModel for your specific fine-tuning tasks. Start with provided recipes and customize based on your model requirements and dataset.
 
