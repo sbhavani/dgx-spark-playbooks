@@ -98,7 +98,7 @@ huggingface-cli login
 ## Step 6:  Clone the git repo with fine-tuning recipes
 
 ```bash
-git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}
+git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main
 cd ${MODEL}/assets
 ```
 

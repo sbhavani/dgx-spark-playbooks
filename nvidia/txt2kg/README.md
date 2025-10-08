@@ -60,8 +60,8 @@ The setup includes:
 In a terminal, clone the txt2kg repository and navigate to the project directory.
 
 ```bash
-git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main txt2kg
-cd txt2kg
+git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main
+cd ${MODEL}/assets
 ```
 
 ## Step 2. Start the txt2kg services
