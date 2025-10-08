@@ -44,7 +44,7 @@ completions.
   ```bash
   nvidia-smi
   ```
-- Docker with NVIDIA Container Toolkit configured, instructions [here](https://******.nvidia.com/dgx-docs/review/621/dgx-spark/latest/nvidia-container-runtime-for-docker.html)
+- Docker with NVIDIA Container Toolkit configured, instructions [here](https://docs.nvidia.com/dgx/dgx-spark/nvidia-container-runtime-for-docker.html)
   ```bash
   docker run -it --gpus=all nvcr.io/nvidia/cuda:13.0.1-devel-ubuntu24.04 nvidia-smi
   ```
