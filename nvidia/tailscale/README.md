@@ -177,28 +177,40 @@ Install Tailscale on the devices you'll use to connect to your Spark remotely.
 Choose the appropriate method for your client operating system.
 
 **On macOS:**
+- Option 1: Install from Mac App Store by searching for "Tailscale" and then clicking Get → Install
+- Option 2: Download the .pkg installer from the [Tailscale website](https://tailscale.com/download)
 
-```bash
-## Option 1: Install from Mac App Store
-## Search for "Tailscale" and click Get → Install
-
-## Option 2: Download from website
-## Visit https://tailscale.com/download and download .pkg installer
-```
 
 **On Windows:**
+- Download installer from the [Tailscale website](https://tailscale.com/download)
+- Run the .msi file and follow installation prompts
+- Launch Tailscale from Start Menu or system tray
 
-```bash
-## Download installer from https://tailscale.com/download
-## Run the .msi file and follow installation prompts
-## Launch Tailscale from Start Menu or system tray
-```
 
 **On Linux:**
 
+Use the same instructions as were done for installing on your DGX Spark.
+
 ```bash
-## Use same installation steps as Spark device (Steps 3-4)
-## Adjust repository URLs for your specific distribution if needed
+## Update package list
+sudo apt update
+
+## Install required tools for adding external repositories
+sudo apt install -y curl gnupg
+
+## Add Tailscale signing key
+curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg | \
+  sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
+
+## Add Tailscale repository
+curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.tailscale-keyring.list | \
+  sudo tee /etc/apt/sources.list.d/tailscale.list
+
+## Update package list with new repository
+sudo apt update
+
+## Install Tailscale
+sudo apt install -y tailscale
 ```
 
 ### Step 7. Connect client devices to tailnet
