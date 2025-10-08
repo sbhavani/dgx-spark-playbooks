@@ -184,11 +184,11 @@ sudo usermod -aG docker $USER
 newgrp docker
 ```
 
-You can now run docker commands without running `sudo`
-Next, ensure you have an NGC API Key to be able to pull containers from NGC
-## More info on setup of --  https://docs.nvidia.com/ngc/latest/ngc-private-registry-user-guide.html#accessing-the-ngc-container-registry
+After this, you should be able to run docker commands without using `sudo`. 
 
-With your API key ready, configure docker to pull from NGC and pull down the VLLM Image
+Next, create an  NGC API Key [here](https://ngc.nvidia.com/setup/api-key) so that you can pull containers from NGC.
+
+Once you have the API key, you can configure docker to pull from NGC and pull down the VLLM image:
 
 ```bash
 docker login nvcr.io
