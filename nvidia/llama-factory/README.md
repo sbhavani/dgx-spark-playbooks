@@ -115,6 +115,7 @@ pip install -e ".[metrics]"
 ## Step 5. Verify Pytorch CUDA support. 
 
 PyTorch is pre-installed with CUDA support.
+
 To verify installation:
 
 ```bash
@@ -132,6 +133,7 @@ cat examples/train_lora/llama3_lora_sft.yaml
 ## Step 7. Launch fine-tuning training
 
 > **Note:** Login to your hugging face hub to download the model if the model is gated.
+
 Execute the training process using the pre-configured LoRA setup.
 
 ```bash
