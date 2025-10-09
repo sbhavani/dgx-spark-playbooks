@@ -1,6 +1,6 @@
 # FLUX.1 Dreambooth LoRA Fine-tuning
 
-> Fine-tune FLUX.1-dev 12B model using multi-concept Dreambooth LoRA for custom image generation
+> Fine-tune FLUX.1-dev 12B model using Dreambooth LoRA for custom image generation
 
 ## Table of Contents
 

@@ -1,6 +1,6 @@
 # DGX Dashboard
 
-> Manage your DGX system and launch JupyterLab
+> Monitor your DGX system and launch JupyterLab
 
 ## Table of Contents
 

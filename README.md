@@ -22,7 +22,7 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 ### NVIDIA
 
 - [Comfy UI](nvidia/comfy-ui/)
-- [Connect to Your Spark from Another Computer](nvidia/connect-to-your-spark/)
+- [Set Up Local Network Access](nvidia/connect-to-your-spark/)
 - [DGX Dashboard](nvidia/dgx-dashboard/)
 - [FLUX.1 Dreambooth LoRA Fine-tuning](nvidia/flux-finetuning/)
 - [Optimized JAX](nvidia/jax/)
@@ -33,9 +33,9 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [NCCL for Two Sparks](nvidia/nccl/)
 - [Fine-tune with NeMo](nvidia/nemo-fine-tune/)
 - [Use a NIM on Spark](nvidia/nim-llm/)
-- [Quantize to NVFP4](nvidia/nvfp4-quantization/)
+- [NVFP4 Quantization](nvidia/nvfp4-quantization/)
 - [Ollama](nvidia/ollama/)
-- [Use Open WebUI with Ollama](nvidia/open-webui/)
+- [Open WebUI with Ollama](nvidia/open-webui/)
 - [Use Open Fold](nvidia/protein-folding/)
 - [Fine tune with Pytorch](nvidia/pytorch-fine-tune/)
 - [RAG application in AI Workbench](nvidia/rag-ai-workbench/)

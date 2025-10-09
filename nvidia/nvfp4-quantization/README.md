@@ -1,4 +1,4 @@
-# Quantize to NVFP4
+# NVFP4 Quantization
 
 > Quantize a model to NVFP4 to run on Spark using TensorRT Model Optimizer
 

@@ -1,6 +1,6 @@
-# Connect to Your Spark from Another Computer
+# Set Up Local Network Access
 
-> Use NVIDIA Sync or manual SSH to connect to your Spark
+> NVIDIA Sync helps set up and configure SSH access
 
 ## Table of Contents
 

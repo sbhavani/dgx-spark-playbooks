@@ -1,4 +1,4 @@
-# Use Open WebUI with Ollama
+# Open WebUI with Ollama
 
 > Install Open WebUI and use Ollama to chat with models on your Spark
 

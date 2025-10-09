@@ -1,6 +1,6 @@
 # Install VS Code
 
-> Install and use VS Code locally or remotely on Spark
+> Install and use VS Code locally or remotely
 
 ## Table of Contents
 

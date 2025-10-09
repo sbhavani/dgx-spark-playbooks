@@ -1,6 +1,6 @@
 # Speculative Decoding
 
-> Learn how to setup speculative decoding for fast inference on Spark
+> Learn how to set up speculative decoding for fast inference on Spark
 
 ## Table of Contents
 
