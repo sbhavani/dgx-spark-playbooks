@@ -17,21 +17,22 @@
   - [Step 9. Troubleshooting](#step-9-troubleshooting)
   - [Step 10. Cleanup and rollback](#step-10-cleanup-and-rollback)
 - [Run on two Sparks](#run-on-two-sparks)
-  - [Step 1. Configure Docker permissions](#step-1-configure-docker-permissions)
-  - [Step 2. Configure network connectivity](#step-2-configure-network-connectivity)
-  - [Step 3. Install NVIDIA Container Toolkit](#step-3-install-nvidia-container-toolkit)
-  - [Step 4. Enable resource advertising](#step-4-enable-resource-advertising)
-  - [Step 5. Initialize Docker Swarm](#step-5-initialize-docker-swarm)
-  - [Step 6. Join worker nodes and deploy](#step-6-join-worker-nodes-and-deploy)
-  - [Step 7. Create hosts file](#step-7-create-hosts-file)
-  - [Step 8. Find your Docker container ID](#step-8-find-your-docker-container-id)
-  - [Step 8. Generate configuration file](#step-8-generate-configuration-file)
-  - [Step 9. Download model](#step-9-download-model)
-  - [Step 10. Serve the model](#step-10-serve-the-model)
-  - [Step 11. Validate API server](#step-11-validate-api-server)
-  - [Step 12. Troubleshooting](#step-12-troubleshooting)
-  - [Step 14. Cleanup and rollback](#step-14-cleanup-and-rollback)
-  - [Step 15. Next steps](#step-15-next-steps)
+  - [Step 1. User prerequisites](#step-1-user-prerequisites)
+  - [Step 2. Configure Docker permissions](#step-2-configure-docker-permissions)
+  - [Step 3. Configure network connectivity](#step-3-configure-network-connectivity)
+  - [Step 4. Install NVIDIA Container Toolkit & setup Docker environment](#step-4-install-nvidia-container-toolkit-setup-docker-environment)
+  - [Step 5. Enable resource advertising](#step-5-enable-resource-advertising)
+  - [Step 6. Initialize Docker Swarm](#step-6-initialize-docker-swarm)
+  - [Step 7. Join worker nodes and deploy](#step-7-join-worker-nodes-and-deploy)
+  - [Step 8. Create hosts file](#step-8-create-hosts-file)
+  - [Step 9. Find your Docker container ID](#step-9-find-your-docker-container-id)
+  - [Step 10. Generate configuration file](#step-10-generate-configuration-file)
+  - [Step 11. Download model](#step-11-download-model)
+  - [Step 12. Serve the model](#step-12-serve-the-model)
+  - [Step 13. Validate API server](#step-13-validate-api-server)
+  - [Step 14. Troubleshooting](#step-14-troubleshooting)
+  - [Step 15. Cleanup and rollback](#step-15-cleanup-and-rollback)
+  - [Step 16. Next steps](#step-16-next-steps)
 
 ---
 
@@ -424,7 +425,15 @@ docker rmi nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev
 
 ## Run on two Sparks
 
-### Step 1. Configure Docker permissions
+### Step 1. User prerequisites
+Ensure all your DGX Spark nodes are set up and accessible with the same username. If your DGX Spark nodes are set up with different usernames, you will need to create a shared username for all the nodes.
+You can create a common user `nvidia` by running the following command:
+
+```bash
+sudo usermod -aG docker nvidia
+```
+
+### Step 2. Configure Docker permissions
 
 To easily manage containers without sudo, you must be in the `docker` group. If you choose to skip this step, you will need to run Docker commands with sudo.
 
@@ -437,13 +446,12 @@ docker ps
 If you see a permission denied error (something like `permission denied while trying to connect to the Docker daemon socket`), add your user to the docker group:
 
 ```bash
-sudo usermod -aG docker $USER
+sudo usermod -aG docker nvidia
 ```
+Note: Replace `nvidia` with the username of the user you want to allow Docker access to.
+Note: After running usermod, you must log out and log back in to start a new session with updated group permissions.
 
-> **Warning**: After running usermod, you must log out and log back in to start a new
-> session with updated group permissions.
-
-### Step 2. Configure network connectivity
+### Step 3. Configure network connectivity
 
 You have two options for configuring network connectivity between your DGX Spark nodes:
 
@@ -526,22 +534,51 @@ nvidia@192.168.100.11's password:
 SSH key copy process complete. These two sparks can now talk to each other.
 ```
 
-### Step 3. Install NVIDIA Container Toolkit
+### Step 4. Install NVIDIA Container Toolkit & setup Docker environment
 
 Ensure the NVIDIA drivers and the NVIDIA Container Toolkit are installed on each node (both manager and workers) that will provide GPU resources. This package enables Docker containers to access the host's GPU hardware. Ensure you complete the [installation steps](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html), including the [Docker configuration](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker) for NVIDIA Container Toolkit.
 
-### Step 4. Enable resource advertising
+### Step 5. Enable resource advertising
+
+First, find your GPU UUID by running:
+```bash
+nvidia-smi -a | grep UUID
+```
+
+Next, modify the Docker daemon configuration to advertise the GPU to Swarm. Edit /etc/docker/daemon.json:
+
+```bash
+sudo nano /etc/docker/daemon.json
+```
+
+Add or modify the file to include the nvidia runtime and GPU UUID (replace GPU-45cbf7b3-f919-7228-7a26-b06628ebefa1 with your actual GPU ID):
+
+```json
+{
+  "runtimes": {
+    "nvidia": {
+      "path": "nvidia-container-runtime",
+      "runtimeArgs": []
+    }
+  },
+  "default-runtime": "nvidia",
+  "node-generic-resources": [
+    "gpu=GPU-45cbf7b3-f919-7228-7a26-b06628ebefa1"
+    ]
+}
+```
 
 Modify the NVIDIA Container Runtime to advertise the GPUs to the Swarm by uncommenting the swarm-resource line in the config.toml file. You can do this either with your preferred text editor (e.g., vim, nano...) or with the following command:
 ```bash
 sudo sed -i 's/^#\s*\(swarm-resource\s*=\s*".*"\)/\1/' /etc/nvidia-container-runtime/config.toml
 ```
-To apply the changes, restart the Docker daemon
+
+Finally, restart the Docker daemon to apply all changes:
 ```bash
 sudo systemctl restart docker
 ```
 
-### Step 5. Initialize Docker Swarm
+### Step 6. Initialize Docker Swarm
 
 On whichever node you want to use as primary, run the following swarm initialization command
 ```bash
@@ -559,7 +596,7 @@ To add a worker to this swarm, run the following command:
 To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
 ```
 
-### Step 6. Join worker nodes and deploy
+### Step 7. Join worker nodes and deploy
 
 Now we can proceed with setting up other nodes of your cluster.
 
@@ -589,7 +626,7 @@ oe9k5o6w41le   trtllm-multinode_trtllm.1       nvcr.io/nvidia/tensorrt-llm/relea
 phszqzk97p83   trtllm-multinode_trtllm.2       nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3   spark-1b3b   Running         Running 2 minutes ago
 ```
 
-### Step 7. Create hosts file
+### Step 8. Create hosts file
 
 You can check the available nodes using `docker node ls`
 ```
@@ -605,14 +642,14 @@ docker node ls --format '{{.ID}}' | xargs -n1 docker node inspect --format '{{ .
 docker cp ~/openmpi-hostfile $(docker ps -q -f name=trtllm-multinode):/etc/openmpi-hostfile
 ```
 
-### Step 8. Find your Docker container ID
+### Step 9. Find your Docker container ID
 
 You can use `docker ps` to find your Docker container ID. Alternatively, you can save the container ID in a variable:
 ```bash
 export TRTLLM_MN_CONTAINER=$(docker ps -q -f name=trtllm-multinode)
 ```
 
-### Step 8. Generate configuration file
+### Step 10. Generate configuration file
 
 ```bash
 docker exec $TRTLLM_MN_CONTAINER bash -c 'cat <<EOF > /tmp/extra-llm-api-config.yml
@@ -625,7 +662,7 @@ cuda_graph_config:
 EOF'
 ```
 
-### Step 9. Download model
+### Step 11. Download model
 
 ```bash
 ## Need to specify huggingface token for model download.
@@ -637,7 +674,7 @@ docker exec \
   -it $TRTLLM_MN_CONTAINER bash -c 'mpirun -x HF_TOKEN bash -c "huggingface-cli download $MODEL"'
 ```
 
-### Step 10. Serve the model
+### Step 12. Serve the model
 
 ```bash
 docker exec \
@@ -657,7 +694,7 @@ This will start the TensorRT-LLM server on port 8000. You can then make inferenc
 
 **Expected output:** Server startup logs and ready message.
 
-### Step 11. Validate API server
+### Step 13. Validate API server
 
 Verify successful deployment by checking container status and testing the API endpoint.
 
@@ -683,7 +720,7 @@ curl -X POST http://localhost:8000/v1/chat/completions \
 
 **Expected output:** JSON response with generated text completion.
 
-### Step 12. Troubleshooting
+### Step 14. Troubleshooting
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
@@ -692,7 +729,7 @@ curl -X POST http://localhost:8000/v1/chat/completions \
 | "CUDA out of memory" errors | Insufficient GPU memory | Reduce `--max_batch_size` or `--max_num_tokens` |
 | Container exits immediately | Missing entrypoint script | Ensure `trtllm-mn-entrypoint.sh` download succeeded and has executable permissions, also ensure you are not running the container already on your node. If port 2233 is already utilized, the entrypoint script will not start. |
 
-### Step 14. Cleanup and rollback
+### Step 15. Cleanup and rollback
 
 Stop and remove containers by using the following command on the leader node:
 
@@ -708,6 +745,6 @@ Remove downloaded models to free disk space:
 rm -rf $HOME/.cache/huggingface/hub/models--nvidia--Qwen3*
 ```
 
-### Step 15. Next steps
+### Step 16. Next steps
 
 Compare performance metrics between speculative decoding and baseline reports to quantify speed improvements. Use the multi-node setup as a foundation for deploying other large models requiring tensor parallelism, or scale to additional nodes for higher throughput workloads.

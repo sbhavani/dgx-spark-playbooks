@@ -78,10 +78,6 @@ docker run --gpus all -it --rm --ipc=host \
 -v $HOME/.cache/huggingface:/root/.cache/huggingface \
 -v ${PWD}:/workspace -w /workspace \
 nvcr.io/nvidia/pytorch:25.09-py3
-
-    -v $HOME/.cache/huggingface:/root/.cache/huggingface \
-    -v ${PWD}:/workspace -w /workspace \
-    nvcr.io/nvidia/pytorch:25.09-py3
 ```
 
 ## Step 4. Install dependencies inside the container
