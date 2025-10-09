@@ -23,6 +23,7 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 
 - [Comfy UI](nvidia/comfy-ui/)
 - [Set Up Local Network Access](nvidia/connect-to-your-spark/)
+- [CUDA-X](nvidia/cuda-x-data-science/)
 - [DGX Dashboard](nvidia/dgx-dashboard/)
 - [FLUX.1 Dreambooth LoRA Fine-tuning](nvidia/flux-finetuning/)
 - [Optimized JAX](nvidia/jax/)
@@ -39,7 +40,6 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [Use Open Fold](nvidia/protein-folding/)
 - [Fine tune with Pytorch](nvidia/pytorch-fine-tune/)
 - [RAG application in AI Workbench](nvidia/rag-ai-workbench/)
-- [RAPIDS](nvidia/rapids/)
 - [SGLang Inference Server](nvidia/sglang/)
 - [Speculative Decoding](nvidia/speculative-decoding/)
 - [Stack two Sparks](nvidia/stack-sparks/)

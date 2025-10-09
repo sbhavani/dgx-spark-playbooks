@@ -1,4 +1,4 @@
-# RAPIDS
+# CUDA-X
 
 > Accelerated data science with NVIDIA RAPIDS
 
