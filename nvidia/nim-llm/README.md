@@ -1,6 +1,6 @@
-# Use a NIM on Spark
+# NIM on Spark
 
-> Run an LLM NIM on Spark
+> Deploy a NIM on Spark
 
 ## Table of Contents
 
@@ -19,17 +19,11 @@
 
 ### Basic idea
 
-NVIDIA Inference Microservices (NIMs) provide optimized containers for deploying large language
-models with simplified APIs. This playbook demonstrates how to run LLM NIMs on DGX Spark devices,
-enabling GPU-accelerated inference through Docker containers. You'll set up authentication with
-NVIDIA's registry, launch a containerized LLM service, and perform basic inference testing to
-verify functionality.
+NVIDIA NIM is containerized software for fast, reliable AI model serving and inference on NVIDIA GPUs. This playbook demonstrates how to run NIM microservices for LLMs on DGX Spark devices, enabling local GPU inference through a simple Docker workflow. You'll authenticate with NVIDIA's registry, launch the NIM inference microservice, and perform basic inference testing to verify functionality.
 
 ### What you'll accomplish
 
-You'll deploy an LLM NIM container on your DGX Spark device, configure it for GPU acceleration,
-and establish a working inference endpoint that responds to HTTP API calls with generated text
-completions.
+You'll launch a NIM container on your DGX Spark device to expose a GPU-accelerated HTTP endpoint for text completions.
 
 ### What to know before starting
 
