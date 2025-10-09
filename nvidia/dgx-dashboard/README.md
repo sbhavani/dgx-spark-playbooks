@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -203,17 +204,7 @@ From the Settings page, under the "Updates" tab:
 
 > **Warning**: System updates will upgrade packages, firmware if available, and trigger a reboot. Save your work before proceeding.
 
-
-## Step 7. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| User can't run updates | User not in sudo group | Add user to sudo group: `sudo usermod -aG sudo <USERNAME>` |
-| JupyterLab won't start | Issue with current virtual environment | Change the working directory in the JupyterLab panel and start a new instance |
-| SSH tunnel connection refused | Incorrect IP or port | Verify Spark device IP and ensure SSH service is running |
-| GPU not visible in monitoring | Driver issues | Check GPU status with `nvidia-smi` |
-
-## Step 8. Cleanup and rollback
+## Step 7. Cleanup and rollback
 
 To clean up resources and return system to original state:
 
@@ -224,9 +215,18 @@ To clean up resources and return system to original state:
 
 No permanent changes are made to the system during normal dashboard usage.
 
-## Step 9. Next steps
+## Step 8. Next steps
 
 Now that you have DGX Dashboard configured, you can:
 
 - Create additional JupyterLab environments for different projects
 - Use the dashboard to manage system maintenance and updates
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| User can't run updates | User not in sudo group | Add user to sudo group: `sudo usermod -aG sudo <USERNAME>` |
+| JupyterLab won't start | Issue with current virtual environment | Change the working directory in the JupyterLab panel and start a new instance |
+| SSH tunnel connection refused | Incorrect IP or port | Verify Spark device IP and ensure SSH service is running |
+| GPU not visible in monitoring | Driver issues | Check GPU status with `nvidia-smi` |

@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -63,10 +64,6 @@ All required assets can be found [in the ComfyUI repository on GitHub](https://g
   * Model downloads are large (~2GB) and may fail due to network issues
   * Port 8188 must be accessible for web interface functionality
 * **Rollback:** Virtual environment can be deleted to remove all installed packages. Downloaded models can be removed manually from the checkpoints directory.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -157,17 +154,7 @@ Expected output should show HTTP 200 response indicating the web server is opera
 
 Open a web browser and navigate to `http://<SPARK_IP>:8188` where `<SPARK_IP>` is your device's IP address.
 
-## Step 9. Optional - Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| PyTorch CUDA not available | Incorrect CUDA version or missing drivers | Verify `nvcc --version` matches cu129, reinstall PyTorch |
-| Model download fails | Network connectivity or storage space | Check internet connection, verify 20GB+ available space |
-| Web interface inaccessible | Firewall blocking port 8188 | Configure firewall to allow port 8188, check IP address |
-| Out of GPU memory errors | Insufficient VRAM for model | Use smaller models or enable CPU fallback mode |
-
-
-## Step 10. Optional - Cleanup and rollback
+## Step 9. Optional - Cleanup and rollback
 
 If you need to remove the installation completely, follow these steps:
 
@@ -181,7 +168,7 @@ rm -rf ComfyUI/
 
 To rollback during installation, press `Ctrl+C` to stop the server and remove the virtual environment.
 
-## Step 11. Optional - Next steps
+## Step 10. Optional - Next steps
 
 Test the installation with a basic image generation workflow:
 
@@ -191,3 +178,19 @@ Test the installation with a basic image generation workflow:
 4. Monitor GPU usage with `nvidia-smi` in a separate terminal
 
 The image generation should complete within 30-60 seconds depending on your hardware configuration.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| PyTorch CUDA not available | Incorrect CUDA version or missing drivers | Verify `nvcc --version` matches cu129, reinstall PyTorch |
+| Model download fails | Network connectivity or storage space | Check internet connection, verify 20GB+ available space |
+| Web interface inaccessible | Firewall blocking port 8188 | Configure firewall to allow port 8188, check IP address |
+| Out of GPU memory errors after manually flushing buffer cache | Insufficient VRAM for model | Use smaller models or enable CPU fallback mode |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```

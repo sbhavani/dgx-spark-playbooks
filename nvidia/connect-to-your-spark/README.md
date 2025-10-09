@@ -7,6 +7,7 @@
 - [Overview](#overview)
 - [Connect with NVIDIA Sync](#connect-with-nvidia-sync)
 - [Connect with Manual SSH](#connect-with-manual-ssh)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -70,7 +71,7 @@ applications, and manage your DGX Spark remotely from your laptop.
 **Risk level:** Low - SSH setup involves credential configuration but no system-level changes
 to the DGX Spark device
 
-**Rollback:** SSH key removal can be done by editing `~/.ssh/authorized_keys` on the DGX Spark
+**Rollback:** SSH key removal can be done by editing `~/.ssh/authorized_keys` on the DGX Spark.
 
 ## Connect with NVIDIA Sync
 
@@ -206,16 +207,7 @@ Exit the SSH session
 exit
 ```
 
-## Step 6. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|--------|-----|
-| Device name doesn't resolve | mDNS blocked on network | Use IP address instead of hostname.local |
-| Connection refused/timeout | DGX Spark not booted or SSH not ready | Wait for device boot completion; SSH available after updates finish |
-| Authentication failed | SSH key setup incomplete | Re-run device setup in NVIDIA Sync; check credentials |
-
-
-## Step 7. Next steps
+## Step 6. Next steps
 
 Test your setup by launching a development tool:
 - Click the NVIDIA Sync system tray icon.
@@ -333,17 +325,26 @@ ssh -L 11000:localhost:11000 <YOUR_USERNAME>@<SPARK_HOSTNAME>.local
 
 After establishing the tunnel, access the forwarded web app in your browser: [http://localhost:11000](http://localhost:11000)
 
+## Step 6. Next steps
 
-## Step 6. Troubleshooting
+With SSH access configured, you can:
+- Open persistent terminal sessions: `ssh <YOUR_USERNAME>@<SPARK_HOSTNAME>.local`.
+- Forward web application ports: `ssh -L <local_port>:localhost:<remote_port> <YOUR_USERNAME>@<SPARK_HOSTNAME>.local`.
+
+## Troubleshooting
+
+## Possible issues connecting via NVIDIA Sync
+
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| Device name doesn't resolve | mDNS blocked on network | Use IP address instead of hostname.local |
+| Connection refused/timeout | DGX Spark not booted or SSH not ready | Wait for device boot completion; SSH available after updates finish |
+| Authentication failed | SSH key setup incomplete | Re-run device setup in NVIDIA Sync; check credentials |
+
+## Possible issues connecting via manual SSH
 
 | Symptom | Cause | Fix |
 |---------|--------|-----|
 | `ssh: Could not resolve hostname` | mDNS not working | Use IP address instead of .local hostname |
 | `Connection refused` | Device not booted or SSH disabled | Wait for full boot; SSH available after system updates complete |
 | `Port forwarding fails` | Service not running or port conflict | Verify remote service is active; try different local port |
-
-## Step 7. Next steps
-
-With SSH access configured, you can:
-- Open persistent terminal sessions: `ssh <YOUR_USERNAME>@<SPARK_HOSTNAME>.local`.
-- Forward web application ports: `ssh -L <local_port>:localhost:<remote_port> <YOUR_USERNAME>@<SPARK_HOSTNAME>.local`.

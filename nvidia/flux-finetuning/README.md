@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -46,10 +47,6 @@ The setup includes:
   * Docker permission issues may require user group changes and session restart
   * The recipe would require hyperparameter tuning and a high-quality dataset for the best results
 **Rollback**: Stop and remove Docker containers, delete downloaded models if needed.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -171,3 +168,12 @@ Find the workflow section on the left-side panel of ComfyUI (or press `w`). Upon
 Provide your prompt in the `CLIP Text Encode (Prompt)` block. Now let's incorporate our custom concepts into our prompt for the fine-tuned model. For example, we will use `tjtoy toy holding sparkgpu gpu in a datacenter`. You can expect the generation to take ~3 mins since it is compute intesive to create high-resolution 1024px images.
 
 Unlike the base model, we can see that the fine-tuned model can generate multiple concepts in a single image. Additionally, ComfyUI exposes several fields to tune and change the look and feel of the generated images.
+
+## Troubleshooting
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
