@@ -23,7 +23,7 @@ NVIDIA NIM is containerized software for fast, reliable AI model serving and inf
 
 ### What you'll accomplish
 
-You'll launch a NIM container on your DGX Spark device to expose a GPU-accelerated HTTP endpoint for text completions.
+You'll launch a NIM container on your DGX Spark device to expose a GPU-accelerated HTTP endpoint for text completions. While these instructions feature working with the Llama 3.1 8B NIM, additional NIM including the [Qwen3-32 NIM](https://catalog.ngc.nvidia.com/orgs/nim/teams/qwen/containers/qwen3-32b-dgx-spark) are available for DGX Spark (see them [here](https://docs.nvidia.com/nim/large-language-models/1.14.0/release-notes.html#new-language-models%20)).
 
 ### What to know before starting
 
