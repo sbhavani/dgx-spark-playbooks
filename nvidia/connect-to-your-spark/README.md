@@ -77,8 +77,10 @@ to the DGX Spark device
 
 ## Step 1. Install NVIDIA Sync
 
-Download and install NVIDIA Sync for your operating system. NVIDIA Sync provides a unified
-interface for managing SSH connections and launching development tools on your DGX Spark device.
+NVIDIA Sync is a desktop app that connects your computer to your DGX Spark over the local network. 
+It gives you a single interface to manage SSH access and launch development tools on your DGX Spark. 
+
+Download and install NVIDIA Sync on your computer to get started.
 
 ::spark-download
 
@@ -115,30 +117,27 @@ interface for managing SSH connections and launching development tools on your D
 
 ## Step 2. Configure Apps
 
-After starting NVIDIA Sync and agreeing to the EULA, select which development tools you want
-to use. These are tools installed on your laptop that Sync can configure and launch connected to your Spark.
+Apps are desktop programs installed on your laptop that NVIDIA Sync can configure and launch with an automatic connection to your Spark.
 
-You can modify these selections later in the Settings window. Applications marked "unavailable"
-require installation on your laptop. 
+You can change your app selections anytime in the Settings window. Apps that are marked "unavailable" must be installed before you can use them.
 
-**Default Options:**
+**Default apps:**
 - **DGX Dashboard**: Web application pre-installed on DGX Spark for system management and integrated JupyterLab access
 - **Terminal**: Your system's built-in terminal with automatic SSH connection
 
 **Optional apps (require separate installation):**
 - **VS Code**: Download from https://code.visualstudio.com/download 
 - **Cursor**: Download from https://cursor.com/downloads 
-- **NVIDIA AI Workbench**: Download from https://nvidia.com/workbench
+- **NVIDIA AI Workbench**: Download from https://www.nvidia.com/workbench
 
 ## Step 3. Add your DGX Spark device
 
-> **Find Your Hostname or IP**
-> 
+> [!NOTE]
 > You must know either your hostname or IP address to connect.
 >
 > - The default hostname can be found on the Quick Start Guide included in the box. For example, `spark-abcd.local`
 > - If you have a display connected to your device, you can find the hostname on the Settings page of the [DGX Dashboard](http://localhost:11000).
-> - If `.local` (mDNS) hostnames don't work on your network you must use your IP address. This can be found in Ubuntu's network settings or by logging into the admin console of your router.
+> - If `.local` (mDNS) hostnames don't work on your network you must use an IP address. This can be found in Ubuntu's network settings or by logging into the admin console of your router.
 
 Finally, connect your DGX Spark by filling out the form:
 
@@ -159,7 +158,8 @@ Click add "Add" and NVIDIA Sync will automatically:
 4. Create an SSH alias locally for future connections
 5. Discard your username and password information
 
-> **Wait for update:**  After completing system setup for the first time, your device may take several minutes to update and become available on the network. If NVIDIA Sync fails to connect, please wait 3-4 minutes and try again.
+> [!IMPORTANT]
+> After completing system setup for the first time, your device may take several minutes to update and become available on the network. If NVIDIA Sync fails to connect, please wait 3-4 minutes and try again.
 
 ## Step 4. Access your DGX Spark
 
@@ -178,9 +178,10 @@ connection to your DGX Spark.
 
 ## Step 5. Validate SSH setup
 
-Verify your local SSH configuration is correct by using the SSH alias:
+NVIDIA Sync creates an SSH alias for your device for easy access manually or from other SSH enabled apps.
 
-Test direct SSH connection (should not prompt for password)
+Verify your local SSH configuration is correct by using the SSH alias. You should not be prompted for your 
+password when using the alias:
 
 ```bash
 ## Configured if you use mDNS hostname
@@ -207,12 +208,21 @@ Exit the SSH session
 exit
 ```
 
-## Step 6. Next steps
+## Step 6. Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| Device name doesn't resolve | mDNS blocked on network | Use IP address instead of hostname.local |
+| Connection refused/timeout | DGX Spark not booted or SSH not ready | Wait for device boot completion; SSH available after updates finish |
+| Authentication failed | SSH key setup incomplete | Re-run device setup in NVIDIA Sync; check credentials |
+
+## Step 7. Next steps
 
 Test your setup by launching a development tool:
 - Click the NVIDIA Sync system tray icon.
 - Select "Terminal" to open a terminal session on your DGX Spark.
-- Or click "DGX Dashboard" to access the web interface at the forwarded localhost port.
+- Select "DGX Dashboard" to use Jupyterlab and manage updates.
+- Try [a custom port example with Open WebUI](/spark/open-webui/sync)
 
 ## Connect with Manual SSH
 
