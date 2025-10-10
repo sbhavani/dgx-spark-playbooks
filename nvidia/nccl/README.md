@@ -58,98 +58,17 @@ containers can be stopped with `docker stop`
 
 ## Run on two Sparks
 
-## Step 1. Setup networking between nodes
+## Step 1. Configure network connectivity
 
-Configure network interfaces for high-performance inter-node communication. Choose one option
-based on your network requirements.
+Follow the network setup instructions from the Connect two Sparks playbook to establish connectivity between your DGX Spark nodes.
 
-**Option 1: Suggested - Netplan configuration**
+This includes:
+- Physical QSFP cable connection
+- Network interface configuration (automatic or manual IP assignment)
+- Passwordless SSH setup
+- Network connectivity verification
 
-Configure network interfaces using netplan on both DGX Spark nodes for automatic link-local
-addressing:
-
-```bash
-## On both nodes, create the netplan configuration file
-sudo tee /etc/netplan/40-cx7.yaml > /dev/null <<EOF
-network:
-  version: 2
-  ethernets:
-    enp1s0f0np0:
-      link-local: [ ipv4 ]
-    enp1s0f1np1:
-      link-local: [ ipv4 ]
-EOF
-
-## On both nodes, set appropriate permissions
-sudo chmod 600 /etc/netplan/40-cx7.yaml
-
-## On both nodes, apply the netplan configuration
-sudo netplan apply
-```
-
-**Option 2: Manual IP assignment (advanced)**
-
-Configure dedicated cluster networking with static IP addresses:
-
-```bash
-## On Node 1
-sudo ip addr add 192.168.100.10/24 dev enP2p1s0f1np1
-sudo ip link set enP2p1s0f1np1 up
-
-## On Node 2
-sudo ip addr add 192.168.100.11/24 dev enP2p1s0f1np1
-sudo ip link set enP2p1s0f1np1 up
-
-## Verify connectivity from Node 1
-ping -c 3 192.168.100.11
-
-## Verify connectivity from Node 2
-ping -c 3 192.168.100.10
-```
-
-## Step 2. Run the DGX Spark discovery script
-
-Automatically identify interconnected DGX Spark systems and configure SSH passwordless
-authentication for multi-node operations:
-
-```bash
-## On either node, run the discovery script
-./discover-sparks
-```
-
-Expected output:
-```
-Found: 192.168.100.10 (spark-1b3b.local)
-Found: 192.168.100.11 (spark-1d84.local)
-
-Copying your SSH public key to all discovered nodes using ssh-copy-id.
-You may be prompted for your password on each node.
-Copying SSH key to 192.168.100.10 ...
-Copying SSH key to 192.168.100.11 ...
-nvidia@192.168.100.11's password:
-
-SSH key copy process complete. These two sparks can now talk to each other.
-```
-
-## Step 3. Identify active network interfaces
-
-Check which ConnectX-7 network interfaces are active and available for NCCL communication:
-
-```bash
-ibdev2netdev
-```
-
-Expected output (showing "Up" for active interfaces):
-```
-rocep1s0f0 port 1 ==> enp1s0f0np0 (Up)
-rocep1s0f1 port 1 ==> enp1s0f1np1 (Down)
-roceP2p1s0f0 port 1 ==> enP2p1s0f0np0 (Up)
-roceP2p1s0f1 port 1 ==> enP2p1s0f1np1 (Down)
-```
-
-Note the active interface names (marked "Up") for use in container configuration.
-
-## Step 4. Launch TensorRT-LLM containers on both nodes
+## Step 2. Launch TensorRT-LLM containers on both nodes
 
 Start containers with appropriate network and GPU configuration for NCCL communication:
 
@@ -170,7 +89,7 @@ docker run --name trtllm --rm -d \
   nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3
 ```
 
-## Step 5. Build NCCL with Blackwell support
+## Step 3. Build NCCL with Blackwell support
 
 Execute these commands inside both containers to build NCCL from source with Blackwell
 architecture support:
@@ -188,7 +107,7 @@ export NCCL_HOME="/opt/nccl/build/"
 export LD_LIBRARY_PATH="$NCCL_HOME/lib:$CUDA_HOME/lib64/:$MPI_HOME/lib:$LD_LIBRARY_PATH"
 ```
 
-## Step 6. Build NCCL test suite
+## Step 4. Build NCCL test suite
 
 Compile the NCCL test suite to validate communication performance:
 
@@ -199,7 +118,7 @@ cd /opt/nccl-tests/
 make MPI=1
 ```
 
-## Step 7. Run NCCL communication test
+## Step 5. Run NCCL communication test
 
 Execute multi-node NCCL performance test using the active network interface:
 
@@ -217,7 +136,7 @@ mpirun -np 2 -H 192.168.100.10:1,192.168.100.11:1 \
   /opt/nccl-tests/build/all_gather_perf -b 32G -e 32G -f 2
 ```
 
-## Step 8. Validate NCCL installation
+## Step 6. Validate NCCL installation
 
 Verify successful NCCL compilation and multi-node communication:
 
@@ -235,7 +154,7 @@ mpirun --version
 Expected output should show NCCL libraries in `/opt/nccl/build/lib/` and test binaries in
 `/opt/nccl-tests/build/`.
 
-## Step 10. Cleanup and rollback
+## Step 7. Cleanup and rollback
 
 **Warning**: These steps will stop containers and reset network configuration.
 
@@ -251,7 +170,7 @@ sudo rm /etc/netplan/40-cx7.yaml
 sudo netplan apply
 ```
 
-## Step 11. Next steps
+## Step 8. Next steps
 
 Test your NCCL setup with a simple distributed training example:
 

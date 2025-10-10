@@ -23,7 +23,7 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 
 - [Comfy UI](nvidia/comfy-ui/)
 - [Set Up Local Network Access](nvidia/connect-to-your-spark/)
-- [CUDA-X Data Science](nvidia/cuda-x-data-science/)
+- [CUDA-X](nvidia/cuda-x-data-science/)
 - [DGX Dashboard](nvidia/dgx-dashboard/)
 - [FLUX.1 Dreambooth LoRA Fine-tuning](nvidia/flux-finetuning/)
 - [Optimized JAX](nvidia/jax/)

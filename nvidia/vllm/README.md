@@ -7,7 +7,7 @@
 - [Overview](#overview)
 - [Instructions](#instructions)
 - [Run on two Sparks](#run-on-two-sparks)
-  - [Step 14. (Optional) Launch 405B inference server](#step-14-optional-launch-405b-inference-server)
+  - [Step 11. (Optional) Launch 405B inference server](#step-11-optional-launch-405b-inference-server)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -16,22 +16,22 @@
 
 ## Basic idea
 
-vLLM is an inference engine designed to run large language models efficiently. The key idea is **maximizing throughput and minimizing memory waste** when serving LLMs.  
+vLLM is an inference engine designed to run large language models efficiently. The key idea is **maximizing throughput and minimizing memory waste** when serving LLMs.
 
-- It uses a memory-efficient attention algoritm called **PagedAttention** to handle long sequences without running out of GPU memory.  
-- New requests can be added to a batch already in process through **continuous batching** to keep GPUs fully utilized.  
-- It has an **OpenAI-compatible API** so applications built for the OpenAI API can switch to a vLLM backend with little or no modification.  
+- It uses a memory-efficient attention algoritm called **PagedAttention** to handle long sequences without running out of GPU memory.
+- New requests can be added to a batch already in process through **continuous batching** to keep GPUs fully utilized.
+- It has an **OpenAI-compatible API** so applications built for the OpenAI API can switch to a vLLM backend with little or no modification.
 
 ## What you'll accomplish
 
-You'll set up vLLM high-throughput LLM serving on DGX Spark with Blackwell architecture, 
-either using a pre-built Docker container or building from source with custom LLVM/Triton 
+You'll set up vLLM high-throughput LLM serving on DGX Spark with Blackwell architecture,
+either using a pre-built Docker container or building from source with custom LLVM/Triton
 support for ARM64.
 
 ## What to know before starting
 
 - Experience building and configuring containers with Docker
-- Familiarity with CUDA toolkit installation and version management 
+- Familiarity with CUDA toolkit installation and version management
 - Understanding of Python virtual environments and package management
 - Knowledge of building software from source using CMake and Ninja
 - Experience with Git version control and patch management
@@ -39,7 +39,7 @@ support for ARM64.
 ## Prerequisites
 
 - DGX Spark device with ARM64 processor and Blackwell GPU architecture
-- CUDA 12.9 or CUDA 13.0 toolkit installed: `nvcc --version` shows CUDA toolkit version.  
+- CUDA 13.0 toolkit installed: `nvcc --version` shows CUDA toolkit version.
 - Docker installed and configured: `docker --version` succeeds
 - NVIDIA Container Toolkit installed
 - Python 3.12 available: `python3.12 --version` succeeds
@@ -55,7 +55,7 @@ support for ARM64.
 
 ## Instructions
 
-## Step 1. Pull vLLM container image 
+## Step 1. Pull vLLM container image
 
 Find the latest container build from https://catalog.ngc.nvidia.com/orgs/nvidia/containers/vllm?version=25.09-py3
 ```
@@ -119,58 +119,23 @@ sudo /usr/local/cuda-12.9/bin/cuda-uninstaller
 ## Step 5. Next steps
 
 - **Production deployment:** Configure vLLM with your specific model requirements
-- **Performance tuning:** Adjust batch sizes and memory settings for your workload  
+- **Performance tuning:** Adjust batch sizes and memory settings for your workload
 - **Monitoring:** Set up logging and metrics collection for production use
 - **Model management:** Explore additional model formats and quantization options
 
 ## Run on two Sparks
 
-## Step 1. Verify hardware connectivity
+## Step 1. Configure network connectivity
 
-Connect the QSFP cable between both DGX Spark systems using the rightmost QSFP interface on each device. This step establishes the 200GbE direct connection required for high-speed inter-node communication.
+Follow the network setup instructions from the Connect two Sparks playbook to establish connectivity between your DGX Spark nodes.
 
-```bash
-## Check QSFP interface availability on both nodes
-ip link show | grep enP2p1s0f1np1
-```
+This includes:
+- Physical QSFP cable connection
+- Network interface configuration (automatic or manual IP assignment)
+- Passwordless SSH setup
+- Network connectivity verification
 
-Expected output shows the interface exists but may be down initially.
-
-## Step 2. Configure cluster network on Node 1
-
-Set up the static IP address for the cluster network interface on the first DGX Spark system. This creates a dedicated network segment for distributed inference communication.
-
-```bash
-## Configure static IP on Node 1
-sudo ip addr add 192.168.100.10/24 dev enP2p1s0f1np1
-sudo ip link set enP2p1s0f1np1 up
-```
-
-## Step 3. Configure cluster network on Node 2
-
-Configure the second node with a corresponding static IP in the same network segment.
-
-```bash
-## Configure static IP on Node 2  
-sudo ip addr add 192.168.100.11/24 dev enP2p1s0f1np1
-sudo ip link set enP2p1s0f1np1 up
-```
-
-## Step 4. Verify network connectivity
-
-Test the direct connection between both nodes to ensure the cluster network is functional.
-
-```bash
-## From Node 1, test connectivity to Node 2
-ping -c 3 192.168.100.11
-
-## From Node 2, test connectivity to Node 1  
-ping -c 3 192.168.100.10
-```
-
-Expected output shows successful ping responses with low latency.
-
-## Step 5. Download cluster deployment script
+## Step 2. Download cluster deployment script
 
 Obtain the vLLM cluster deployment script on both nodes. This script orchestrates the Ray cluster setup required for distributed inference.
 
@@ -180,7 +145,7 @@ wget https://raw.githubusercontent.com/vllm-project/vllm/refs/heads/main/example
 chmod +x run_cluster.sh
 ```
 
-## Step 6. Pull the NVIDIA vLLM Image from NGC
+## Step 3. Pull the NVIDIA vLLM Image from NGC
 
 First, you will need to configure docker to pull from NGC
 If this is your first time using docker run:
@@ -190,21 +155,16 @@ sudo usermod -aG docker $USER
 newgrp docker
 ```
 
-After this, you should be able to run docker commands without using `sudo`. 
+After this, you should be able to run docker commands without using `sudo`.
 
-Next, create an  NGC API Key [here](https://ngc.nvidia.com/setup/api-key) so that you can pull containers from NGC.
-
-Once you have the API key, you can configure docker to pull from NGC and pull down the VLLM image:
 
 ```bash
-docker login nvcr.io
-## Username will be `$oauthtoken` and the password is your NGC API Key
 docker pull nvcr.io/nvidia/vllm:25.09-py3
 export VLLM_IMAGE=nvcr.io/nvidia/vllm:25.09-py3
 ```
 
 
-## Step 7. Start Ray head node
+## Step 4. Start Ray head node
 
 Launch the Ray cluster head node on Node 1. This node coordinates the distributed inference and serves the API endpoint.
 
@@ -223,7 +183,7 @@ bash run_cluster.sh $VLLM_IMAGE 192.168.100.10 --head ~/.cache/huggingface \
 ```
 
 
-## Step 8. Start Ray worker node
+## Step 5. Start Ray worker node
 
 Connect Node 2 to the Ray cluster as a worker node. This provides additional GPU resources for tensor parallelism.
 
@@ -241,7 +201,7 @@ bash run_cluster.sh $VLLM_IMAGE 192.168.100.10 --worker ~/.cache/huggingface \
 -e MASTER_ADDR=192.168.100.10
 ```
 
-## Step 9. Verify cluster status
+## Step 6. Verify cluster status
 
 Confirm both nodes are recognized and available in the Ray cluster.
 
@@ -252,7 +212,7 @@ docker exec node ray status
 
 Expected output shows 2 nodes with available GPU resources.
 
-## Step 10. Download Llama 3.3 70B model
+## Step 7. Download Llama 3.3 70B model
 
 Authenticate with Hugging Face and download the recommended production-ready model.
 
@@ -262,7 +222,7 @@ huggingface-cli login
 huggingface-cli download meta-llama/Llama-3.3-70B-Instruct
 ```
 
-## Step 11. Launch inference server for Llama 3.3 70B
+## Step 8. Launch inference server for Llama 3.3 70B
 
 Start the vLLM inference server with tensor parallelism across both nodes.
 
@@ -273,7 +233,7 @@ vllm serve meta-llama/Llama-3.3-70B-Instruct \
 --tensor-parallel-size 2 --max_model_len 2048
 ```
 
-## Step 12. Test 70B model inference
+## Step 9. Test 70B model inference
 
 Verify the deployment with a sample inference request.
 
@@ -291,7 +251,7 @@ curl http://localhost:8000/v1/completions \
 
 Expected output includes a generated haiku response.
 
-## Step 13. (Optional) Deploy Llama 3.1 405B model
+## Step 10. (Optional) Deploy Llama 3.1 405B model
 
 > **Warning:** 405B model has insufficient memory headroom for production use.
 
@@ -302,7 +262,7 @@ Download the quantized 405B model for testing purposes only.
 huggingface-cli download hugging-quants/Meta-Llama-3.1-405B-Instruct-AWQ-INT4
 ```
 
-### Step 14. (Optional) Launch 405B inference server
+### Step 11. (Optional) Launch 405B inference server
 
 Start the server with memory-constrained parameters for the large model.
 
@@ -314,7 +274,7 @@ vllm serve hugging-quants/Meta-Llama-3.1-405B-Instruct-AWQ-INT4 \
 --max-num-seqs 1 --max_num_batched_tokens 256
 ```
 
-## Step 15. (Optional) Test 405B model inference
+## Step 12. (Optional) Test 405B model inference
 
 Verify the 405B deployment with constrained parameters.
 
@@ -329,7 +289,7 @@ curl http://localhost:8000/v1/completions \
 }'
 ```
 
-## Step 16. Validate deployment
+## Step 13. Validate deployment
 
 Perform comprehensive validation of the distributed inference system.
 
@@ -345,7 +305,7 @@ nvidia-smi
 docker exec node nvidia-smi --query-gpu=memory.used,memory.total --format=csv
 ```
 
-## Step 18. Cleanup and rollback
+## Step 14. Cleanup and rollback
 
 Remove temporary configurations and containers when testing is complete.
 
@@ -362,7 +322,7 @@ sudo ip addr del 192.168.100.11/24 dev enP2p1s0f1np1  # Node 2
 sudo ip link set enP2p1s0f1np1 down
 ```
 
-## Step 19. Next steps
+## Step 15. Next steps
 
 Access the Ray dashboard for cluster monitoring and explore additional features:
 
@@ -372,7 +332,7 @@ http://192.168.100.10:8265
 
 ## Consider implementing for production:
 ## - Health checks and automatic restarts
-## - Log rotation for long-running services  
+## - Log rotation for long-running services
 ## - Persistent model caching across restarts
 ## - Alternative quantization methods (FP8, INT4)
 ```
@@ -382,14 +342,13 @@ http://192.168.100.10:8265
 | Symptom | Cause | Fix |
 |---------|--------|-----|
 | Node 2 not visible in Ray cluster | Network connectivity issue | Verify QSFP cable connection, check IP configuration |
-| Cannot access gated repo for URL | Certain HuggingFace models have restricted access | Regenerate your [HuggingFace token](https://huggingface.co/docs/hub/en/security-tokens); and request access to the [gated model](https://huggingface.co/docs/hub/en/models-gated#customize-requested-information) on your web browser |
 | Model download fails | Authentication or network issue | Re-run `huggingface-cli login`, check internet access |
 | Cannot access gated repo for URL | Certain HuggingFace models have restricted access | Regenerate your HuggingFace token; and request access to the gated model on your web browser |
 | CUDA out of memory with 405B | Insufficient GPU memory | Use 70B model or reduce max_model_len parameter |
 | Container startup fails | Missing ARM64 image | Rebuild vLLM image following ARM64 instructions |
 
-> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
-> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU.
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within
 > the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
 ```bash
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'

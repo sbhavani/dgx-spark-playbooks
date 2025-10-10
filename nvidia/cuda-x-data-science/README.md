@@ -1,6 +1,6 @@
-# CUDA-X Data Science
+# CUDA-X
 
-> Install and use NVIDIA cuML and NVIDIA cuDF to accelerate UMAP, HDBSCAN, pandas and more with zero code changes.
+> Accelerated data science with NVIDIA RAPIDS
 
 ## Table of Contents
 
@@ -12,25 +12,18 @@
 ## Overview
 
 ## Basic Idea
-This playbook includes two example notebooks that demonstrate the acceleration of key machine learning algorithms and core pandas operations using CUDA-X Data Science libraries:
+CUDA-X Data Science (formally RAPIDS) is an open-source library collection that accelerates the data science and data processing ecosystem. Accelerate popular python tools like scikit-learn and pandas with zero code changes on DGX Spark to maximize performance at your desk. This playbook orients you with example workflows, demonstrating the acceleration of key machine learning algorithms like UMAP and HBDSCAN and core pandas operations, without changing your code.
 
-- **NVIDIA cuDF:** Accelerates operations for data preparation and core data processing of 8GB of strings data, with no code changes.
-- **NVIDIA cuML:** Accelerates popular, compute intensive machine learning algorithms in sci-kit learn (LinearSVC), UMAP, and HDBSCAN, with no code changes.
+In this playbook, we will demonstrate the acceleration of key machine learning algorithms like UMAP and HBDSCAN and core pandas operations, without changing your code.
 
-CUDA-X Data Science (formally RAPIDS) is an open-source library collection that accelerates the data science and data processing ecosystem. These libraries accelerate popular Python tools like scikit-learn and pandas with zero code changes. On DGX Spark, these libraries maximize performance at your desk with your existing code.
-
-## What you'll accomplish
-You will accelerate popular machine learning algorithms and data analytics operations GPU. You will understand how to accelerate popular Python tools, and the value of running data science workflows on your DGX Spark. 
+## What to know before starting
+- Familiarity with pandas, scikit learn, machine learning algorithms, such as support vector machine, clustering, and dimensionality reduction algorithms
 
 ## Prerequisites
-- Familiarity with pandas, scikit-learn, machine learning algorithms, such as support vector machine, clustering, and dimensionality reduction algorithms.
 - Install conda
 - Generate a Kaggle API key
 
-## Time & risk
-- Duration:
-  - 20-30 minutes setup time. 
-  - 2-3 minutes to run each notebook.
+**Duration:** 20-30 minutes setup time and 2-3 minutes to run each notebook.
 
 ## Instructions
 
@@ -40,34 +33,32 @@ You will accelerate popular machine learning algorithms and data analytics opera
 - Install conda using [these instructions](https://docs.anaconda.com/miniconda/install/)
 - Create Kaggle API key using [these instructions](https://www.kaggle.com/discussions/general/74235) and place the **kaggle.json** file in the same folder as the notebook
 
-## Step 2. Installing Data Science libraries
-- Use the following command to install the CUDA-X libraries (this will create a new conda environment)
+## Step 2. Installing CUDA-X libraries
+- use the following command to install the CUDA-X libraries (this will create a new conda environment)
   ```bash
     conda create -n rapids-test -c rapidsai-nightly -c conda-forge -c nvidia  \
     rapids=25.10 python=3.12 'cuda-version=13.0' \
     jupyterlab hdbscan umap-learn
   ```
 ## Step 3. Activate the conda environment
-- Activate the conda environment
+- activate the conda environment
   ```bash
     conda activate rapids-test
   ```
-## Step 4. Cloning the playbook repository
-- Clone the github repository and go the assets folder place in cuda-x-data-science folder
+## Step 4. Cloning the notebooks
+- clone the github repository and go the cuda-x-data-science/assets folder
   ```bash
-    git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets
+    ssh://git@******:12051/spark-playbooks/dgx-spark-playbook-assets.git
   ```
-- Place the **kaggle.json** created in Step 1 in the assets folder
+- place the **kaggle.json** created in Step 1 in the assets folder
 
 ## Step 5. Run the notebooks
-There are two notebooks in the GitHub repository. 
-One runs an example of a large strings data processing workflow with pandas code on GPU.
-- Run the cudf_pandas_demo.ipynb notebook
+- Both the notebooks are self explanatory
+- To experience the acceleration achieved using cudf.pandas, run the cudf_pandas_demo.ipynb notebook
   ```bash
     jupyter notebook cudf_pandas_demo.ipynb
   ```
-The other goes over an example of machine learning algorithms including UMAP and HDBSCAN.
-- Run the cuml_sklearn_demo.ipynb notebook
+- To experience the acceleration achieved using cuml, run the cuml_sklearn_demo.ipynb notebook
   ```bash
     jupyter notebook cuml_sklearn_demo.ipynb
   ```

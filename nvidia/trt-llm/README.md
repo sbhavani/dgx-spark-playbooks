@@ -16,21 +16,20 @@
   - [Step 8. Serve LLM with OpenAI-compatible API](#step-8-serve-llm-with-openai-compatible-api)
   - [Step 10. Cleanup and rollback](#step-10-cleanup-and-rollback)
 - [Run on two Sparks](#run-on-two-sparks)
-  - [Step 1. User prerequisites](#step-1-user-prerequisites)
+  - [Step 1. Configure network connectivity](#step-1-configure-network-connectivity)
   - [Step 2. Configure Docker permissions](#step-2-configure-docker-permissions)
-  - [Step 3. Configure network connectivity](#step-3-configure-network-connectivity)
-  - [Step 4. Install NVIDIA Container Toolkit & setup Docker environment](#step-4-install-nvidia-container-toolkit-setup-docker-environment)
-  - [Step 5. Enable resource advertising](#step-5-enable-resource-advertising)
-  - [Step 6. Initialize Docker Swarm](#step-6-initialize-docker-swarm)
-  - [Step 7. Join worker nodes and deploy](#step-7-join-worker-nodes-and-deploy)
-  - [Step 8. Create hosts file](#step-8-create-hosts-file)
-  - [Step 9. Find your Docker container ID](#step-9-find-your-docker-container-id)
-  - [Step 10. Generate configuration file](#step-10-generate-configuration-file)
-  - [Step 11. Download model](#step-11-download-model)
-  - [Step 12. Serve the model](#step-12-serve-the-model)
-  - [Step 13. Validate API server](#step-13-validate-api-server)
-  - [Step 15. Cleanup and rollback](#step-15-cleanup-and-rollback)
-  - [Step 16. Next steps](#step-16-next-steps)
+  - [Step 3. Install NVIDIA Container Toolkit & setup Docker environment](#step-3-install-nvidia-container-toolkit-setup-docker-environment)
+  - [Step 4. Enable resource advertising](#step-4-enable-resource-advertising)
+  - [Step 5. Initialize Docker Swarm](#step-5-initialize-docker-swarm)
+  - [Step 6. Join worker nodes and deploy](#step-6-join-worker-nodes-and-deploy)
+  - [Step 7. Create hosts file](#step-7-create-hosts-file)
+  - [Step 8. Find your Docker container ID](#step-8-find-your-docker-container-id)
+  - [Step 9. Generate configuration file](#step-9-generate-configuration-file)
+  - [Step 10. Download model](#step-10-download-model)
+  - [Step 11. Serve the model](#step-11-serve-the-model)
+  - [Step 12. Validate API server](#step-12-validate-api-server)
+  - [Step 14. Cleanup and rollback](#step-14-cleanup-and-rollback)
+  - [Step 15. Next steps](#step-15-next-steps)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -408,13 +407,15 @@ docker rmi nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev
 
 ## Run on two Sparks
 
-### Step 1. User prerequisites
-Ensure all your DGX Spark nodes are set up and accessible with the same username. If your DGX Spark nodes are set up with different usernames, you will need to create a shared username for all the nodes.
-You can create a common user `nvidia` by running the following command:
+### Step 1. Configure network connectivity
 
-```bash
-sudo usermod -aG docker nvidia
-```
+Follow the network setup instructions from the Connect two Sparks playbook to establish connectivity between your DGX Spark nodes.
+
+This includes:
+- Physical QSFP cable connection
+- Network interface configuration (automatic or manual IP assignment)
+- Passwordless SSH setup
+- Network connectivity verification
 
 ### Step 2. Configure Docker permissions
 
@@ -434,94 +435,11 @@ sudo usermod -aG docker nvidia
 Note: Replace `nvidia` with the username of the user you want to allow Docker access to.
 Note: After running usermod, you must log out and log back in to start a new session with updated group permissions.
 
-### Step 3. Configure network connectivity
-
-You have two options for configuring network connectivity between your DGX Spark nodes:
-
-#### Option 1: Automatic IP assignment (recommended)
-
-Follow these steps on both DGX Spark nodes to configure network interfaces using netplan:
-
-```bash
-## Create the netplan configuration file
-sudo tee /etc/netplan/40-cx7.yaml > /dev/null <<EOF
-network:
-  version: 2
-  ethernets:
-    enp1s0f0np0:
-      link-local: [ ipv4 ]
-    enp1s0f1np1:
-      link-local: [ ipv4 ]
-EOF
-
-## Set appropriate permissions
-sudo chmod 600 /etc/netplan/40-cx7.yaml
-
-## Apply the configuration
-sudo netplan apply
-```
-
-#### Option 2: Manual IP assignment (advanced)
-
-First, identify which network ports are available and up:
-
-```bash
-## Check network port status
-ibdev2netdev
-```
-
-Example output:
-```
-roceP2p1s0f0 port 1 ==> enP2p1s0f0np0 (Up)
-roceP2p1s0f1 port 1 ==> enP2p1s0f1np1 (Down)
-rocep1s0f0 port 1 ==> enp1s0f0np0 (Up)
-rocep1s0f1 port 1 ==> enp1s0f1np1 (Down)
-```
-
-Use an interface that shows as "(Up)" in your output. In this example, we'll use **enp1s0f0np0**.
-
-On Node 1:
-```bash
-## Assign static IP and bring up interface
-sudo ip addr add 192.168.100.10/24 dev enp1s0f0np0
-sudo ip link set enp1s0f0np0 up
-```
-
-On Node 2:
-```bash
-## Assign static IP and bring up interface
-sudo ip addr add 192.168.100.11/24 dev enp1s0f0np0
-sudo ip link set enp1s0f0np0 up
-```
-
-
-#### Set up passwordless SSH authentication
-
-Run the DGX Spark [**discover-sparks.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/discover-sparks.sh) script on both nodes to automatically configure SSH:
-
-```bash
-bash ./discover-sparks.sh
-```
-
-Expected output similar to the below, with different IPs and node names. The first time you run the script, you'll be prompted for your password for each node.
-```
-Found: 192.168.100.10 (spark-1b3b.local)
-Found: 192.168.100.11 (spark-1d84.local)
-
-Copying your SSH public key to all discovered nodes using ssh-copy-id.
-You may be prompted for your password on each node.
-Copying SSH key to 192.168.100.10 ...
-Copying SSH key to 192.168.100.11 ...
-nvidia@192.168.100.11's password:
-
-SSH key copy process complete. These two sparks can now talk to each other.
-```
-
-### Step 4. Install NVIDIA Container Toolkit & setup Docker environment
+### Step 3. Install NVIDIA Container Toolkit & setup Docker environment
 
 Ensure the NVIDIA drivers and the NVIDIA Container Toolkit are installed on each node (both manager and workers) that will provide GPU resources. This package enables Docker containers to access the host's GPU hardware. Ensure you complete the [installation steps](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html), including the [Docker configuration](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker) for NVIDIA Container Toolkit.
 
-### Step 5. Enable resource advertising
+### Step 4. Enable resource advertising
 
 First, find your GPU UUID by running:
 ```bash
@@ -561,7 +479,7 @@ Finally, restart the Docker daemon to apply all changes:
 sudo systemctl restart docker
 ```
 
-### Step 6. Initialize Docker Swarm
+### Step 5. Initialize Docker Swarm
 
 On whichever node you want to use as primary, run the following swarm initialization command
 ```bash
@@ -579,7 +497,7 @@ To add a worker to this swarm, run the following command:
 To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
 ```
 
-### Step 7. Join worker nodes and deploy
+### Step 6. Join worker nodes and deploy
 
 Now we can proceed with setting up other nodes of your cluster.
 
@@ -609,7 +527,7 @@ oe9k5o6w41le   trtllm-multinode_trtllm.1       nvcr.io/nvidia/tensorrt-llm/relea
 phszqzk97p83   trtllm-multinode_trtllm.2       nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3   spark-1b3b   Running         Running 2 minutes ago
 ```
 
-### Step 8. Create hosts file
+### Step 7. Create hosts file
 
 You can check the available nodes using `docker node ls`
 ```
@@ -625,14 +543,14 @@ docker node ls --format '{{.ID}}' | xargs -n1 docker node inspect --format '{{ .
 docker cp ~/openmpi-hostfile $(docker ps -q -f name=trtllm-multinode):/etc/openmpi-hostfile
 ```
 
-### Step 9. Find your Docker container ID
+### Step 8. Find your Docker container ID
 
 You can use `docker ps` to find your Docker container ID. Alternatively, you can save the container ID in a variable:
 ```bash
 export TRTLLM_MN_CONTAINER=$(docker ps -q -f name=trtllm-multinode)
 ```
 
-### Step 10. Generate configuration file
+### Step 9. Generate configuration file
 
 ```bash
 docker exec $TRTLLM_MN_CONTAINER bash -c 'cat <<EOF > /tmp/extra-llm-api-config.yml
@@ -645,7 +563,7 @@ cuda_graph_config:
 EOF'
 ```
 
-### Step 11. Download model
+### Step 10. Download model
 
 ```bash
 ## Need to specify huggingface token for model download.
@@ -657,7 +575,7 @@ docker exec \
   -it $TRTLLM_MN_CONTAINER bash -c 'mpirun -x HF_TOKEN bash -c "huggingface-cli download $MODEL"'
 ```
 
-### Step 12. Serve the model
+### Step 11. Serve the model
 
 ```bash
 docker exec \
@@ -677,7 +595,7 @@ This will start the TensorRT-LLM server on port 8000. You can then make inferenc
 
 **Expected output:** Server startup logs and ready message.
 
-### Step 13. Validate API server
+### Step 12. Validate API server
 
 Verify successful deployment by checking container status and testing the API endpoint.
 
@@ -703,7 +621,7 @@ curl -X POST http://localhost:8000/v1/chat/completions \
 
 **Expected output:** JSON response with generated text completion.
 
-### Step 15. Cleanup and rollback
+### Step 14. Cleanup and rollback
 
 Stop and remove containers by using the following command on the leader node:
 
@@ -719,7 +637,7 @@ Remove downloaded models to free disk space:
 rm -rf $HOME/.cache/huggingface/hub/models--nvidia--Qwen3*
 ```
 
-### Step 16. Next steps
+### Step 15. Next steps
 
 Compare performance metrics between speculative decoding and baseline reports to quantify speed improvements. Use the multi-node setup as a foundation for deploying other large models requiring tensor parallelism, or scale to additional nodes for higher throughput workloads.
 
@@ -729,7 +647,6 @@ Compare performance metrics between speculative decoding and baseline reports to
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| Cannot access gated repo for URL | Certain HuggingFace models have restricted access | Regenerate your [HuggingFace token](https://huggingface.co/docs/hub/en/security-tokens); and request access to the [gated model](https://huggingface.co/docs/hub/en/models-gated#customize-requested-information) on your web browser |
 | OOM during weight loading (e.g., [Nemotron Super 49B](https://huggingface.co/nvidia/Llama-3_3-Nemotron-Super-49B-v1_5)) | Parallel weight-loading memory pressure | `export TRT_LLM_DISABLE_LOAD_WEIGHTS_IN_PARALLEL=1` |
 | "CUDA out of memory" | GPU VRAM insufficient for model | Reduce `free_gpu_memory_fraction: 0.9` or batch size or use smaller model |
 | "Model not found" error | HF_TOKEN invalid or model inaccessible | Verify token and model permissions |
@@ -742,12 +659,11 @@ Compare performance metrics between speculative decoding and baseline reports to
 |---------|-------|-----|
 | MPI hostname test returns single hostname | Network connectivity issues | Verify both nodes are on reachable IP addresses |
 | "Permission denied" on HuggingFace download | Invalid or missing HF_TOKEN | Set valid token: `export HF_TOKEN=<TOKEN>` |
-| Cannot access gated repo for URL | Certain HuggingFace models have restricted access | Regenerate your [HuggingFace token](https://huggingface.co/docs/hub/en/security-tokens); and request access to the [gated model](https://huggingface.co/docs/hub/en/models-gated#customize-requested-information) on your web browser |
 | "CUDA out of memory" errors | Insufficient GPU memory | Reduce `--max_batch_size` or `--max_num_tokens` |
 | Container exits immediately | Missing entrypoint script | Ensure `trtllm-mn-entrypoint.sh` download succeeded and has executable permissions, also ensure you are not running the container already on your node. If port 2233 is already utilized, the entrypoint script will not start. |
 
-> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
-> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU.
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within
 > the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
 ```bash
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'

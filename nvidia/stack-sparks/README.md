@@ -6,6 +6,10 @@
 
 - [Overview](#overview)
 - [Run on two Sparks](#run-on-two-sparks)
+  - [Option 1: Automatic IP Assignment (Recommended)](#option-1-automatic-ip-assignment-recommended)
+  - [Option 2: Manual IP Assignment (Advanced)](#option-2-manual-ip-assignment-advanced)
+  - [Option 1: Automatically configure SSH](#option-1-automatically-configure-ssh)
+  - [Option 2: Manually discover and configure SSH](#option-2-manually-discover-and-configure-ssh)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -15,76 +19,98 @@
 ## Basic idea
 
 Configure two DGX Spark systems for high-speed inter-node communication using 200GbE direct
-QSFP connections and NCCL multi-node communication. This setup enables distributed training
-and inference workloads across multiple Blackwell GPUs by establishing network connectivity,
-configuring SSH authentication, and validating communication with NCCL performance tests.
+QSFP connections. This setup enables distributed workloads across multiple DGX Spark nodes
+by establishing network connectivity and configuring SSH authentication.
 
 ## What you'll accomplish
 
 You will physically connect two DGX Spark devices with a QSFP cable, configure network
-interfaces for cluster communication, establish passwordless SSH between nodes, and validate
-the setup with NCCL multi-node tests to create a functional distributed computing environment.
+interfaces for cluster communication, and establish passwordless SSH between nodes to create
+a functional distributed computing environment.
 
 ## What to know before starting
 
-- Working with network interface configuration and netplan
-- Using Docker containers with GPU and network access
 - Basic understanding of distributed computing concepts
+- Working with network interface configuration and netplan
 - Experience with SSH key management
-- Familiarity with NVIDIA GPU architectures and CUDA environments
 
 ## Prerequisites
 
-- Two DGX Spark systems with NVIDIA Blackwell GPUs available
-- QSFP cable for direct 200GbE connection between devices
-- Docker installed on both systems: `docker --version`
-- CUDA toolkit installed: `nvcc --version` (should show 12.9 or higher)
-- SSH access available on both systems: `ssh-keygen -t rsa` (if keys don't exist)
-- Git available for source code compilation: `git --version`
+- Two DGX Spark systems
+- One QSFP cable for direct 200GbE connection between two devices
+- SSH access available to both systems
 - Root or sudo access on both systems: `sudo whoami`
+- The same username on both systems
 
 ## Ancillary files
 
 All required files for this playbook can be found [here on GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/)
 
-- `discover-sparks` script for automatic node discovery and SSH key distribution
-- `trtllm-mn-entrypoint.sh` container entrypoint script for multi-node setup
-- Network interface mapping tools (`ibdev2netdev`, `ip link show`)
+- **discover-sparks.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/discover-sparks) script for automatic node discovery and SSH key distribution
 
 ## Time & risk
 
-**Duration:** 2-3 hours including validation tests
+**Duration:** 1 hour including validation
 
-**Risk level:** Medium - involves network reconfiguration and container setup
+**Risk level:** Medium - involves network reconfiguration
 
 **Rollback:** Network changes can be reversed by removing netplan configs or IP assignments
 
 ## Run on two Sparks
 
-## Step 1. Physical Hardware Connection
+## Step 1. Ensure Same Username on Both Systems
 
-Connect the QSFP cable between both DGX Spark systems using the rightmost QSFP interface
-on each device. This establishes the 200GbE direct connection required for high-speed
-inter-node communication.
+On both systems check the username and make sure it's the same:
 
 ```bash
-## Check QSFP interface availability on both nodes
-ip link show | grep enP2p1s0f1np1
+## Check current username
+whoami
 ```
 
-Expected output shows the interface exists but may be down initially.
+If usernames don't match, create a new user (e.g., nvidia) on both systems and login in with the new user:
 
-## Step 2. Network Interface Configuration
+```bash
+## Create nvidia user and add to sudo group
+sudo useradd -m nvidia
+sudo usermod -aG sudo nvidia
 
-Choose one option based on your network requirements.
+## Set password for nvidia user
+sudo passwd nvidia
 
-**Option 1: Automatic IP Assignment (Recommended)**
+## Switch to nvidia user
+su - nvidia
+```
+
+## Step 2. Physical Hardware Connection
+
+Connect the QSFP cable between both DGX Spark systems using any QSFP interface
+on each device. This establishes the 200GbE direct connection required for high-speed
+inter-node communication. Upon connection between the two nodes, you will see the an output like the one below: in this example the interface showing as 'Up' is **enp1s0f1np1** / **enP2p1s0f1np1** (each physical port has two names).
+
+Example output:
+```bash
+## Check QSFP interface availability on both nodes
+nvidia@dxg-spark-1:~$ ibdev2netdev
+roceP2p1s0f0 port 1 ==> enP2p1s0f0np0 (Down)
+roceP2p1s0f1 port 1 ==> enP2p1s0f1np1 (Up)
+rocep1s0f0 port 1 ==> enp1s0f0np0 (Down)
+rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
+```
+
+Note: If none of the interfaces are showing as 'Up', please check the QSFP cable connection, reboot the systems and try again.
+Note: The interface showing as 'Up' depends on which port you are using to connect the two nodes. Each physical port has two names, for example, enp1s0f1np1 and enP2p1s0f1np1 refer to the same physical port. Please disregard enP2p1s0f0np0 and enP2p1s0f1np1, and use enp1s0f0np0 and enp1s0f1np1 only.
+
+## Step 3. Network Interface Configuration
+
+Choose one option to setup the network interfaces. Option 1 and 2 are mutually exclusive.
+
+### Option 1: Automatic IP Assignment (Recommended)
 
 Configure network interfaces using netplan on both DGX Spark nodes for automatic
 link-local addressing:
 
 ```bash
-## On both nodes, create the netplan configuration file
+## Create the netplan configuration file
 sudo tee /etc/netplan/40-cx7.yaml > /dev/null <<EOF
 network:
   version: 2
@@ -95,217 +121,128 @@ network:
       link-local: [ ipv4 ]
 EOF
 
-## On both nodes, set appropriate permissions
+## Set appropriate permissions
 sudo chmod 600 /etc/netplan/40-cx7.yaml
 
-## On both nodes, apply the netplan configuration
+## Apply the configuration
 sudo netplan apply
 ```
 
-**Option 2: Manual IP Assignment (Advanced)**
+Note: Using this option, the IPs assigned to the interfaces will change if you reboot the system.
 
-Configure dedicated cluster networking with static IP addresses:
+### Option 2: Manual IP Assignment (Advanced)
 
-```bash
-## On Node 1
-sudo ip addr add 192.168.100.10/24 dev enP2p1s0f1np1
-sudo ip link set enP2p1s0f1np1 up
-
-## On Node 2
-sudo ip addr add 192.168.100.11/24 dev enP2p1s0f1np1
-sudo ip link set enP2p1s0f1np1 up
-
-## Verify connectivity from Node 1
-ping -c 3 192.168.100.11
-
-## Verify connectivity from Node 2
-ping -c 3 192.168.100.10
-```
-
-## Step 3. SSH Key Distribution
-
-Automatically identify interconnected DGX Spark systems and configure SSH passwordless
-authentication for multi-node operations. This step runs on either node.
+First, identify which network ports are available and up:
 
 ```bash
-## On either node, run the discovery script
-./discover-sparks
-```
-
-Expected output:
-```
-Found: 192.168.100.10 (spark-1b3b.local)
-Found: 192.168.100.11 (spark-1d84.local)
-
-Copying your SSH public key to all discovered nodes using ssh-copy-id.
-You may be prompted for your password on each node.
-Copying SSH key to 192.168.100.10 ...
-Copying SSH key to 192.168.100.11 ...
-nvidia@192.168.100.11's password:
-
-SSH key copy process complete. These two sparks can now talk to each other.
-```
-
-## Step 4. Network Interface Validation
-
-Check which ConnectX-7 network interfaces are active and available for communication:
-
-```bash
+## Check network port status
 ibdev2netdev
 ```
 
-Expected output (showing "Up" for active interfaces):
+Example output:
 ```
-rocep1s0f0 port 1 ==> enp1s0f0np0 (Up)
-rocep1s0f1 port 1 ==> enp1s0f1np1 (Down)
-roceP2p1s0f0 port 1 ==> enP2p1s0f0np0 (Up)
-roceP2p1s0f1 port 1 ==> enP2p1s0f1np1 (Down)
+roceP2p1s0f0 port 1 ==> enP2p1s0f0np0 (Down)
+roceP2p1s0f1 port 1 ==> enP2p1s0f1np1 (Up)
+rocep1s0f0 port 1 ==> enp1s0f0np0 (Down)
+rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
 ```
 
-Note the active interface names (marked "Up") for use in container configuration.
+Use an interface that shows as "(Up)" in your output. In this example, we'll use **enp1s0f1np1**. You can disregard interfaces starting with the prefix`enP2p<...>` and only use interfaces starting with `enp1<...>` instead.
 
-## Step 5. Launch Containers with Network Configuration
+On Node 1:
+```bash
+## Assign static IP and bring up interface.
+sudo ip addr add 192.168.100.10/24 dev enp1s0f1np1
+sudo ip link set enp1s0f1np1 up
+```
 
-Start containers with appropriate network and GPU configuration for NCCL communication.
-This step runs on both nodes.
+Repeat the same process for Node 2, but using IP **192.168.100.11/24**. Ensure to use the correct interface name using `ibdev2netdev` command.
+```bash
+## Assign static IP and bring up interface.
+sudo ip addr add 192.168.100.11/24 dev enp1s0f1np1
+sudo ip link set enp1s0f1np1 up
+```
+
+You can verify the IP assignment on both nodes by running the following command on each node:
+```bash
+## Replace enp1s0f1np1 with the interface showing as "(Up)" in your output, either enp1s0f0np0 or enp1s0f1np1
+ip addr show enp1s0f1np1
+```
+
+## Step 3. Set up passwordless SSH authentication
+
+### Option 1: Automatically configure SSH
+
+Run the DGX Spark [**discover-sparks.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/discover-sparks) script from one of the nodes to automatically discover and configure SSH:
 
 ```bash
-## On both nodes, launch the container
-docker run --name trtllm --rm -d \
-  --gpus all --network host --ipc=host \
-  --ulimit memlock=-1 --ulimit stack=67108864 \
-  -e UCX_NET_DEVICES=enp1s0f0np0,enp1s0f1np1 \
-  -e NCCL_SOCKET_IFNAME=enp1s0f0np0,enp1s0f1np1 \
-  -e OMPI_MCA_btl_tcp_if_include=enp1s0f0np0,enp1s0f1np1 \
-  -e OMPI_ALLOW_RUN_AS_ROOT=1 \
-  -e OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
-  -v $HOME/.cache/huggingface/:/root/.cache/huggingface/ \
-  -v ./trtllm-mn-entrypoint.sh:/opt/trtllm-mn-entrypoint.sh \
-  -v ~/.ssh:/tmp/.ssh:ro \
-  --entrypoint /opt/trtllm-mn-entrypoint.sh \
-  nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3
+bash ./discover-sparks
 ```
 
-## Step 6. Build NCCL with Blackwell Support
+Expected output similar to the below, with different IPs and node names. The first time you run the script, you'll be prompted for your password for each node.
+```
+Found: 169.254.35.62 (dgx-spark-1.local)
+Found: 169.254.35.63 (dgx-spark-2.local)
 
-Execute these commands inside both containers to build NCCL from source with Blackwell
-architecture support. Access the container with `docker exec -it trtllm bash`.
+Setting up bidirectional SSH access (local <-> remote nodes)...
+You may be prompted for your password for each node.
 
-```bash
-## Install dependencies and build NCCL
-sudo apt-get update && sudo apt-get install -y libopenmpi-dev
-git clone -b v2.28.3-1 https://github.com/NVIDIA/nccl.git /opt/nccl/
-cd /opt/nccl/
-make -j src.build NVCC_GENCODE="-gencode=arch=compute_121,code=sm_121"
-
-## Set environment variables
-export MPI_HOME="/usr/lib/aarch64-linux-gnu/openmpi"
-export NCCL_HOME="/opt/nccl/build/"
-export LD_LIBRARY_PATH="$NCCL_HOME/lib:$CUDA_HOME/lib64/:$MPI_HOME/lib:$LD_LIBRARY_PATH"
+SSH setup complete! Both local and remote nodes can now SSH to each other without passwords.
 ```
 
-## Step 7. Build NCCL Test Suite
+Note: If you encoutner any errors, please follow Option 2 below to manually configure SSH and debug the issue.
 
-Compile the NCCL test suite to validate communication performance. This runs inside
-both containers.
+### Option 2: Manually discover and configure SSH
 
+You will need to find the IP addresses for the CX-7 interfaces that are up. On both nodes, run the following command to find the IP addresses and take note of them for the next step.
 ```bash
-## Clone and build NCCL tests
-git clone https://github.com/NVIDIA/nccl-tests.git /opt/nccl-tests/
-cd /opt/nccl-tests/
-make MPI=1
+  ip addr show enp1s0f0np0
+  ip addr show enp1s0f1np1
 ```
 
-## Step 8. Run NCCL Communication Test
-
-Execute multi-node NCCL performance test using the active network interface. This runs
-from one of the containers.
-
-```bash
-## Set network interface environment variables (use your active interface from Step 4)
-export UCX_NET_DEVICES=enp1s0f0np0
-export NCCL_SOCKET_IFNAME=enp1s0f0np0
-export OMPI_MCA_btl_tcp_if_include=enp1s0f0np0
-
-## Run the all_gather performance test across both nodes
-mpirun -np 2 -H 192.168.100.10:1,192.168.100.11:1 \
-  -x NCCL_DEBUG=VERSION -x NCCL_DEBUG_SUBSYS=TUNING \
-  -x LD_LIBRARY_PATH=$LD_LIBRARY_PATH \
-  -x NCCL_MERGE_LEVEL=SYS -x NCCL_PROTO="SIMPLE" \
-  /opt/nccl-tests/build/all_gather_perf -b 32G -e 32G -f 2
+Example output:
+```
+## In this example, we are using interface enp1s0f1np1.
+nvidia@dgx-spark-1:~$ ip addr show enp1s0f1np1
+    4: enp1s0f1np1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+        link/ether 3c:6d:66:cc:b3:b7 brd ff:ff:ff:ff:ff:ff
+        inet **169.254.35.62**/16 brd 169.254.255.255 scope link noprefixroute enp1s0f1np1
+          valid_lft forever preferred_lft forever
+        inet6 fe80::3e6d:66ff:fecc:b3b7/64 scope link
+          valid_lft forever preferred_lft forever
 ```
 
-## Step 9. Validate NCCL Installation
+In this example, the IP address for Node 1 is **169.254.35.62**. Repeat the process for Node 2.
 
-Verify successful NCCL compilation and multi-node communication by checking built
-components.
-
+On both nodes, run the following commands to enable passwordless SSH:
 ```bash
-## Check NCCL library build
-ls -la /opt/nccl/build/lib/
-
-## Verify NCCL test binaries
-ls -la /opt/nccl-tests/build/
-
-## Check MPI configuration
-mpirun --version
+## Copy your SSH public key to both nodes. Please replace the IP addresses with the ones you found in the previous step.
+ssh-copy-id -i ~/.ssh/id_rsa.pub nvidia@<IP for Node 1>
+ssh-copy-id -i ~/.ssh/id_rsa.pub nvidia@<IP for Node 2>
 ```
 
-Expected output should show NCCL libraries in `/opt/nccl/build/lib/` and test binaries
-in `/opt/nccl-tests/build/`.
+## Step 4. Verify Multi-Node Communication
 
-## Step 10. Performance Validation
-
-Review the all_gather test output for communication performance metrics from Step 8.
-
-Expected metrics from the test output:
-- Bandwidth measurements between nodes
-- Latency for different message sizes
-- GPU-to-GPU communication confirmation
-- No error messages or communication failures
-
-## Step 11. Additional NCCL Tests
-
-Run additional performance validation tests to verify the complete setup.
+Test basic multi-node functionality:
 
 ```bash
-## Example: Run a simple NCCL bandwidth test
-/opt/nccl-tests/build/all_reduce_perf -b 1M -e 1G -f 2
-
-## Example: Verify GPU topology detection
-nvidia-smi topo -m
+## Test hostname resolution across nodes
+ssh <IP for Node 1> hostname
+ssh <IP for Node 2> hostname
 ```
 
-## Step 13. Cleanup and Rollback
+## Step 6. Cleanup and Rollback
 
-> **Warning**: These steps will stop containers and reset network configuration.
+> **Warning**: These steps will reset network configuration.
 
 ```bash
-## Stop containers on both nodes
-docker stop trtllm
-docker rm trtllm
-
 ## Rollback network configuration (if using Option 1)
 sudo rm /etc/netplan/40-cx7.yaml
 sudo netplan apply
 
 ## Rollback network configuration (if using Option 2)
-sudo ip addr del 192.168.100.10/24 dev enP2p1s0f1np1  # Node 1
-sudo ip addr del 192.168.100.11/24 dev enP2p1s0f1np1  # Node 2
-sudo ip link set enP2p1s0f1np1 down
-```
-
-## Step 14. Next Steps
-
-Your NCCL environment is ready for multi-node distributed training workloads on DGX Spark
-systems with Blackwell GPUs.
-
-```bash
-## Test basic multi-node functionality
-mpirun -np 2 -H 192.168.100.10:1,192.168.100.11:1 hostname
-
-## Verify GPU visibility across nodes
-mpirun -np 2 -H 192.168.100.10:1,192.168.100.11:1 nvidia-smi -L
+sudo ip addr del 192.168.100.10/24 dev enp1s0f0np0  # Adjust the interface name to the one you used in step 3.
+sudo ip addr del 192.168.100.11/24 dev enp1s0f0np0  # Adjust the interface name to the one you used in step 3.
 ```
 
 ## Troubleshooting
@@ -314,7 +251,4 @@ mpirun -np 2 -H 192.168.100.10:1,192.168.100.11:1 nvidia-smi -L
 |---------|-------|-----|
 | "Network unreachable" errors | Network interfaces not configured | Verify netplan config and `sudo netplan apply` |
 | SSH authentication failures | SSH keys not properly distributed | Re-run `./discover-sparks` and enter passwords |
-| NCCL build failures with Blackwell | Wrong compute capability specified | Verify `NVCC_GENCODE="-gencode=arch=compute_121,code=sm_121"` |
-| MPI communication timeouts | Wrong network interfaces specified | Check `ibdev2netdev` and update interface names |
-| Container networking issues | Host network mode problems | Ensure `--network host --ipc=host` in docker run |
 | Node 2 not visible in cluster | Network connectivity issue | Verify QSFP cable connection, check IP configuration |
