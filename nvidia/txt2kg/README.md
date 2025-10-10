@@ -1,6 +1,6 @@
 # Text to Knowledge Graph
 
-> Transform unstructured text using LLM inference into interactive knowledge graphs with GPU-accelerated visualization
+> Transform unstructured text into interactive knowledge graphs using local GPU-accelerated LLM inference and graph visualization
 
 ## Table of Contents
 
@@ -20,8 +20,9 @@ The unified memory architecture enables running larger, more accurate models tha
 This txt2kg playbook transforms unstructured text documents into structured knowledge graphs using:
 - **Knowledge Triple Extraction**: Using Ollama with GPU acceleration for local LLM inference to extract subject-predicate-object relationships
 - **Graph Database Storage**: ArangoDB for storing and querying knowledge triples with relationship traversal
-- **Vector Embeddings**: Local SentenceTransformer models for entity embeddings and semantic search
 - **GPU-Accelerated Visualization**: Three.js WebGPU rendering for interactive 2D/3D graph exploration
+
+> **Future Enhancements**: Vector embeddings and GraphRAG capabilities are planned enhancements.
 
 ## What you'll accomplish
 
@@ -29,7 +30,6 @@ You will have a fully functional system capable of processing documents, generat
 The setup includes:
 - **Local LLM Inference**: Ollama for GPU-accelerated LLM inference with no API keys required
 - **Graph Database**: ArangoDB for storing and querying triples with relationship traversal
-- **Vector Search**: Local Pinecone-compatible storage for entity embeddings and KNN search
 - **Interactive Visualization**: GPU-accelerated graph rendering with Three.js WebGPU
 - **Modern Web Interface**: Next.js frontend with document management and query interface
 - **Fully Containerized**: Reproducible deployment with Docker Compose and GPU support
@@ -67,7 +67,7 @@ cd ${MODEL}/assets
 
 ## Step 2. Start the txt2kg services
 
-Use the provided start script to launch all required services. This will set up Ollama, ArangoDB, local Pinecone, and the Next.js frontend:
+Use the provided start script to launch all required services. This will set up Ollama, ArangoDB, and the Next.js frontend:
 
 ```bash
 ./start.sh
@@ -77,7 +77,6 @@ The script will automatically:
 - Check for GPU availability
 - Start Docker Compose services
 - Set up ArangoDB database
-- Initialize local Pinecone vector storage
 - Launch the web interface
 
 ## Step 3. Pull an Ollama model (optional)
@@ -90,7 +89,7 @@ docker exec ollama-compose ollama pull <model-name>
 
 Browse available models at [https://ollama.com/search](https://ollama.com/search)
 
-> **Note**: The unified memory architecture enables running larger models like 70B parameters, which produce significantly more accurate knowledge triples and deliver superior GraphRAG performance.
+> **Note**: The unified memory architecture enables running larger models like 70B parameters, which produce significantly more accurate knowledge triples.
 
 ## Step 4. Access the web interface
 
@@ -103,7 +102,6 @@ http://localhost:3001
 You can also access individual services:
 - **ArangoDB Web Interface**: http://localhost:8529 
 - **Ollama API**: http://localhost:11434
-- **Local Pinecone**: http://localhost:5081
 
 ## Step 5. Upload documents and build knowledge graphs
 
@@ -114,19 +112,19 @@ You can also access individual services:
 #### 5.2. Knowledge Graph Generation
 - The system extracts subject-predicate-object triples using Ollama
 - Triples are stored in ArangoDB for relationship querying
-- Entity embeddings are generated and stored in local Pinecone (optional)
 
 #### 5.3. Interactive Visualization
 - View your knowledge graph in 2D or 3D with GPU-accelerated rendering
 - Explore nodes and relationships interactively
 
-#### 5.4. Graph-based RAG Queries
+#### 5.4. Graph-based Queries
 - Ask questions about your documents using the query interface
 - Graph traversal enhances context with entity relationships from ArangoDB
-- The system uses KNN search to find relevant entities in the vector database (optional)
 - LLM generates responses using the enriched graph context
 
-## Step 7. Cleanup and rollback
+> **Future Enhancement**: GraphRAG capabilities with vector-based KNN search for entity retrieval are planned.
+
+## Step 6. Cleanup and rollback
 
 Stop all services and optionally remove containers:
 
@@ -141,11 +139,11 @@ docker compose down -v
 docker exec ollama-compose ollama rm llama3.1:8b
 ```
 
-## Step 8. Next steps
+## Step 7. Next steps
 
 - Experiment with different Ollama models for varied extraction quality
 - Customize triple extraction prompts for domain-specific knowledge
-- Explore advanced Graph-based RAG features
+- Explore advanced graph querying and visualization features
 
 ## Troubleshooting
 
