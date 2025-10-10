@@ -342,6 +342,7 @@ http://192.168.100.10:8265
 | Symptom | Cause | Fix |
 |---------|--------|-----|
 | Node 2 not visible in Ray cluster | Network connectivity issue | Verify QSFP cable connection, check IP configuration |
+| Cannot access gated repo for URL | Certain HuggingFace models have restricted access | Regenerate your [HuggingFace token](https://huggingface.co/docs/hub/en/security-tokens); and request access to the [gated model](https://huggingface.co/docs/hub/en/models-gated#customize-requested-information) on your web browser |
 | Model download fails | Authentication or network issue | Re-run `huggingface-cli login`, check internet access |
 | Cannot access gated repo for URL | Certain HuggingFace models have restricted access | Regenerate your HuggingFace token; and request access to the gated model on your web browser |
 | CUDA out of memory with 405B | Insufficient GPU memory | Use 70B model or reduce max_model_len parameter |
