@@ -1,4 +1,4 @@
-# Stack two Sparks
+# Connect two Sparks
 
 > Connect two Spark devices and setup them up for inference and fine-tuning
 
