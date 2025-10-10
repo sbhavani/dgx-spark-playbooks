@@ -17,9 +17,9 @@
   - [Step 9. Configure SSH authentication](#step-9-configure-ssh-authentication)
   - [Step 10. Test SSH connection](#step-10-test-ssh-connection)
   - [Step 11. Validate installation](#step-11-validate-installation)
-  - [Step 12. Troubleshooting](#step-12-troubleshooting)
   - [Step 13. Cleanup and rollback](#step-13-cleanup-and-rollback)
   - [Step 14. Next steps](#step-14-next-steps)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -68,10 +68,6 @@ all traffic automatically encrypted and NAT traversal handled transparently.
   * Network connectivity issues during initial setup
   * Authentication provider service dependencies
 * **Rollback**: Tailscale can be completely removed with `sudo apt remove tailscale` and all network routing automatically reverts to default settings.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -313,18 +309,6 @@ Expected output:
 - Successful file transfers
 - Remote command execution working
 
-### Step 12. Troubleshooting
-
-Common issues and their solutions:
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| `tailscale up` auth fails | Network issues | Check internet, try `curl -I login.tailscale.com` |
-| SSH connection refused | SSH not running | Run `sudo systemctl start ssh --no-pager` on Spark |
-| SSH auth failure | Wrong SSH keys | Check public key in `~/.ssh/authorized_keys` |
-| Cannot ping hostname | DNS issues | Use IP from `tailscale status` instead |
-| Devices missing | Different accounts | Use same identity provider for all devices |
-
 ### Step 13. Cleanup and rollback
 
 Remove Tailscale completely if needed. This will disconnect devices from the
@@ -358,3 +342,20 @@ Your Tailscale setup is complete. You can now:
 - Transfer files securely: `scp file.txt <USERNAME>@<SPARK_HOSTNAME>:~/`
 - Open the DGX Dashboard and start JupyterLab, then connect with:
   `ssh -L 8888:localhost:1102 <USERNAME>@<SPARK_HOSTNAME>`
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `tailscale up` auth fails | Network issues | Check internet, try `curl -I login.tailscale.com` |
+| SSH connection refused | SSH not running | Run `sudo systemctl start ssh --no-pager` on Spark |
+| SSH auth failure | Wrong SSH keys | Check public key in `~/.ssh/authorized_keys` |
+| Cannot ping hostname | DNS issues | Use IP from `tailscale status` instead |
+| Devices missing | Different accounts | Use same identity provider for all devices |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```

@@ -8,6 +8,7 @@
 - [Instructions](#instructions)
 - [Run on two Sparks](#run-on-two-sparks)
   - [Step 14. (Optional) Launch 405B inference server](#step-14-optional-launch-405b-inference-server)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -50,11 +51,7 @@ support for ARM64.
 
 * **Duration:** 30 minutes for Docker approach
 * **Risks:** Container registry access requires internal credentials
-* **Rollback:** Container approach is non-destructive. 
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
+* **Rollback:** Container approach is non-destructive.
 
 ## Instructions
 
@@ -348,17 +345,6 @@ nvidia-smi
 docker exec node nvidia-smi --query-gpu=memory.used,memory.total --format=csv
 ```
 
-## Step 17. Troubleshooting
-
-Common issues and their resolutions:
-
-| Symptom | Cause | Fix |
-|---------|--------|-----|
-| Node 2 not visible in Ray cluster | Network connectivity issue | Verify QSFP cable connection, check IP configuration |
-| Model download fails | Authentication or network issue | Re-run `huggingface-cli login`, check internet access |
-| CUDA out of memory with 405B | Insufficient GPU memory | Use 70B model or reduce max_model_len parameter |
-| Container startup fails | Missing ARM64 image | Rebuild vLLM image following ARM64 instructions |
-
 ## Step 18. Cleanup and rollback
 
 Remove temporary configurations and containers when testing is complete.
@@ -389,4 +375,20 @@ http://192.168.100.10:8265
 ## - Log rotation for long-running services  
 ## - Persistent model caching across restarts
 ## - Alternative quantization methods (FP8, INT4)
+```
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| Node 2 not visible in Ray cluster | Network connectivity issue | Verify QSFP cable connection, check IP configuration |
+| Model download fails | Authentication or network issue | Re-run `huggingface-cli login`, check internet access |
+| CUDA out of memory with 405B | Insufficient GPU memory | Use 70B model or reduce max_model_len parameter |
+| Container startup fails | Missing ARM64 image | Rebuild vLLM image following ARM64 instructions |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 ```

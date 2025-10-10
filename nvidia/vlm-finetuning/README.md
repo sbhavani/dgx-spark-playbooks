@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -53,10 +54,6 @@ The setup includes:
   * Training requires sustained GPU usage and memory
   * Dataset preparation may require manual steps (Kaggle downloads, video processing)
 * **Rollback**: Stop and remove Docker containers, delete downloaded models and datasets if needed.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -321,3 +318,12 @@ If you trained your model sufficiently, you should see that the fine-tuned model
 Since the model's output adheres to the schema we trained, we can directly export the model's prediction into a database for video analytics.
 
 Feel free to play around with additional videos available in the gallery.
+
+## Troubleshooting
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```

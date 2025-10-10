@@ -7,6 +7,7 @@
 - [Overview](#overview)
 - [Instructions](#instructions)
 - [Setup Open WebUI on Remote Spark with NVIDIA Sync](#setup-open-webui-on-remote-spark-with-nvidia-sync)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -42,11 +43,6 @@ for model management, persistent data storage, and GPU acceleration for model in
 * **Risks**:
   * Docker permission issues may require user group changes and session restart
   * Large model downloads may take significant time depending on network speed
-* **Rollback**: Stop and remove Docker containers using provided cleanup commands, remove custom port from NVIDIA Sync settings.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -129,17 +125,6 @@ Write me a haiku about GPUs
 ```
 
 Press Enter to send the message and wait for the model's response.
-
-## Step 7. Troubleshooting
-
-Common issues and their solutions.
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| Permission denied on docker ps | User not in docker group | Run Step 1 completely, including logging out and logging back in or use sudo|
-| Model download fails | Network connectivity issues | Check internet connection, retry download |
-| GPU not detected in container | Missing `--gpus=all flag` | Recreate container with correct command |
-| Port 8080 already in use | Another application using port | Change port in docker command or stop conflicting service |
 
 ## Step 8. Cleanup and rollback
 
@@ -346,18 +331,6 @@ Under the "Custom" section, click the `x` icon on the right of the "Open WebUI" 
 
 This will close the tunnel and stop the Open WebUI docker container.
 
-## Step 10. Troubleshooting
-
-Common issues and their solutions.
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| Permission denied on docker ps | User not in docker group | Run Step 1 completely, including terminal restart |
-| Browser doesn't open automatically | Auto-open setting disabled | Manually navigate to localhost:12000 |
-| Model download fails | Network connectivity issues | Check internet connection, retry download |
-| GPU not detected in container | Missing `--gpus=all flag` | Recreate container with correct start script |
-| Port 12000 already in use | Another application using port | Change port in Custom App settings or stop conflicting service |
-
 ## Step 11. Cleanup and rollback
 
 Steps to completely remove the Open WebUI installation and free up resources:
@@ -400,3 +373,31 @@ docker pull ghcr.io/open-webui/open-webui:ollama
 ```
 
 After the update, launch Open WebUI again from NVIDIA Sync.
+
+## Troubleshooting
+
+## Common issues with manual setup
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Permission denied on docker ps | User not in docker group | Run Step 1 completely, including logging out and logging back in or use sudo|
+| Model download fails | Network connectivity issues | Check internet connection, retry download |
+| GPU not detected in container | Missing `--gpus=all flag` | Recreate container with correct command |
+| Port 8080 already in use | Another application using port | Change port in docker command or stop conflicting service |
+
+## Common issues with setting up via NVIDIA Sync
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Permission denied on docker ps | User not in docker group | Run Step 1 completely, including terminal restart |
+| Browser doesn't open automatically | Auto-open setting disabled | Manually navigate to localhost:12000 |
+| Model download fails | Network connectivity issues | Check internet connection, retry download |
+| GPU not detected in container | Missing `--gpus=all flag` | Recreate container with correct start script |
+| Port 12000 already in use | Another application using port | Change port in Custom App settings or stop conflicting service |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```

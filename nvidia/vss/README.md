@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -51,10 +52,6 @@ You will deploy NVIDIA's VSS AI Blueprint on NVIDIA Spark hardware with Blackwel
   * Network configuration conflicts if shared network already exists
   * Remote API endpoints may have rate limits or connectivity issues (hybrid deployment)
 * **Rollback:** Stop all containers with `docker compose down`, remove shared network with `docker network rm vss-shared-network`, and clean up temporary media directories.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -368,16 +365,7 @@ Follow the steps [here](https://docs.nvidia.com/vss/latest/content/ui_app.html) 
 - Access VSS interface at `http://localhost:9100`
 - Upload videos and test summarization features
 
-## Step 11. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|--------|-----|
-| Container fails to start with "pull access denied" | Missing or incorrect nvcr.io credentials | Re-run `docker login nvcr.io` with valid credentials |
-| Network creation fails | Existing network with same name | Run `docker network rm vss-shared-network` then recreate |
-| Services fail to communicate | Incorrect environment variables | Verify `IS_SBSA=1 IS_AARCH64=1` are set correctly |
-| Web interfaces not accessible | Services still starting or port conflicts | Wait 2-3 minutes, check `docker ps` for container status |
-
-## Step 12. Cleanup and rollback
+## Step 11. Cleanup and rollback
 
 To completely remove the VSS deployment and free up system resources:
 
@@ -402,7 +390,7 @@ rm -rf /tmp/alert-media-dir
 sudo pkill -f sys_cache_cleaner.sh
 ```
 
-## Step 13. Next steps
+## Step 12. Next steps
 
 With VSS deployed, you can now:
 
@@ -417,3 +405,19 @@ With VSS deployed, you can now:
 - Test video summarization and Q&A features
 - Configure knowledge graphs and graph databases
 - Integrate with existing video processing workflows
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| Container fails to start with "pull access denied" | Missing or incorrect nvcr.io credentials | Re-run `docker login nvcr.io` with valid credentials |
+| Network creation fails | Existing network with same name | Run `docker network rm vss-shared-network` then recreate |
+| Services fail to communicate | Incorrect environment variables | Verify `IS_SBSA=1 IS_AARCH64=1` are set correctly |
+| Web interfaces not accessible | Services still starting or port conflicts | Wait 2-3 minutes, check `docker ps` for container status |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```

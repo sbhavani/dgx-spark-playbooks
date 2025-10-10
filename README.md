@@ -28,7 +28,7 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [FLUX.1 Dreambooth LoRA Fine-tuning](nvidia/flux-finetuning/)
 - [Optimized JAX](nvidia/jax/)
 - [LLaMA Factory](nvidia/llama-factory/)
-- [MONAI-Reasoning-CXR-3B Model](nvidia/monai-reasoning/)
+- [MONAI Reasoning Model](nvidia/monai-reasoning/)
 - [Build and Deploy a Multi-Agent Chatbot](nvidia/multi-agent-chatbot/)
 - [Multi-modal Inference](nvidia/multi-modal-inference/)
 - [NCCL for Two Sparks](nvidia/nccl/)

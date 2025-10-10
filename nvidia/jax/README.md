@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -64,10 +65,6 @@ All required assets can be found [here on GitHub](https://gitlab.com/nvidia/dgx-
   * Package dependency conflicts in Python environment
   * Performance validation may require architecture-specific optimizations
 **Rollback:** Container environments provide isolation; remove containers and restart to reset state.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -167,19 +164,7 @@ The notebooks will show you how to check the performance of each SOM training im
 
 Visually inspect the SOM training output on random color data to confirm algorithm correctness.
 
-## Step 10. Troubleshooting
-
-Common issues and their solutions:
-
-| Symptom | Cause | Fix |
-|---------|--------|-----|
-| `nvidia-smi` not found | Missing NVIDIA drivers | Install NVIDIA drivers for ARM64 |
-| Container fails to access GPU | Missing NVIDIA Container Toolkit | Install `nvidia-container-toolkit` |
-| JAX only uses CPU | CUDA/JAX version mismatch | Reinstall JAX with CUDA support |
-| Port 8080 unavailable | Port already in use | Use `-p 8081:8080` or kill process on 8080 |
-| Package conflicts in Docker build | Outdated environment file | Update environment file for Blackwell |
-
-## Step 11. Next steps
+## Step 10. Next steps
 
 Apply JAX optimization techniques to your own NumPy-based machine learning code.
 
@@ -192,3 +177,20 @@ python -m cProfile your_numpy_script.py
 
 Try adapting your favorite NumPy algorithms to JAX and measure performance improvements on 
 Blackwell GPU architecture.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| `nvidia-smi` not found | Missing NVIDIA drivers | Install NVIDIA drivers for ARM64 |
+| Container fails to access GPU | Missing NVIDIA Container Toolkit | Install `nvidia-container-toolkit` |
+| JAX only uses CPU | CUDA/JAX version mismatch | Reinstall JAX with CUDA support |
+| Port 8080 unavailable | Port already in use | Use `-p 8081:8080` or kill process on 8080 |
+| Package conflicts in Docker build | Outdated environment file | Update environment file for Blackwell |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```

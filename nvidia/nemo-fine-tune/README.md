@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -46,10 +47,6 @@ All necessary files for the playbook can be found [here on GitHub](https://githu
 * **Duration:** 45-90 minutes for complete setup and initial model fine-tuning
 * **Risks:** Model downloads can be large (several GB), ARM64 package compatibility issues may require troubleshooting, distributed training setup complexity increases with multi-node configurations
 * **Rollback:** Virtual environments can be completely removed; no system-level changes are made to the host system beyond package installations.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -278,18 +275,6 @@ print('✅ Setup complete')
 "
 ```
 
-## Step 12. Troubleshooting
-
-Common issues and solutions for NeMo AutoModel setup on NVIDIA Spark devices.
-
-| Symptom | Cause | Fix |
-|---------|--------|-----|
-| `nvcc: command not found` | CUDA toolkit not in PATH | Add CUDA toolkit to PATH: `export PATH=/usr/local/cuda/bin:$PATH` |
-| `pip install uv` permission denied | System-level pip restrictions | Use `pip3 install --user uv` and update PATH |
-| GPU not detected in training | CUDA driver/runtime mismatch | Verify driver compatibility: `nvidia-smi` and reinstall CUDA if needed |
-| Out of memory during training | Model too large for available GPU memory | Reduce batch size, enable gradient checkpointing, or use model parallelism |
-| ARM64 package compatibility issues | Package not available for ARM architecture | Use source installation or build from source with ARM64 flags |
-
 ## Step 13. Cleanup and rollback
 
 Remove the installation and restore the original environment if needed. These commands safely remove all installed components.
@@ -324,3 +309,20 @@ cp recipes/llm_finetune/finetune.py my_custom_training.py
 ```
 
 Explore the [NeMo AutoModel GitHub repository](https://github.com/NVIDIA-NeMo/Automodel) for advanced recipes, documentation, and community examples. Consider setting up custom datasets, experimenting with different model architectures, and scaling to multi-node distributed training for larger models.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| `nvcc: command not found` | CUDA toolkit not in PATH | Add CUDA toolkit to PATH: `export PATH=/usr/local/cuda/bin:$PATH` |
+| `pip install uv` permission denied | System-level pip restrictions | Use `pip3 install --user uv` and update PATH |
+| GPU not detected in training | CUDA driver/runtime mismatch | Verify driver compatibility: `nvidia-smi` and reinstall CUDA if needed |
+| Out of memory during training | Model too large for available GPU memory | Reduce batch size, enable gradient checkpointing, or use model parallelism |
+| ARM64 package compatibility issues | Package not available for ARM architecture | Use source installation or build from source with ARM64 flags |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```

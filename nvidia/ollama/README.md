@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -178,19 +179,7 @@ curl -N http://localhost:11434/api/chat -d '{
 }'
 ```
 
-## Step 9. Troubleshooting
-
-**Description**: Common issues and their solutions when setting up Ollama with NVIDIA Sync.
-
-| Symptom | Cause | Fix |
-|---------|--------|-----|
-| "Connection refused" on localhost:11434 | SSH tunnel not active | Start Ollama Server in NVIDIA Sync custom apps |
-| Model download fails with disk space error | Insufficient storage on Spark | Free up space or choose smaller model (e.g., qwen2.5:7b) |
-| Ollama command not found after install | Installation path not in PATH | Restart terminal session or run `source ~/.bashrc` |
-| API returns "model not found" error | Model not pulled or wrong name | Run `ollama list` to verify available models |
-| Slow inference on Spark | Model too large for GPU memory | Try smaller model or check GPU memory with `nvidia-smi` |
-
-## Step 10. Cleanup and rollback
+## Step 9. Cleanup and rollback
 
 **Description**: How to remove the setup and return to the original state.
 
@@ -213,7 +202,7 @@ sudo userdel ollama
 
 This will remove all Ollama files and downloaded models.
 
-## Step 11. Next steps
+## Step 10. Next steps
 
 **Description**: Explore additional functionality and integration options with your working Ollama
 setup.
@@ -229,3 +218,13 @@ Monitor GPU and system usage during inference using the DGX Dashboard available 
 
 Build applications using the Ollama API by integrating with your preferred programming language's
 HTTP client libraries.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| "Connection refused" on localhost:11434 | SSH tunnel not active | Start Ollama Server in NVIDIA Sync custom apps |
+| Model download fails with disk space error | Insufficient storage on Spark | Free up space or choose smaller model (e.g., qwen2.5:7b) |
+| Ollama command not found after install | Installation path not in PATH | Restart terminal session or run `source ~/.bashrc` |
+| API returns "model not found" error | Model not pulled or wrong name | Run `ollama list` to verify available models |
+| Slow inference on Spark | Model too large for GPU memory | Try smaller model or check GPU memory with `nvidia-smi` |

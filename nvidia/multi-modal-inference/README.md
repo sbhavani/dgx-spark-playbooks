@@ -14,6 +14,7 @@
   - [Substep C. FP4 quantized precision](#substep-c-fp4-quantized-precision)
   - [Substep A. BF16 precision](#substep-a-bf16-precision)
   - [Substep B. FP8 quantized precision](#substep-b-fp8-quantized-precision)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -186,15 +187,7 @@ nvidia-smi
 python3 -c "import tensorrt as trt; print(f'TensorRT version: {trt.__version__}')"
 ```
 
-## Step 8. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| "CUDA out of memory" error | Insufficient VRAM for model | Use FP8/FP4 quantization or smaller model |
-| "Invalid HF token" error | Missing or expired HuggingFace token | Set valid token: `export HF_TOKEN=<YOUR_TOKEN>` |
-| Model download timeouts | Network issues or rate limiting | Retry command or pre-download models |
-
-## Step 9. Cleanup and rollback
+## Step 8. Cleanup and rollback
 
 Remove downloaded models and exit container environment to free disk space.
 
@@ -208,8 +201,23 @@ exit
 rm -rf $HOME/.cache/huggingface/
 ```
 
-## Step 10. Next steps
+## Step 9. Next steps
 
 Use the validated setup to generate custom images or integrate multi-modal inference into your 
 applications. Try different prompts or explore model fine-tuning with the established TensorRT 
 environment.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| "CUDA out of memory" error | Insufficient VRAM for model | Use FP8/FP4 quantization or smaller model |
+| "Invalid HF token" error | Missing or expired HuggingFace token | Set valid token: `export HF_TOKEN=<YOUR_TOKEN>` |
+| Model download timeouts | Network issues or rate limiting | Retry command or pre-download models |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```

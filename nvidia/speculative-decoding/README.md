@@ -9,9 +9,9 @@
   - [Step 1. Configure Docker permissions](#step-1-configure-docker-permissions)
   - [Step 2. Run draft-target speculative decoding](#step-2-run-draft-target-speculative-decoding)
   - [Step 3. Test the draft-target setup](#step-3-test-the-draft-target-setup)
-  - [Step 4. Troubleshooting](#step-4-troubleshooting)
   - [Step 5.  Cleanup](#step-5-cleanup)
   - [Step 6. Next Steps](#step-6-next-steps)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -55,10 +55,6 @@ These examples demonstrate how to accelerate large language model inference whil
 * **Duration:** 10-20 minutes for setup, additional time for model downloads (varies by network speed)
 * **Risks:** GPU memory exhaustion with large models, container registry access issues, network timeouts during downloads
 * **Rollback:** Stop Docker containers and optionally clean up downloaded model cache.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -140,17 +136,6 @@ curl -X POST http://localhost:8000/v1/completions \
 - **Memory efficient**: Uses FP4 quantized models for reduced memory footprint
 - **Compatible models**: Uses Llama family models with consistent tokenization
 
-### Step 4. Troubleshooting
-
-Common issues and solutions:
-
-| Symptom | Cause | Fix |
-|---------|--------|-----|
-| "CUDA out of memory" error | Insufficient GPU memory | Reduce `kv_cache_free_gpu_memory_fraction` to 0.9 or use a device with more VRAM |
-| Container fails to start | Docker GPU support issues | Verify `nvidia-docker` is installed and `--gpus=all` flag is supported |
-| Model download fails | Network or authentication issues | Check HuggingFace authentication and network connectivity |
-| Server doesn't respond | Port conflicts or firewall | Check if port 8000 is available and not blocked |
-
 ### Step 5.  Cleanup
 
 Stop the Docker container when finished:
@@ -170,3 +155,19 @@ docker stop <container_id>
 - Monitor token acceptance rates and throughput improvements
 - Test with different prompt lengths and generation parameters
 - Read more on Speculative Decoding [here](https://nvidia.github.io/TensorRT-LLM/advanced/speculative-decoding.html).
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| "CUDA out of memory" error | Insufficient GPU memory | Reduce `kv_cache_free_gpu_memory_fraction` to 0.9 or use a device with more VRAM |
+| Container fails to start | Docker GPU support issues | Verify `nvidia-docker` is installed and `--gpus=all` flag is supported |
+| Model download fails | Network or authentication issues | Check HuggingFace authentication and network connectivity |
+| Server doesn't respond | Port conflicts or firewall | Check if port 8000 is available and not blocked |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```

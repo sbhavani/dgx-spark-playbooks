@@ -7,6 +7,7 @@
 - [Overview](#overview)
 - [Instructions](#instructions)
   - [Step 4. Install LLaMA Factory with dependencies](#step-4-install-llama-factory-with-dependencies)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -66,10 +67,6 @@ model adaptation for specialized domains while leveraging hardware-specific opti
 * **Duration:** 30-60 minutes for initial setup, 1-7 hours for training depending on model size and dataset.
 * **Risks:** Model downloads require significant bandwidth and storage. Training may consume substantial GPU memory and require parameter tuning for hardware constraints.
 * **Rollback:** Remove Docker containers and cloned repositories. Training checkpoints are saved locally and can be deleted to reclaim storage space.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -182,15 +179,7 @@ llamafactory-cli chat examples/inference/llama3_lora_sft.yaml
 llamafactory-cli export examples/merge_lora/llama3_lora_sft.yaml
 ```
 
-## Step 11. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|--------|-----|
-| CUDA out of memory during training | Batch size too large for GPU VRAM | Reduce `per_device_train_batch_size` or increase `gradient_accumulation_steps` |
-| Model download fails or is slow | Network connectivity or Hugging Face Hub issues | Check internet connection, try using `HF_HUB_OFFLINE=1` for cached models |
-| Training loss not decreasing | Learning rate too high/low or insufficient data | Adjust `learning_rate` parameter or check dataset quality |
-
-## Step 12. Cleanup and rollback
+## Step 11. Cleanup and rollback
 
 > **Warning:** This will delete all training progress and checkpoints.
 
@@ -206,4 +195,19 @@ To rollback Docker container changes:
 ```bash
 exit  # Exit container
 docker container prune -f
+```
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| CUDA out of memory during training | Batch size too large for GPU VRAM | Reduce `per_device_train_batch_size` or increase `gradient_accumulation_steps` |
+| Model download fails or is slow | Network connectivity or Hugging Face Hub issues | Check internet connection, try using `HF_HUB_OFFLINE=1` for cached models |
+| Training loss not decreasing | Learning rate too high/low or insufficient data | Adjust `learning_rate` parameter or check dataset quality |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 ```

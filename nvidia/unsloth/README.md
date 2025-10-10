@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -54,10 +55,6 @@ The Python test script can be found [here on GitHub](https://gitlab.com/nvidia/d
   * CUDA toolkit configuration issues may prevent kernel compilation
   * Memory constraints on smaller models require batch size adjustments
 * **Rollback**: Uninstall packages with `pip uninstall unsloth torch torchvision`.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -143,3 +140,12 @@ for advanced usage instructions, including:
 - [Continued training from checkpoints](https://github.com/unslothai/unsloth/wiki#loading-lora-adapters-for-continued-finetuning)
 - [Using custom chat templates](https://github.com/unslothai/unsloth/wiki#chat-templates)
 - [Running evaluation loops](https://github.com/unslothai/unsloth/wiki#evaluation-loop---also-fixes-oom-or-crashing)
+
+## Troubleshooting
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```

@@ -7,6 +7,7 @@
 - [Overview](#overview)
 - [Instructions](#instructions)
 - [Access with NVIDIA Sync](#access-with-nvidia-sync)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -49,10 +50,6 @@ You will have Visual Studio Code running natively on your DGX Spark device with 
 * **Duration:** 10-15 minutes
 * **Risk level:** Low - installation uses official packages with standard rollback
 * **Rollback:** Standard package removal via system package manager
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -153,14 +150,6 @@ Within VS Code:
 * Run the test script: `python3 test.py`
 * Test Git integration by running `git status` in the terminal
 
-## Step 7. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| `dpkg: dependency problems` during install | Missing dependencies | Run `sudo apt-get install -f` |
-| VS Code won't launch with GUI error | No display server/X11 | Verify GUI desktop is running: `echo $DISPLAY` |
-| Extensions fail to install | Network connectivity or ARM64 compatibility | Check internet connection, verify extension ARM64 support |
-
 ## Step 8. Uninstalling VS Code
 
 > **Warning:** Uninstalling VS Code will remove all user settings and extensions.
@@ -202,3 +191,18 @@ NVIDIA Sync will automatically configure SSH key-based authentication for secure
 - Install VS Code extensions for your development workflow (Python, Docker, GitLens, etc.)
 - Clone repositories from GitHub or other version control systems
 - Configure and locally host an LLM code assistant if desired
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `dpkg: dependency problems` during install | Missing dependencies | Run `sudo apt-get install -f` |
+| VS Code won't launch with GUI error | No display server/X11 | Verify GUI desktop is running: `echo $DISPLAY` |
+| Extensions fail to install | Network connectivity or ARM64 compatibility | Check internet connection, verify extension ARM64 support |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```

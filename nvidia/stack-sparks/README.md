@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Run on two Sparks](#run-on-two-sparks)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -275,17 +276,6 @@ Run additional performance validation tests to verify the complete setup.
 nvidia-smi topo -m
 ```
 
-## Step 12. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| "Network unreachable" errors | Network interfaces not configured | Verify netplan config and `sudo netplan apply` |
-| SSH authentication failures | SSH keys not properly distributed | Re-run `./discover-sparks` and enter passwords |
-| NCCL build failures with Blackwell | Wrong compute capability specified | Verify `NVCC_GENCODE="-gencode=arch=compute_121,code=sm_121"` |
-| MPI communication timeouts | Wrong network interfaces specified | Check `ibdev2netdev` and update interface names |
-| Container networking issues | Host network mode problems | Ensure `--network host --ipc=host` in docker run |
-| Node 2 not visible in cluster | Network connectivity issue | Verify QSFP cable connection, check IP configuration |
-
 ## Step 13. Cleanup and Rollback
 
 > **Warning**: These steps will stop containers and reset network configuration.
@@ -317,3 +307,14 @@ mpirun -np 2 -H 192.168.100.10:1,192.168.100.11:1 hostname
 ## Verify GPU visibility across nodes
 mpirun -np 2 -H 192.168.100.10:1,192.168.100.11:1 nvidia-smi -L
 ```
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| "Network unreachable" errors | Network interfaces not configured | Verify netplan config and `sudo netplan apply` |
+| SSH authentication failures | SSH keys not properly distributed | Re-run `./discover-sparks` and enter passwords |
+| NCCL build failures with Blackwell | Wrong compute capability specified | Verify `NVCC_GENCODE="-gencode=arch=compute_121,code=sm_121"` |
+| MPI communication timeouts | Wrong network interfaces specified | Check `ibdev2netdev` and update interface names |
+| Container networking issues | Host network mode problems | Ensure `--network host --ipc=host` in docker run |
+| Node 2 not visible in cluster | Network connectivity issue | Verify QSFP cable connection, check IP configuration |

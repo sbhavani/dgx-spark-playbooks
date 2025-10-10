@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -53,10 +54,6 @@ architectures.
 * **Estimated time:** 30-45 minutes (including AI Workbench installation if needed)
 * **Risk level:** Low - Uses pre-built containers and established APIs
 * **Rollback:** Simply delete the cloned project from AI Workbench to remove all components. No system changes are made outside the AI Workbench environment.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -150,17 +147,6 @@ Complete the in-app quickstart instructions to upload the sample dataset and tes
 **Substep B: Test custom dataset (optional)**
 Upload a custom dataset, adjust the Router prompt, and submit custom queries to test customization.
 
-## Step 9. Troubleshooting
-
-This step provides solutions for common issues you might encounter while using the chat interface.
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| Tavily API Error | Internet connection or DNS issues | Wait and retry query |
-| 401 Unauthorized | Wrong or malformed API key | Replace key in Project Secrets and restart |
-| 403 Unauthorized | API key lacks permissions | Generate new key with proper access |
-| Agentic loop timeout | Complex query exceeding time limit | Try simpler query or retry |
-
 ## Step 10. Cleanup and rollback
 
 This step explains how to remove the project if needed and what changes were made to your system.
@@ -187,3 +173,12 @@ Explore advanced features:
 * Review the agentic reasoning logs in the "Monitor" tab to understand decision-making
 
 Consider customizing the Gradio UI or integrating the agentic RAG components into your own projects.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Tavily API Error | Internet connection or DNS issues | Wait and retry query |
+| 401 Unauthorized | Wrong or malformed API key | Replace key in Project Secrets and restart |
+| 403 Unauthorized | API key lacks permissions | Generate new key with proper access |
+| Agentic loop timeout | Complex query exceeding time limit | Try simpler query or retry |

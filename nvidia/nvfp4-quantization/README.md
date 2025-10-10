@@ -7,6 +7,7 @@
 - [Overview](#overview)
   - [NVFP4 on Blackwell](#nvfp4-on-blackwell)
 - [Instructions](#instructions)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -64,10 +65,6 @@ df -h .
   * Quantization process is memory-intensive and may fail on systems with insufficient GPU memory
   * Output files are large (several GB) and require adequate storage space
 * **Rollback**: Remove the output directory and any pulled Docker images to restore original state.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -225,16 +222,6 @@ curl -X POST http://localhost:8000/v1/chat/completions \
   }'
 ```
 
-## Step 9. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|--------|-----|
-| "Permission denied" when accessing Hugging Face | Missing or invalid HF token | Run `huggingface-cli login` with valid token |
-| Container exits with CUDA out of memory | Insufficient GPU memory | Reduce batch size or use a machine with more GPU memory |
-| Model files not found in output directory | Volume mount failed or wrong path | Verify `$(pwd)/output_models` resolves correctly |
-| Git clone fails inside container | Network connectivity issues | Check internet connection and retry |
-| Quantization process hangs | Container resource limits | Increase Docker memory limits or use `--ulimit` flags |
-
 ## Step 10. Cleanup and rollback
 
 To clean up the environment and remove generated files:
@@ -259,3 +246,20 @@ The quantized model is now ready for deployment. Common next steps include:
 - Integrating the quantized model into your inference pipeline.
 - Deploying to NVIDIA Triton Inference Server for production serving.
 - Running additional validation tests on your specific use cases.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| "Permission denied" when accessing Hugging Face | Missing or invalid HF token | Run `huggingface-cli login` with valid token |
+| Container exits with CUDA out of memory | Insufficient GPU memory | Reduce batch size or use a machine with more GPU memory |
+| Model files not found in output directory | Volume mount failed or wrong path | Verify `$(pwd)/output_models` resolves correctly |
+| Git clone fails inside container | Network connectivity issues | Check internet connection and retry |
+| Quantization process hangs | Container resource limits | Increase Docker memory limits or use `--ulimit` flags |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```

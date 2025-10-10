@@ -1,11 +1,12 @@
-# MONAI-Reasoning-CXR-3B Model
+# MONAI Reasoning Model
 
-> Work with a MONAI vision-language model through Open WebUI
+> Work with a MONAI-Reasoning-CXR-3B vision-language model through Open WebUI
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [Instructions](#instructions)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -79,10 +80,6 @@ uname -m
 * **Estimated time:** 20-35 minutes (not including model download)
 * **Risk level:** Low. All steps use publicly available containers and models
 * **Rollback:** The entire deployment is containerized. To roll back, you can simply stop and remove the Docker containers
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Instructions
 
@@ -263,16 +260,7 @@ Configure the front-end interface to connect to your VLLM backend:
 
 You can now upload a chest X-ray image and ask questions directly in the chat interface. The custom prompt suggestion "Find abnormalities and support devices in the image" will be available for quick access.
 
-## Step 10. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| VLLM container fails to start | Insufficient GPU memory | Reduce `--gpu-memory-utilization` to 0.25 |
-| Model download fails | Network connectivity or HF auth | Check `huggingface-cli whoami` and internet |
-| Open WebUI shows connection error | Wrong backend URL | Verify `OPENAI_API_BASE_URL` is set correctly |
-| Model doesn't show full reasoning | Reasoning tags enabled | Disable "Reasoning Tags" in Chat Controls → Advanced Params |
-
-## Step 11. Cleanup and Rollback
+## Step 9. Cleanup and Rollback
 
 To stop and remove the containers and network, run the following commands. This will not 
 delete your downloaded model weights.
@@ -290,8 +278,24 @@ docker network rm monai-net
 ## rm -rf ~/monai-reasoning-spark/models
 ```
 
-## Step 12. Next Steps
+## Step 10. Next Steps
 
 Your MONAI reasoning system is now ready for use. Upload chest X-ray images through the web 
 interface at http://<YOUR_SPARK_DEVICE_IP>:3000 and interact with the MONAI-Reasoning-CXR-3B model 
 for medical image analysis and reasoning tasks.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| VLLM container fails to start | Insufficient GPU memory | Reduce `--gpu-memory-utilization` to 0.25 |
+| Model download fails | Network connectivity or HF auth | Check `huggingface-cli whoami` and internet |
+| Open WebUI shows connection error | Wrong backend URL | Verify `OPENAI_API_BASE_URL` is set correctly |
+| Model doesn't show full reasoning | Reasoning tags enabled | Disable "Reasoning Tags" in Chat Controls → Advanced Params |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```

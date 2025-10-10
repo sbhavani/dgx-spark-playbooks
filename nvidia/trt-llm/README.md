@@ -14,7 +14,6 @@
   - [Step 6. Validate setup with quickstart_advanced](#step-6-validate-setup-with-quickstartadvanced)
   - [Step 7. Validate setup with quickstart_multimodal](#step-7-validate-setup-with-quickstartmultimodal)
   - [Step 8. Serve LLM with OpenAI-compatible API](#step-8-serve-llm-with-openai-compatible-api)
-  - [Step 9. Troubleshooting](#step-9-troubleshooting)
   - [Step 10. Cleanup and rollback](#step-10-cleanup-and-rollback)
 - [Run on two Sparks](#run-on-two-sparks)
   - [Step 1. User prerequisites](#step-1-user-prerequisites)
@@ -30,9 +29,9 @@
   - [Step 11. Download model](#step-11-download-model)
   - [Step 12. Serve the model](#step-12-serve-the-model)
   - [Step 13. Validate API server](#step-13-validate-api-server)
-  - [Step 14. Troubleshooting](#step-14-troubleshooting)
   - [Step 15. Cleanup and rollback](#step-15-cleanup-and-rollback)
   - [Step 16. Next steps](#step-16-next-steps)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -114,10 +113,6 @@ Reminder: not all model architectures are supported for NVFP4 quantization.
 * **Duration**: 45-60 minutes for setup and API server deployment
 * **Risk level**: Medium - container pulls and model downloads may fail due to network issues
 * **Rollback**: Stop inference servers and remove downloaded models to free resources.
-* DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. With many applications still updating to take advantage of UMA, you may encounter memory issues even when within the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```
 
 ## Single Spark
 
@@ -394,18 +389,6 @@ curl -s http://localhost:8355/v1/chat/completions \
     "max_tokens": 64
   }'
 ```
-
-### Step 9. Troubleshooting
-
-Common issues and their solutions:
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| OOM during weight loading (e.g., [Nemotron Super 49B](https://huggingface.co/nvidia/Llama-3_3-Nemotron-Super-49B-v1_5)) | Parallel weight-loading memory pressure | `export TRT_LLM_DISABLE_LOAD_WEIGHTS_IN_PARALLEL=1` |
-| "CUDA out of memory" | GPU VRAM insufficient for model | Reduce `free_gpu_memory_fraction: 0.9` or batch size or use smaller model |
-| "Model not found" error | HF_TOKEN invalid or model inaccessible | Verify token and model permissions |
-| Container pull timeout | Network connectivity issues | Retry pull or use local mirror |
-| Import tensorrt_llm fails | Container runtime issues | Restart Docker daemon and retry |
 
 ### Step 10. Cleanup and rollback
 
@@ -720,15 +703,6 @@ curl -X POST http://localhost:8000/v1/chat/completions \
 
 **Expected output:** JSON response with generated text completion.
 
-### Step 14. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| MPI hostname test returns single hostname | Network connectivity issues | Verify both nodes are on reachable IP addresses |
-| "Permission denied" on HuggingFace download | Invalid or missing HF_TOKEN | Set valid token: `export HF_TOKEN=<TOKEN>` |
-| "CUDA out of memory" errors | Insufficient GPU memory | Reduce `--max_batch_size` or `--max_num_tokens` |
-| Container exits immediately | Missing entrypoint script | Ensure `trtllm-mn-entrypoint.sh` download succeeded and has executable permissions, also ensure you are not running the container already on your node. If port 2233 is already utilized, the entrypoint script will not start. |
-
 ### Step 15. Cleanup and rollback
 
 Stop and remove containers by using the following command on the leader node:
@@ -748,3 +722,31 @@ rm -rf $HOME/.cache/huggingface/hub/models--nvidia--Qwen3*
 ### Step 16. Next steps
 
 Compare performance metrics between speculative decoding and baseline reports to quantify speed improvements. Use the multi-node setup as a foundation for deploying other large models requiring tensor parallelism, or scale to additional nodes for higher throughput workloads.
+
+## Troubleshooting
+
+## Common issues for running on a single Spark
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| OOM during weight loading (e.g., [Nemotron Super 49B](https://huggingface.co/nvidia/Llama-3_3-Nemotron-Super-49B-v1_5)) | Parallel weight-loading memory pressure | `export TRT_LLM_DISABLE_LOAD_WEIGHTS_IN_PARALLEL=1` |
+| "CUDA out of memory" | GPU VRAM insufficient for model | Reduce `free_gpu_memory_fraction: 0.9` or batch size or use smaller model |
+| "Model not found" error | HF_TOKEN invalid or model inaccessible | Verify token and model permissions |
+| Container pull timeout | Network connectivity issues | Retry pull or use local mirror |
+| Import tensorrt_llm fails | Container runtime issues | Restart Docker daemon and retry |
+
+## Common Issues for running on two Starks
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| MPI hostname test returns single hostname | Network connectivity issues | Verify both nodes are on reachable IP addresses |
+| "Permission denied" on HuggingFace download | Invalid or missing HF_TOKEN | Set valid token: `export HF_TOKEN=<TOKEN>` |
+| "CUDA out of memory" errors | Insufficient GPU memory | Reduce `--max_batch_size` or `--max_num_tokens` |
+| Container exits immediately | Missing entrypoint script | Ensure `trtllm-mn-entrypoint.sh` download succeeded and has executable permissions, also ensure you are not running the container already on your node. If port 2233 is already utilized, the entrypoint script will not start. |
+
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
+> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
+```bash
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+```
