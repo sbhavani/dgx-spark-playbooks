@@ -1,44 +1,66 @@
-# GNN Model Service
+# GNN Model Service (Experimental)
 
-This service provides a REST API for serving predictions from a Graph Neural Network (GNN) model trained to enhance RAG (Retrieval Augmented Generation) performance. It allows comparing GNN-based knowledge graph retrieval with traditional RAG approaches.
+**Status**: This is an experimental service for serving Graph Neural Network models trained for enhanced RAG retrieval.
+
+**Note**: This service is **not included** in the default docker-compose configurations and must be deployed separately.
 
 ## Overview
 
-The service exposes a simple API to:
-- Load a pre-trained GNN model that combines graph structures with language models
-- Process queries by incorporating graph-structured knowledge
-- Return predictions that leverage both text and graph relationships
+This service provides a REST API for serving predictions from a Graph Neural Network (GNN) model that enhances knowledge graph retrieval:
+
+- Load pre-trained GNN models (GAT architecture)
+- Process queries with graph-structured knowledge
+- Combine GNN embeddings with LLM generation
+- Compare GNN-based retrieval vs traditional RAG
 
 ## Getting Started
 
 ### Prerequisites
 
-- Docker and Docker Compose
-- The trained model file (created using `train_export.py`)
+- Python 3.8+
+- PyTorch and PyTorch Geometric
+- A trained model file (created using `train_export.py` in `scripts/gnn/`)
+- Docker (optional)
 
-### Running the Service
+### Training the Model
 
-The service is included in the main docker-compose configuration. Simply run:
-
-```bash
-docker-compose up -d
-```
-
-This will start the GNN model service along with other services in the system.
-
-## Training the Model
-
-Before using the service, you need to train the GNN model:
+Before using the service, you must train a GNN model using the training pipeline:
 
 ```bash
-# Create the models directory if it doesn't exist
-mkdir -p models
+# See scripts/gnn/README.md for full instructions
 
-# Run the training script
+# 1. Preprocess data from ArangoDB
+python scripts/gnn/preprocess_data.py --use_arango --output_dir ./output
+
+# 2. Train the model
+python scripts/gnn/train_test_gnn.py --output_dir ./output
+
+# 3. Export model for serving
 python deploy/services/gnn_model/train_export.py --output_dir models
 ```
 
-This will create the `tech-qa-model.pt` file in the models directory, which the service will load.
+This creates the `tech-qa-model.pt` file needed by the service.
+
+### Running the Service
+
+#### Option A: Direct Python
+
+```bash
+cd deploy/services/gnn_model
+pip install -r requirements.txt
+python app.py
+```
+
+Service runs on: http://localhost:5000
+
+#### Option B: Docker
+
+```bash
+cd deploy/services/gnn_model
+docker build -t gnn-model-service .
+docker run -p 5000:5000 -v $(pwd)/models:/app/models gnn-model-service
+```
+
 
 ## API Endpoints
 
@@ -89,7 +111,26 @@ The GNN model service uses:
 - A Language Model (LLM) to generate answers
 - A combined architecture (GRetriever) that leverages both components
 
-## Limitations
+## Integration with txt2kg
 
-- The current implementation requires graph construction to be handled separately
-- The `create_graph_from_text` function in the service is a placeholder that needs implementation based on your specific graph construction approach 
+To integrate this service with the main txt2kg application:
+
+1. Train a model using the GNN training pipeline
+2. Deploy the GNN service on a separate port
+3. Update the frontend to call the GNN service endpoints
+4. Compare GNN-enhanced retrieval vs standard RAG
+
+## Current Status
+
+This is an experimental feature. The service code exists but requires:
+- A trained GNN model
+- Integration with the frontend query pipeline
+- Graph construction from txt2kg knowledge graphs
+- Performance benchmarking vs traditional RAG
+
+## Future Enhancements
+
+- Docker Compose integration for easier deployment
+- Automatic model training from txt2kg graphs
+- Real-time model updates as graphs grow
+- Comparison UI in the frontend 

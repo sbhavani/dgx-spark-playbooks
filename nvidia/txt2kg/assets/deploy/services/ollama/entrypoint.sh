@@ -8,10 +8,10 @@ OLLAMA_PID=$!
 
 # Wait for Ollama to be ready
 echo "Waiting for Ollama to be ready..."
-max_attempts=30
+max_attempts=120
 attempt=0
 while [ $attempt -lt $max_attempts ]; do
-    if curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
+    if /bin/ollama list > /dev/null 2>&1; then
         echo "Ollama is ready!"
         break
     fi
@@ -26,9 +26,8 @@ fi
 
 # Check if any models are present
 echo "Checking for existing models..."
-MODELS=$(curl -s http://localhost:11434/api/tags | grep -o '"models":\s*\[\]' || echo "has_models")
 
-if [[ "$MODELS" == *'"models": []'* ]]; then
+if ! /bin/ollama list | grep -q llama3.1:8b; then
     echo "No models found. Pulling llama3.1:8b..."
     /bin/ollama pull llama3.1:8b
     echo "Successfully pulled llama3.1:8b"
@@ -39,4 +38,3 @@ fi
 # Keep the container running
 echo "Setup complete. Ollama is running."
 wait $OLLAMA_PID
-

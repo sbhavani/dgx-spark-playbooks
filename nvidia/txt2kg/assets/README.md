@@ -28,55 +28,57 @@ By default, this playbook leverages **Ollama** for local LLM inference, providin
 - Knowledge triple extraction from text documents
 - Knowledge graph construction and visualization
 - **Local-first architecture** with Ollama for LLM inference
-- Graph-based RAG for more contextual answers
 - Graph database integration with ArangoDB
-- Local vector embeddings with Pinecone-compatible storage
-- GPU-accelerated LLM inference with Ollama and optional vLLM
-- Sentence Transformers for efficient embedding generation
 - Interactive knowledge graph visualization with Three.js WebGPU
-- Optional NVIDIA API integration for cloud-based models
+- GPU-accelerated LLM inference with Ollama
 - Fully containerized deployment with Docker Compose
-- Decomposable and customizable
+- Optional NVIDIA API integration for cloud-based models
+- Optional vector search and advanced inference capabilities
+- Optional graph-based RAG for contextual answers
 
 ## Software Components
 
-The following are the default components included in this playbook:
+### Core Components (Default)
 
 * **LLM Inference**
-  * **Ollama** (default): Local LLM inference with GPU acceleration
+  * **Ollama**: Local LLM inference with GPU acceleration
     * Default model: `llama3.1:8b`
     * Supports any Ollama-compatible model
-  * **NVIDIA API** (optional): Cloud-based models via NVIDIA API Catalog
-* **Vector Database & Embedding**
-  * **SentenceTransformer**: Local embedding generation
-    * Model: `all-MiniLM-L6-v2`
-  * **Pinecone (Local)**: Self-hosted vector storage and similarity search
-    * No cloud API key required
-    * Compatible with Pinecone client libraries
 * **Knowledge Graph Database**
   * **ArangoDB**: Graph database for storing knowledge triples (entities and relationships)
     * Web interface on port 8529
     * No authentication required (configurable)
 * **Graph Visualization**
   * **Three.js WebGPU**: Client-side GPU-accelerated graph rendering
-  * Optional remote WebGPU clustering for large graphs
 * **Frontend & API**
   * **Next.js**: Modern React framework with API routes
 
+### Optional Components
+
+* **Vector Database & Embedding** (with `--complete` flag)
+  * **SentenceTransformer**: Local embedding generation (model: `all-MiniLM-L6-v2`)
+  * **Pinecone**: Self-hosted vector storage and similarity search
+* **Cloud Models** (configure separately)
+  * **NVIDIA API**: Cloud-based models via NVIDIA API Catalog
+
 ## Technical Diagram
 
-The architecture follows this workflow:
+### Default Architecture (Minimal Setup)
+
+The core workflow for knowledge graph building and visualization:
 1. User uploads documents through the txt2kg web UI
 2. Documents are processed and chunked for analysis
 3. **Ollama** extracts knowledge triples (subject-predicate-object) from the text using local LLM inference
 4. Triples are stored in **ArangoDB** graph database
-5. **SentenceTransformer** generates entity embeddings
-6. Embeddings are stored in local **Pinecone** vector database
-7. User queries are processed through graph-based RAG:
-   - KNN search identifies relevant entities in the vector database
-   - Graph traversal enhances context with entity relationships from ArangoDB
-   - Ollama generates responses using the enriched context
-8. Results are visualized with **Three.js WebGPU** rendering in the browser
+5. Knowledge graph is visualized with **Three.js WebGPU** rendering in the browser
+6. Users can query the graph and generate insights using Ollama
+
+### Future Enhancements
+
+Additional capabilities can be added:
+- **Vector search**: Add semantic similarity search with local Pinecone and SentenceTransformer embeddings
+- **S3 storage**: MinIO for scalable document storage
+- **GNN-based GraphRAG**: Graph Neural Networks for enhanced retrieval
 
 ## GPU-Accelerated LLM Inference
 
@@ -86,7 +88,7 @@ This playbook includes **GPU-accelerated LLM inference** with Ollama:
 - **Fully local inference**: No cloud dependencies or API keys required
 - **GPU acceleration**: Automatic CUDA support with NVIDIA GPUs
 - **Multiple model support**: Use any Ollama-compatible model
-- **Optimized performance**: Flash attention, KV cache optimization, and quantization
+- **Optimized inference**: Flash attention, KV cache optimization, and quantization
 - **Easy model management**: Pull and switch models with simple commands
 - **Privacy-first**: All data processing happens on your hardware
 
@@ -96,21 +98,10 @@ This playbook includes **GPU-accelerated LLM inference** with Ollama:
 - Flash attention enabled
 - Q8_0 KV cache for memory efficiency
 
-## Minimum System Requirements
+## Software Requirements
 
-**OS Requirements:**
-- Ubuntu 22.04 or later
-
-**Driver Versions:**
-- GPU Driver: 530.30.02+
-- CUDA: 12.0+
-
-**Hardware Requirements:**
-- NVIDIA GPU with CUDA support (GTX 1060 or newer, RTX series recommended)
-- VRAM requirements depend on model size:
-  - 8B models: 6-8GB VRAM
-  - 70B models: 48GB+ VRAM (or use quantized versions)
-- System RAM: 16GB+ recommended
+- CUDA 12.0+
+- Docker with NVIDIA Container Toolkit
 
 ## Deployment Guide
 
@@ -120,9 +111,7 @@ This playbook includes **GPU-accelerated LLM inference** with Ollama:
 
 The default configuration uses:
 - Local Ollama (no API key needed)
-- Local Pinecone (no API key needed)
 - Local ArangoDB (no authentication by default)
-- Local SentenceTransformer embeddings
 
 Optional environment variables for customization:
 ```bash
@@ -150,7 +139,6 @@ cd txt2kg
 That's it! No configuration needed. The script will:
 - Start all required services with Docker Compose
 - Set up ArangoDB database
-- Initialize local Pinecone vector storage
 - Launch Ollama with GPU acceleration
 - Start the Next.js frontend
 
@@ -168,8 +156,6 @@ docker exec ollama-compose ollama pull llama3.1:8b
 
 - **Switch Ollama models**: Use any model from Ollama's library (Llama, Mistral, Qwen, etc.)
 - **Modify extraction prompts**: Customize how triples are extracted from text
-- **Adjust embedding parameters**: Change the SentenceTransformer model
-- **Implement custom entity relationships**: Define domain-specific relationship types
 - **Add domain-specific knowledge sources**: Integrate external ontologies or taxonomies
 - **Use NVIDIA API**: Connect to cloud models for specific use cases
 
@@ -177,4 +163,4 @@ docker exec ollama-compose ollama pull llama3.1:8b
 
 [MIT](LICENSE)
 
-This is licensed under the MIT License. This project will download and install additional third-party open source software projects and containers.
+This project will download and install additional third-party open source software projects and containers.

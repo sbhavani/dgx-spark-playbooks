@@ -1,9 +1,11 @@
-# TXT2KG Pipeline with ArangoDB Integration
+# GNN Training Pipeline (Experimental)
 
-This project provides a two-stage pipeline for knowledge graph-based question answering:
+**Status**: This is an experimental feature for training Graph Neural Network models for enhanced RAG retrieval.
 
-1. **Data Preprocessing** (`preprocess_data.py`): Extracts knowledge graph triples from either ArangoDB or using TXT2KG, and prepares the dataset.
-2. **Model Training & Testing** (`train_test_gnn.py`): Trains and evaluates a GNN-based retriever model on the preprocessed dataset.
+This pipeline provides a two-stage process for training GNN-based knowledge graph retrieval models:
+
+1. **Data Preprocessing** (`preprocess_data.py`): Extracts knowledge graph triples from ArangoDB and prepares training datasets.
+2. **Model Training & Testing** (`train_test_gnn.py`): Trains and evaluates a GNN-based retriever model using PyTorch Geometric.
 
 ## Prerequisites
 
@@ -20,10 +22,11 @@ This project provides a two-stage pipeline for knowledge graph-based question an
 pip install -r scripts/requirements.txt
 ```
 
-2. Ensure ArangoDB is running. You can use the docker-compose file:
+2. Ensure ArangoDB is running. You can use the main start script:
 
 ```bash
-docker-compose up -d arangodb arangodb-init
+# From project root
+./start.sh
 ```
 
 ## Usage
@@ -57,13 +60,9 @@ You can specify custom ArangoDB connection parameters:
 python scripts/preprocess_data.py --use_arango --arango_url "http://localhost:8529" --arango_db "your_db" --arango_user "username" --arango_password "password"
 ```
 
-#### Using TXT2KG (original behavior)
+#### Using Direct Triple Extraction
 
-If you don't pass the `--use_arango` flag, the script will use the original TXT2KG approach:
-
-```bash
-python scripts/preprocess_data.py --NV_NIM_KEY "your-nvidia-api-key"
-```
+If you don't pass the `--use_arango` flag, the script will extract triples directly using the configured LLM provider.
 
 ### Stage 2: Model Training & Testing
 

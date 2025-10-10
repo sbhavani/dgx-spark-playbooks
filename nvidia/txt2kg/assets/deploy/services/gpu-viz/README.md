@@ -1,48 +1,68 @@
-# Unified GPU Graph Visualization Service
+# GPU Graph Visualization Services
 
 ## 🚀 Overview
 
-The unified service combines **PyGraphistry Cloud** and **Local GPU (cuGraph)** processing into a single FastAPI service, giving you maximum flexibility for graph visualization.
+This directory contains optional GPU-accelerated graph visualization services that run separately from the main txt2kg application. These services provide advanced visualization capabilities for large-scale graphs.
 
-## ⚡ Processing Modes
+**Note**: These services are **optional** and not included in the default docker-compose configurations. They must be run separately.
 
+## 📦 Available Services
+
+### 1. Unified GPU Service (`unified_gpu_service.py`)
+Combines **PyGraphistry Cloud** and **Local GPU (cuGraph)** processing into a single FastAPI service.
+
+**Processing Modes:**
 | Mode | Description | Requirements |
 |------|-------------|--------------|
 | **PyGraphistry Cloud** | Interactive GPU embeds in browser | API credentials |
 | **Local GPU (cuGraph)** | Full GPU processing on your hardware | NVIDIA GPU + cuGraph |
 | **Local CPU** | NetworkX fallback processing | None |
 
-## 🛠️ Quick Setup
+### 2. Remote GPU Rendering Service (`remote_gpu_rendering_service.py`)
+Provides GPU-accelerated graph layout and rendering with iframe-embeddable visualizations.
 
-### 1. Set Environment Variables (Optional)
+### 3. Local GPU Service (`local_gpu_viz_service.py`)
+Local GPU processing service with WebSocket support for real-time updates.
+
+## 🛠️ Setup
+
+### Prerequisites
+- NVIDIA GPU with CUDA support (for GPU modes)
+- RAPIDS cuGraph (for local GPU processing)
+- PyGraphistry account (for cloud mode)
+
+### Installation
+
 ```bash
-# For PyGraphistry Cloud features
-export GRAPHISTRY_PERSONAL_KEY="your_personal_key"
-export GRAPHISTRY_SECRET_KEY="your_secret_key"
+# Install dependencies
+pip install -r deploy/services/gpu-viz/requirements.txt
+
+# For remote WebGPU service
+pip install -r deploy/services/gpu-viz/requirements-remote-webgpu.txt
 ```
 
-### 2. Run the Service
+### Running Services
 
-#### Option A: Direct Python
+#### Unified GPU Service
 ```bash
-cd services
+cd deploy/services/gpu-viz
 python unified_gpu_service.py
 ```
 
-#### Option B: Using Startup Script
+Service runs on: http://localhost:8080
+
+#### Remote GPU Rendering Service
 ```bash
-cd services
-./start_gpu_services.sh
+cd deploy/services/gpu-viz
+python remote_gpu_rendering_service.py
 ```
 
-#### Option C: Docker (NVIDIA PyG Container)
+Service runs on: http://localhost:8082
+
+#### Using Startup Script
 ```bash
-cd services
-docker build -t unified-gpu-viz .
-docker run --gpus all -p 8080:8080 \
-  -e GRAPHISTRY_PERSONAL_KEY="your_key" \
-  -e GRAPHISTRY_SECRET_KEY="your_secret" \
-  unified-gpu-viz
+cd deploy/services/gpu-viz
+./start_remote_gpu_services.sh
 ```
 
 ## 📡 API Usage
@@ -85,25 +105,19 @@ Response:
 
 ## 🎯 Frontend Integration
 
-### React Component Usage
+The txt2kg frontend includes built-in components for GPU visualization:
 
-```tsx
-import { UnifiedGPUViewer } from '@/components/unified-gpu-viewer'
+- `UnifiedGPUViewer`: Connects to unified GPU service
+- `PyGraphistryViewer`: Direct PyGraphistry cloud integration
+- `ForceGraphWrapper`: Three.js WebGPU visualization (default)
 
-function MyApp() {
-  const graphData = {
-    nodes: [...],
-    links: [...]
-  }
+### Using GPU Services in Frontend
 
-  return (
-    <UnifiedGPUViewer 
-      graphData={graphData}
-      onError={(error) => console.error(error)}
-    />
-  )
-}
-```
+The frontend has API routes that can connect to these services:
+- `/api/pygraphistry/*`: PyGraphistry integration
+- `/api/unified-gpu/*`: Unified GPU service integration
+
+To use these services, ensure they are running separately and configure the frontend environment variables accordingly.
 
 ### Mode-Specific Processing
 

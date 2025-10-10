@@ -4,17 +4,12 @@
 
 # Parse command line arguments
 DEV_FRONTEND=false
-USE_VLLM=false
 USE_COMPLETE=false
 
 while [[ $# -gt 0 ]]; do
   case $1 in
     --dev-frontend)
       DEV_FRONTEND=true
-      shift
-      ;;
-    --vllm)
-      USE_VLLM=true
       shift
       ;;
     --complete)
@@ -25,12 +20,15 @@ while [[ $# -gt 0 ]]; do
       echo "Usage: ./start.sh [OPTIONS]"
       echo ""
       echo "Options:"
-      echo "  --dev-frontend   Run frontend in development mode (without Docker)"
-      echo "  --vllm           Use vLLM instead of Ollama for LLM inference"
-      echo "  --complete       Use complete stack with MinIO S3 storage"
-      echo "  --help, -h       Show this help message"
+      echo "  --dev-frontend    Run frontend in development mode (without Docker)"
+      echo "  --complete        Use complete stack (vLLM, Pinecone, Sentence Transformers)"
+      echo "  --help, -h        Show this help message"
       echo ""
-      echo "Default: Starts with Ollama, ArangoDB, local Pinecone, and Next.js frontend"
+      echo "Default: Starts minimal stack with Ollama, ArangoDB, and Next.js frontend"
+      echo ""
+      echo "Examples:"
+      echo "  ./start.sh                # Start minimal demo (recommended)"
+      echo "  ./start.sh --complete     # Start with all optional services"
       exit 0
       ;;
     *)
@@ -81,15 +79,12 @@ else
 fi
 
 # Build the docker-compose command
-if [ "$USE_VLLM" = true ]; then
-  CMD="$DOCKER_COMPOSE_CMD -f $(pwd)/deploy/compose/docker-compose.vllm.yml"
-  echo "Using vLLM for GPU-accelerated LLM inference with FP8 quantization..."
-elif [ "$USE_COMPLETE" = true ]; then
+if [ "$USE_COMPLETE" = true ]; then
   CMD="$DOCKER_COMPOSE_CMD -f $(pwd)/deploy/compose/docker-compose.complete.yml"
-  echo "Using complete stack with MinIO S3 storage..."
+  echo "Using complete stack (Ollama, vLLM, Pinecone, Sentence Transformers)..."
 else
   CMD="$DOCKER_COMPOSE_CMD -f $(pwd)/deploy/compose/docker-compose.yml"
-  echo "Using default configuration (Ollama + ArangoDB + local Pinecone)..."
+  echo "Using minimal configuration (Ollama + ArangoDB only)..."
 fi
 
 # Execute the command
@@ -104,14 +99,16 @@ echo "=========================================="
 echo "txt2kg is now running!"
 echo "=========================================="
 echo ""
-echo "Services:"
+echo "Core Services:"
 echo "  • Web UI: http://localhost:3001"
 echo "  • ArangoDB: http://localhost:8529"
 echo "  • Ollama API: http://localhost:11434"
-echo "  • Local Pinecone: http://localhost:5081"
 echo ""
 
-if [ "$USE_VLLM" = true ]; then
+if [ "$USE_COMPLETE" = true ]; then
+  echo "Additional Services (Complete Stack):"
+  echo "  • Local Pinecone: http://localhost:5081"
+  echo "  • Sentence Transformers: http://localhost:8000"
   echo "  • vLLM API: http://localhost:8001"
   echo ""
 fi
@@ -125,6 +122,6 @@ echo "  3. Upload documents and start building your knowledge graph!"
 echo ""
 echo "Other options:"
 echo "  • Run frontend in dev mode: ./start.sh --dev-frontend"
-echo "  • Use vLLM instead of Ollama: ./start.sh --vllm"
+echo "  • Use complete stack: ./start.sh --complete"
 echo "  • View logs: docker compose logs -f"
 echo "" 
