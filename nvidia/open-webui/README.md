@@ -60,18 +60,14 @@ If you see a permission denied error (something like `permission denied while tr
 
 ```bash
 sudo usermod -aG docker $USER
-newgrp docker
 ```
 
-Test Docker access again. In the terminal, run:
-
-```bash
-docker ps
-```
+> **Warning**: After running usermod, you must log out and log back in to start a new
+> session with updated group permissions.
 
 ## Step 2. Verify Docker setup and pull container
 
-Pull the Open WebUI container image with integrated Ollama:
+Open a new terminal, pull the Open WebUI container image with integrated Ollama:
 
 ```bash
 docker pull ghcr.io/open-webui/open-webui:ollama
@@ -134,8 +130,7 @@ Press Enter to send the message and wait for the model's response.
 
 Steps to completely remove the Open WebUI installation and free up resources:
 
-> [!WARNING]
-> These commands will permanently delete all Open WebUI data and downloaded models.
+> **Warning**: These commands will permanently delete all Open WebUI data and downloaded models.
 
 Stop and remove the Open WebUI container:
 
@@ -156,6 +151,9 @@ Remove persistent data volumes:
 docker volume rm open-webui open-webui-ollama
 ```
 
+To rollback permission change: `sudo deluser $USER docker`
+
+
 ## Step 9. Next steps
 
 Try downloading different models from the Ollama library at https://ollama.com/library.
@@ -170,8 +168,7 @@ docker pull ghcr.io/open-webui/open-webui:ollama
 
 ## Setup Open WebUI on Remote Spark with NVIDIA Sync
 
-> [!TIP]
-> If you haven't already installed NVIDIA Sync, [learn how here.](/spark/connect-to-your-spark/sync)
+> **Note**: If you haven't already installed NVIDIA Sync, [learn how here.](/spark/connect-to-your-spark/sync)
 
 ## Step 1. Configure Docker permissions
 
@@ -187,18 +184,17 @@ If you see a permission denied error (something like `permission denied while tr
 
 ```bash
 sudo usermod -aG docker $USER
-newgrp docker
 ```
 
-Test Docker access again. In the terminal, run:
-
-```bash
-docker ps
-```
+> **Warning**: After running usermod, you must close the terminal window completely to start a new
+> session with updated group permissions.
 
 ## Step 2. Verify Docker setup and pull container
 
-Open a new Terminal app from NVIDIA Sync and pull the Open WebUI container image with integrated Ollama on your DGX Spark:
+This step confirms Docker is working properly and downloads the Open WebUI container
+image. This runs on the DGX Spark device and may take several minutes depending on network speed.
+
+Open a new Terminal app from NVIDIA Sync and pull the Open WebUI container image with integrated Ollama:
 
 ```bash
 docker pull ghcr.io/open-webui/open-webui:ollama
@@ -208,15 +204,18 @@ Once the container image is downloaded, continue to setup NVIDIA Sync.
 
 ## Step 3. Open NVIDIA Sync Settings
 
-- Click on the NVIDIA Sync icon in your system tray or taskbar to open the main application window.
-- Click the gear icon in the top right corner to open the Settings window.
-- Click on the "Custom" tab to access Custom Ports configuration.
+Click on the NVIDIA Sync icon in your system tray or taskbar to open the main application window.
 
-## Step 4. Add Open WebUI custom port configuration
+Click the gear icon in the top right corner to open the Settings window.
 
-Setting up a new Custom port will XXXX
+Click on the "Custom" tab to access Custom Ports configuration.
 
-Click the "Add New" button on the Custom tab.
+## Step 4. Add Open WebUI custom port
+
+This step creates a new entry in NVIDIA Sync that will manage the Open
+WebUI container and create the necessary SSH tunnel.
+
+Click the "Add New" button in the Custom section.
 
 Fill out the form with these values:
 
@@ -271,9 +270,12 @@ echo "Running. Press Ctrl+C to stop ${NAME}."
 while :; do sleep 86400; done
 ```
 
-Click the "Add" button to save configuration to your DGX Spark.
+Click the "Add" button to save configuration.
 
 ## Step 5. Launch Open WebUI
+
+This step starts the Open WebUI container on your DGX Spark and establishes the SSH
+tunnel. The browser will open automatically if configured correctly.
 
 Click on the NVIDIA Sync icon in your system tray or taskbar to open the main application window.
 
@@ -281,13 +283,9 @@ Under the "Custom" section, click on "Open WebUI".
 
 Your default web browser should automatically open to the Open WebUI interface at `http://localhost:12000`.
 
-> [!TIP]
-> On first run, Open WebUI downloads models. This can delay server start and cause the page to fail to load in your browser. Simply wait and refresh the page.
-> On future launches it will open quickly.
-
 ## Step 6. Create administrator account
 
-To start using Open WebUI you must create an initial administrator account. This is a local account that you will use to access the Open WebUI interface.
+This step sets up the initial administrator account for Open WebUI. This is a local account that you will use to access the Open WebUI interface.
 
 In the Open WebUI interface, click the "Get Started" button at the bottom of the screen.
 
@@ -297,20 +295,23 @@ Click the registration button to create your account and access the main interfa
 
 ## Step 7. Download and configure a model
 
-Next, download a language model with Ollama and configure it for use in
-Open WebUI. This download happens on your DGX Spark device and may take several minutes.
+This step downloads a language model through Ollama and configures it for use in
+Open WebUI. The download happens on your DGX Spark device and may take several minutes.
 
 Click on the "Select a model" dropdown in the top left corner of the Open WebUI interface.
 
 Type `gpt-oss:20b` in the search field.
 
-Click the `Pull "gpt-oss:20b" from Ollama.com` button that appears.
+Click the "Pull 'gpt-oss:20b' from Ollama.com" button that appears.
 
 Wait for the model download to complete. You can monitor progress in the interface.
 
 Once complete, select "gpt-oss:20b" from the model dropdown.
 
 ## Step 8. Test the model
+
+This step verifies that the complete setup is working properly by testing model
+inference through the web interface.
 
 In the chat textarea at the bottom of the Open WebUI interface, enter:
 
@@ -330,40 +331,11 @@ Under the "Custom" section, click the `x` icon on the right of the "Open WebUI" 
 
 This will close the tunnel and stop the Open WebUI docker container.
 
-## Step 10. Troubleshooting
-
-Common issues and their solutions.
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| Permission denied on docker ps | User not in docker group | Run Step 1 completely, including terminal restart |
-| Browser doesn't open automatically | Auto-open setting disabled | Manually navigate to localhost:12000 |
-| Model download fails | Network connectivity issues | Check internet connection, retry download |
-| GPU not detected in container | Missing `--gpus=all flag` | Recreate container with correct start script |
-| Port 12000 already in use | Another application using port | Change port in Custom App settings or stop conflicting service |
-
-## Step 11. Next steps
-
-Try downloading different models from the Ollama library at https://ollama.com/library.
-
-You can monitor GPU and memory usage through the DGX Dashboard available in NVIDIA Sync as you try different models.
-
-If Open WebUI reports an update is available, you can pull the the container image by running this in your terminal:
-
-```bash
-docker stop open-webui
-docker rm open-webui 
-docker pull ghcr.io/open-webui/open-webui:ollama
-```
-
-After the update, launch Open WebUI again from NVIDIA Sync.
-
-## Step 12. Cleanup and rollback
+## Step 11. Cleanup and rollback
 
 Steps to completely remove the Open WebUI installation and free up resources:
 
-> [!WARNING]
-> These commands will permanently delete all Open WebUI data and downloaded models.
+> **Warning**: These commands will permanently delete all Open WebUI data and downloaded models.
 
 Stop and remove the Open WebUI container:
 
@@ -384,7 +356,23 @@ Remove persistent data volumes:
 docker volume rm open-webui open-webui-ollama
 ```
 
+To rollback permission change: `sudo deluser $USER docker`
+
 Remove the Custom App from NVIDIA Sync by opening Settings > Custom tab and deleting the entry.
+
+## Step 12. Next steps
+
+Try downloading different models from the Ollama library at https://ollama.com/library.
+
+You can monitor GPU and memory usage through the DGX Dashboard available in NVIDIA Sync as you try different models.
+
+If Open WebUI reports an update is available, you can update the container image by running:
+
+```bash
+docker pull ghcr.io/open-webui/open-webui:ollama
+```
+
+After the update, launch Open WebUI again from NVIDIA Sync.
 
 ## Troubleshooting
 
@@ -407,8 +395,7 @@ Remove the Custom App from NVIDIA Sync by opening Settings > Custom tab and dele
 | GPU not detected in container | Missing `--gpus=all flag` | Recreate container with correct start script |
 | Port 12000 already in use | Another application using port | Change port in Custom App settings or stop conflicting service |
 
-> > [!NOTE]
-> DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
 > With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
 > the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
 ```bash
