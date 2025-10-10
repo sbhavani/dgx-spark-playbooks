@@ -140,6 +140,10 @@ docker volume rm "$(basename "$PWD")_postgres_data"
 
 ## Troubleshooting
 
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| Cannot access gated repo for URL | Certain HuggingFace models have restricted access | Regenerate your HuggingFace token; and request access to the gated model on your web browser |
+
 > **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
 > With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
 > the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:

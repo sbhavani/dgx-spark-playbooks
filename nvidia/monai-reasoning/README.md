@@ -290,6 +290,7 @@ for medical image analysis and reasoning tasks.
 |---------|-------|-----|
 | VLLM container fails to start | Insufficient GPU memory | Reduce `--gpu-memory-utilization` to 0.25 |
 | Model download fails | Network connectivity or HF auth | Check `huggingface-cli whoami` and internet |
+| Cannot access gated repo for URL | Certain HuggingFace models have restricted access | Regenerate your HuggingFace token; and request access to the gated model on your web browser |
 | Open WebUI shows connection error | Wrong backend URL | Verify `OPENAI_API_BASE_URL` is set correctly |
 | Model doesn't show full reasoning | Reasoning tags enabled | Disable "Reasoning Tags" in Chat Controls → Advanced Params |
 

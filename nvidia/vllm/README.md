@@ -383,6 +383,7 @@ http://192.168.100.10:8265
 |---------|--------|-----|
 | Node 2 not visible in Ray cluster | Network connectivity issue | Verify QSFP cable connection, check IP configuration |
 | Model download fails | Authentication or network issue | Re-run `huggingface-cli login`, check internet access |
+| Cannot access gated repo for URL | Certain HuggingFace models have restricted access | Regenerate your HuggingFace token; and request access to the gated model on your web browser |
 | CUDA out of memory with 405B | Insufficient GPU memory | Use 70B model or reduce max_model_len parameter |
 | Container startup fails | Missing ARM64 image | Rebuild vLLM image following ARM64 instructions |
 
