@@ -46,7 +46,7 @@ a functional distributed computing environment.
 
 All required files for this playbook can be found [here on GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/)
 
-- **discover-sparks.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/discover-sparks) script for automatic node discovery and SSH key distribution
+- [**discover-sparks.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/discover-sparks) script for automatic node discovery and SSH key distribution
 
 ## Time & risk
 
@@ -190,7 +190,7 @@ You may be prompted for your password for each node.
 SSH setup complete! Both local and remote nodes can now SSH to each other without passwords.
 ```
 
-Note: If you encoutner any errors, please follow Option 2 below to manually configure SSH and debug the issue.
+Note: If you encounter any errors, please follow Option 2 below to manually configure SSH and debug the issue.
 
 ### Option 2: Manually discover and configure SSH
 
@@ -217,8 +217,8 @@ In this example, the IP address for Node 1 is **169.254.35.62**. Repeat the proc
 On both nodes, run the following commands to enable passwordless SSH:
 ```bash
 ## Copy your SSH public key to both nodes. Please replace the IP addresses with the ones you found in the previous step.
-ssh-copy-id -i ~/.ssh/id_rsa.pub nvidia@<IP for Node 1>
-ssh-copy-id -i ~/.ssh/id_rsa.pub nvidia@<IP for Node 2>
+ssh-copy-id -i ~/.ssh/id_rsa.pub <username>@<IP for Node 1>
+ssh-copy-id -i ~/.ssh/id_rsa.pub <username>@<IP for Node 2>
 ```
 
 ## Step 4. Verify Multi-Node Communication

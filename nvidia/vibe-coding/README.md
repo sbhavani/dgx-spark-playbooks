@@ -22,7 +22,7 @@ While NVIDIA NIMs are not yet widely supported, this guide uses **Ollama** with 
 
 ### What You'll Accomplish
 
-You’ll have a fully configured DGX Spark system capable of:
+You'll have a fully configured DGX Spark system capable of:
 - Running local code assistance through Ollama.
 - Serving models remotely for Continue.dev and VSCode integration.
 - Hosting large LLMs like GPT-OSS 120B using unified memory.
@@ -144,7 +144,7 @@ Add additional model entries for any other Ollama models you wish to host remote
 - Verify Docker and GPU drivers are installed correctly.
 - Run `ollama serve` manually to view errors.
 
-**2. VSCode can’t connect**
+**2. VSCode can't connect**
 - Ensure port 11434 is open and accessible from your workstation.
 - Check `OLLAMA_HOST` and `OLLAMA_ORIGINS` in `/etc/systemd/system/ollama.service.d/override.conf`.
 
