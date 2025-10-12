@@ -6,19 +6,18 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
-  - [Substep A. BF16 quantized precision](#substep-a-bf16-quantized-precision)
-  - [Substep B. FP8 quantized precision](#substep-b-fp8-quantized-precision)
-  - [Substep C. FP4 quantized precision](#substep-c-fp4-quantized-precision)
-  - [Substep A. FP16 precision (high VRAM requirement)](#substep-a-fp16-precision-high-vram-requirement)
-  - [Substep B. FP8 quantized precision](#substep-b-fp8-quantized-precision)
-  - [Substep C. FP4 quantized precision](#substep-c-fp4-quantized-precision)
-  - [Substep A. BF16 precision](#substep-a-bf16-precision)
-  - [Substep B. FP8 quantized precision](#substep-b-fp8-quantized-precision)
 - [Troubleshooting](#troubleshooting)
 
 ---
 
 ## Overview
+
+* Basic idea
+
+Multi-modal inference combines different data types, such as **text, images, and audio**, within a single model pipeline to generate or interpret richer outputs.  
+Instead of processing one input type at a time, multi-modal systems have shared representations that  **text-to-image generation**, **image captioning**, or **vision-language reasoning**.  
+
+On GPUs, this enables **parallel processing across modalities** for faster, higher-fidelity results for tasks that combine language and vision.
 
 ## What you'll accomplish
 
@@ -39,18 +38,18 @@ FP8, FP4).
 - NVIDIA Spark device with Blackwell GPU architecture
 - Docker installed and accessible to current user
 - NVIDIA Container Runtime configured
-- Hugging Face account with valid token
+- Hugging Face account with access to Black Forest Labs models [FLUX.1-dev](https://huggingface.co/black-forest-labs/FLUX.1-dev) and [FLUX.1-dev-onnx](https://huggingface.co/black-forest-labs/FLUX.1-dev-onnx) on Hugging Face
+- Hugging Face [token](https://huggingface.co/settings/tokens) configured with access to both FLUX.1 model repositories
 - At least 48GB VRAM available for FP16 Flux.1 Schnell operations
 - Verify GPU access: `nvidia-smi`
 - Check Docker GPU integration: `docker run --rm --gpus all nvidia/cuda:12.0-base-ubuntu20.04 nvidia-smi`
-- Confirm HF token access with permissions to FLUX repos: `echo $HF_TOKEN`, Sign in to your huggingface account You can create the token from create your token here (make sure you provide permissions to the token): https://huggingface.co/settings/tokens , Note the permissions to be checked and the repos: black-forest-labs/FLUX.1-dev and black-forest-labs/FLUX.1-dev-onnx (search for these repos when creating the user token) to be added.
 
 ## Ancillary files
 
 All necessary files can be found in the TensorRT repository [here on GitHub](https://github.com/NVIDIA/TensorRT)
-- **requirements.txt** - Python dependencies for TensorRT demo environment
-- **demo_txt2img_flux.py** - Flux.1 model inference script  
-- **demo_txt2img_xl.py** - SDXL model inference script
+- [**requirements.txt**](https://github.com/NVIDIA/TensorRT/blob/main/demo/Diffusion/requirements.txt) - Python dependencies for TensorRT demo environment
+- [**demo_txt2img_flux.py**](https://github.com/NVIDIA/TensorRT/blob/main/demo/Diffusion/demo_txt2img_flux.py) - Flux.1 model inference script  
+- [**demo_txt2img_xl.py**](https://github.com/NVIDIA/TensorRT/blob/main/demo/Diffusion/demo_txt2img_xl.py) - SDXL model inference script
 - **TensorRT repository** - Contains diffusion demo code and optimization tools
 
 ## Time & risk
@@ -104,21 +103,21 @@ pip3 install -r requirements.txt
 
 Test multi-modal inference using the Flux.1 Dev model with different precision formats.
 
-### Substep A. BF16 quantized precision
+**Substep A. BF16 quantized precision**
 
 ```bash
 python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
   --hf-token=$HF_TOKEN --download-onnx-models --bf16
 ```
 
-### Substep B. FP8 quantized precision
+**Substep B. FP8 quantized precision**
 
 ```bash
 python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
   --hf-token=$HF_TOKEN --quantization-level 4 --fp8 --download-onnx-models
 ```
 
-### Substep C. FP4 quantized precision
+**Substep C. FP4 quantized precision**
 
 ```bash
 python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
@@ -131,14 +130,14 @@ Test the faster Flux.1 Schnell variant with different precision formats.
 
 > **Warning**: FP16 Flux.1 Schnell requires >48GB VRAM for native export
 
-### Substep A. FP16 precision (high VRAM requirement)
+**Substep A. FP16 precision (high VRAM requirement)**
 
 ```bash
 python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
   --hf-token=$HF_TOKEN --version="flux.1-schnell"
 ```
 
-### Substep B. FP8 quantized precision
+**Substep B. FP8 quantized precision**
 
 ```bash
 python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
@@ -146,7 +145,7 @@ python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry b
   --quantization-level 4 --fp8 --download-onnx-models
 ```
 
-### Substep C. FP4 quantized precision
+**Substep C. FP4 quantized precision**
 
 ```bash
 python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
@@ -158,14 +157,14 @@ python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry b
 
 Test the SDXL model for comparison with different precision formats.
 
-### Substep A. BF16 precision
+**Substep A. BF16 precision**
 
 ```bash
 python3 demo_txt2img_xl.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
   --hf-token=$HF_TOKEN --version xl-1.0 --download-onnx-models
 ```
 
-### Substep B. FP8 quantized precision
+**Substep B. FP8 quantized precision**
 
 ```bash
 python3 demo_txt2img_xl.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
