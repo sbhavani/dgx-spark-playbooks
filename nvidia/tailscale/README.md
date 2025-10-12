@@ -314,8 +314,8 @@ Expected output:
 Remove Tailscale completely if needed. This will disconnect devices from the
 tailnet and remove all network configurations.
 
-> **Warning**: This will permanently remove the device from your Tailscale
-> network and require re-authentication to rejoin.
+> [!WARNING]
+> his will permanently remove the device from your Tailscale network and require re-authentication to rejoin.
 
 ```bash
 ## Stop Tailscale service

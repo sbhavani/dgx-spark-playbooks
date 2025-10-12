@@ -229,7 +229,8 @@ ssh <IP for Node 2> hostname
 
 ## Step 6. Cleanup and Rollback
 
-> **Warning**: These steps will reset network configuration.
+> [!WARNING]
+> These steps will reset network configuration.
 
 ```bash
 ## Rollback network configuration (if using Option 1)

@@ -85,7 +85,8 @@ git --version
 ## Step 2. Launch PyTorch container with GPU support
 
 Start the NVIDIA PyTorch container with GPU access and mount your workspace directory.
-> **Note:** This NVIDIA PyTorch container supports CUDA 13
+> [!NOTE]
+> This NVIDIA PyTorch container supports CUDA 13
 
 ```bash
 docker run --gpus all --ipc=host --ulimit memlock=-1 -it --ulimit stack=67108864 --rm -v "$PWD":/workspace nvcr.io/nvidia/pytorch:25.09-py3 bash
@@ -128,7 +129,8 @@ cat examples/train_lora/llama3_lora_sft.yaml
 
 ## Step 7. Launch fine-tuning training
 
-> **Note:** Login to your hugging face hub to download the model if the model is gated.
+> [!NOTE]
+> Login to your hugging face hub to download the model if the model is gated.
 
 Execute the training process using the pre-configured LoRA setup.
 
@@ -206,7 +208,8 @@ docker container prune -f
 | Model download fails or is slow | Network connectivity or Hugging Face Hub issues | Check internet connection, try using `HF_HUB_OFFLINE=1` for cached models |
 | Training loss not decreasing | Learning rate too high/low or insufficient data | Adjust `learning_rate` parameter or check dataset quality |
 
-> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> [!NOTE]
+> DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
 > With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
 > the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
 ```bash

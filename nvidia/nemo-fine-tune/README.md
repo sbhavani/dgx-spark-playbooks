@@ -192,7 +192,8 @@ First, export your HF_TOKEN so that gated models can be downloaded.
 ## Run basic LLM fine-tuning example
 export HF_TOKEN=<your_huggingface_token>
 ```
-> **Note:** Please Replace `<your_huggingface_token>` with your Hugging Face access token to access gated models (e.g., Llama).
+> [!NOTE]
+> Please Replace `<your_huggingface_token>` with your Hugging Face access token to access gated models (e.g., Llama).
 
 **Full Fine-tuning example:**
 
@@ -321,7 +322,8 @@ Explore the [NeMo AutoModel GitHub repository](https://github.com/NVIDIA-NeMo/Au
 | ARM64 package compatibility issues | Package not available for ARM architecture | Use source installation or build from source with ARM64 flags |
 | Cannot access gated repo for URL | Certain HuggingFace models have restricted access | Regenerate your [HuggingFace token](https://huggingface.co/docs/hub/en/security-tokens); and request access to the [gated model](https://huggingface.co/docs/hub/en/models-gated#customize-requested-information) on your web browser |
 
-> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> [!NOTE]
+> DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
 > With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
 > the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
 ```bash

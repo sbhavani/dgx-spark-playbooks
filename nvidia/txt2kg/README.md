@@ -154,7 +154,8 @@ docker exec ollama-compose ollama rm llama3.1:8b
 | Slow triple extraction | Large model or large context window | Reduce document chunk size or use faster models |
 | ArangoDB connection refused | Service not fully started | Wait 30s after start.sh, verify with `docker ps` |
 
-> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> [!NOTE]
+> DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
 > With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
 > the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
 ```bash

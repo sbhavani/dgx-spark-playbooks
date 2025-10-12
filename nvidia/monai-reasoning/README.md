@@ -115,7 +115,8 @@ ls -la ./models/monai-reasoning-cxr-3b
 ## You should see model files including config.json and model weights
 ```
 
-> **Important Note:** Currently, a custom internal VLLM container is required until the sm121 support is available in the public image. The instructions below use the internal container `******:5005/dl/dgx/vllm:main-py3.31165712-devel`.
+> [!IMPORTANT]
+> Currently, a custom internal VLLM container is required until the sm121 support is available in the public image. The instructions below use the internal container `******:5005/dl/dgx/vllm:main-py3.31165712-devel`.
 
 ## Step 3. Verify System Architecture
 
@@ -294,7 +295,8 @@ for medical image analysis and reasoning tasks.
 | Open WebUI shows connection error | Wrong backend URL | Verify `OPENAI_API_BASE_URL` is set correctly |
 | Model doesn't show full reasoning | Reasoning tags enabled | Disable "Reasoning Tags" in Chat Controls → Advanced Params |
 
-> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> [!NOTE]
+> DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
 With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
 the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
 ```bash

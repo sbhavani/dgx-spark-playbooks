@@ -348,7 +348,8 @@ http://192.168.100.10:8265
 | CUDA out of memory with 405B | Insufficient GPU memory | Use 70B model or reduce max_model_len parameter |
 | Container startup fails | Missing ARM64 image | Rebuild vLLM image following ARM64 instructions |
 
-> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU.
+> [!NOTE]
+> DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU.
 > With many applications still updating to take advantage of UMA, you may encounter memory issues even when within
 > the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
 ```bash

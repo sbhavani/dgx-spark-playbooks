@@ -190,7 +190,8 @@ To remove the custom app:
 1. Open NVIDIA Sync Settings → Custom tab
 2. Select "Ollama Server" and click "Remove"
 
-**Warning**: To completely uninstall Ollama from your Spark device:
+> [!WARNING]
+> To completely uninstall Ollama from your Spark device:
 
 ```bash
 sudo systemctl stop ollama

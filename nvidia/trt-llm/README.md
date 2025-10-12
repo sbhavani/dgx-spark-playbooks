@@ -310,7 +310,8 @@ docker run \
 ```
 
 
-> **Note:** If you hit a host OOM during downloads or first run, free the OS page cache on the host (outside the container) and retry:
+> [!NOTE]
+> If you hit a host OOM during downloads or first run, free the OS page cache on the host (outside the container) and retry:
 ```bash
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 ```
@@ -734,7 +735,8 @@ docker rmi ghcr.io/open-webui/open-webui:main
 | "task: non-zero exit (255)" | Container exit with error code 255 | Check container logs with `docker ps -a --filter "name=trtllm-multinode_trtllm"` to get container ID, then `docker logs <container_id>` to see detailed error messages |
 | Docker state stuck in "Pending" with "no suitable node (insufficien...)" | Docker daemon not properly configured for GPU access | Verify steps 2-4 were completed successfully and check that `/etc/docker/daemon.json` contains correct GPU configuration |
 
-> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU.
+> [!NOTE]
+> DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU.
 > With many applications still updating to take advantage of UMA, you may encounter memory issues even when within
 > the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
 ```bash

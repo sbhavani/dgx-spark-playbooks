@@ -319,7 +319,8 @@ Feel free to play around with additional videos available in the gallery.
 
 ## Troubleshooting
 
-> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> [!NOTE]
+> DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
 > With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
 > the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
 ```bash

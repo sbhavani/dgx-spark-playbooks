@@ -134,7 +134,8 @@ docker network create vss-shared-network
 
 Log in to NVIDIA's container registry using your [NGC API Key](https://org.ngc.nvidia.com/setup/api-keys).
 
-> **Note:** If you don’t have an NVIDIA account already, you’ll have to create one and register for the [developer program](https://developer.nvidia.com/nvidia-developer-program).
+> [!NOTE]
+> If you don’t have an NVIDIA account already, you’ll have to create one and register for the [developer program](https://developer.nvidia.com/nvidia-developer-program).
 
 ```bash
 ## Log in to NVIDIA Container Registry
@@ -193,7 +194,8 @@ Launch the complete VSS Event Reviewer stack including Alert Bridge, VLM Pipelin
 IS_SBSA=1 IS_AARCH64=1 ALERT_REVIEW_MEDIA_BASE_DIR=/tmp/alert-media-dir docker compose up
 ```
 
-> **Note:** This step will take several minutes as containers are pulled and services initialize. The VSS backend requires additional startup time. Proceed to the next step in a new terminal in the meantime.
+> [!NOTE]
+> This step will take several minutes as containers are pulled and services initialize. The VSS backend requires additional startup time. Proceed to the next step in a new terminal in the meantime.
 
 **8.5 Navigate to CV Event Detector directory**
 
@@ -266,7 +268,8 @@ Open these URLs in your browser:
 - `http://localhost:7862` - CV UI to launch and monitor CV pipeline
 - `http://localhost:7860` - Alert Inspector UI to view clips and review VLM results
 
-> **Note:** You may now proceed to step 10.
+> [!NOTE]
+> You may now proceed to step 10.
 
 ## Step 9. Option B 
 
@@ -322,7 +325,8 @@ cat config.yaml | grep -A 10 "model"
 docker compose up
 ```
 
-> **Note:** This step will take several minutes as containers are pulled and services initialize. The VSS backend requires additional startup time. 
+> [!NOTE]
+> This step will take several minutes as containers are pulled and services initialize. The VSS backend requires additional startup time. 
 
 **9.7 Validate Standard VSS deployment**
 
@@ -411,7 +415,8 @@ With VSS deployed, you can now:
 | Services fail to communicate | Incorrect environment variables | Verify `IS_SBSA=1 IS_AARCH64=1` are set correctly |
 | Web interfaces not accessible | Services still starting or port conflicts | Wait 2-3 minutes, check `docker ps` for container status |
 
-> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> [!NOTE]
+> DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
 > With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
 > the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
 ```bash
