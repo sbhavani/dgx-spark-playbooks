@@ -310,7 +310,7 @@ docker run \
 ```
 
 
-> **Note:** If you hit a host OOM during downloads or first run, free the OS page cache on the host (outside the container) and retry:
+> Note: If you hit a host OOM during downloads or first run, free the OS page cache on the host (outside the container) and retry:
 ```bash
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 ```
@@ -411,7 +411,7 @@ docker rmi nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev
 
 ### Step 1. Configure network connectivity
 
-Follow the network setup instructions from the [Connect two Sparks](https://build.nvidia.com/spark/stack-sparks/stacked-sparks) playbook to establish connectivity between your DGX Spark nodes.
+Follow the network setup instructions from the Connect two Sparks playbook to establish connectivity between your DGX Spark nodes.
 
 This includes:
 - Physical QSFP cable connection
@@ -447,13 +447,13 @@ First, find your GPU UUID by running:
 nvidia-smi -a | grep UUID
 ```
 
-Next, modify the Docker daemon configuration to advertise the GPU to Swarm. Edit **/etc/docker/daemon.json**:
+Next, modify the Docker daemon configuration to advertise the GPU to Swarm. Edit /etc/docker/daemon.json:
 
 ```bash
 sudo nano /etc/docker/daemon.json
 ```
 
-Add or modify the file to include the nvidia runtime and GPU UUID (replace **GPU-45cbf7b3-f919-7228-7a26-b06628ebefa1** with your actual GPU UUID):
+Add or modify the file to include the nvidia runtime and GPU UUID (replace GPU-45cbf7b3-f919-7228-7a26-b06628ebefa1 with your actual GPU ID):
 
 ```json
 {
@@ -470,7 +470,7 @@ Add or modify the file to include the nvidia runtime and GPU UUID (replace **GPU
 }
 ```
 
-Modify the NVIDIA Container Runtime to advertise the GPUs to the Swarm by uncommenting the swarm-resource line in the **config.toml** file. You can do this either with your preferred text editor (e.g., vim, nano...) or with the following command:
+Modify the NVIDIA Container Runtime to advertise the GPUs to the Swarm by uncommenting the swarm-resource line in the config.toml file. You can do this either with your preferred text editor (e.g., vim, nano...) or with the following command:
 ```bash
 sudo sed -i 's/^#\s*\(swarm-resource\s*=\s*".*"\)/\1/' /etc/nvidia-container-runtime/config.toml
 ```
@@ -519,7 +519,7 @@ On your primary node, deploy the TRT-LLM multi-node stack by downloading the [**
 ```bash
 docker stack deploy -c $HOME/docker-compose.yml trtllm-multinode
 ```
-**Note:** Ensure you download both files into the same directory from which you are running the command.
+Note: Ensure you download both files into the same directory from which you are running the command.
 
 You can verify the status of your worker nodes using the following
 ```bash
@@ -534,7 +534,7 @@ oe9k5o6w41le   trtllm-multinode_trtllm.1       nvcr.io/nvidia/tensorrt-llm/relea
 phszqzk97p83   trtllm-multinode_trtllm.2       nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3   spark-1b3b   Running         Running 2 minutes ago
 ```
 
-**Note:** If your "Current state" is not "Running", see troubleshooting section for more information.
+Note: If your "Current state" is not "Running", see troubleshooting section for more information.
 
 ### Step 7. Create hosts file
 
@@ -603,7 +603,7 @@ docker exec \
 
 This will start the TensorRT-LLM server on port 8355. You can then make inference requests to `http://localhost:8355` using the OpenAI-compatible API format.
 
-**Note:** You might see a warning such as `UCX  WARN  network device 'enp1s0f0np0' is not available, please use one or more of`. You can ignore this warning if your inference is successful, as it's related to only one of your two CX-7 ports being used, and the other being left unused.
+Note: You might see a warning such as `UCX  WARN  network device 'enp1s0f0np0' is not available, please use one or more of`. You can ignore this warning if your inference is successful, as it's related to only one of your two CX-7 ports being used, and the other being left unused.
 
 **Expected output:** Server startup logs and ready message.
 
@@ -659,7 +659,7 @@ After setting up TensorRT-LLM inference server in either single-node or multi-no
 Run the following command on the DGX Spark node where you have the TensorRT-LLM inference server running.
 For multi-node setup, this would be the primary node.
 
-**Note:** If you used a different port for your OpenAI-compatible API server, adjust the `OPENAI_API_BASE_URL="http://localhost:8355/v1"` to match the IP and port of your TensorRT-LLM inference server.
+Note: If you used a different port for your OpenAI-compatible API server, adjust the `OPENAI_API_BASE_URL="http://localhost:8355/v1"` to match the IP and port of your TensorRT-LLM inference server.
 
 ```bash
 docker run \

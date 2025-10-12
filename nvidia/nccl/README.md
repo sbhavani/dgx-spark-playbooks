@@ -6,12 +6,13 @@
 
 - [Overview](#overview)
 - [Run on two Sparks](#run-on-two-sparks)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
 ## Overview
 
-## Basic idea
+## Basic Idea
 
 NCCL (NVIDIA Collective Communication Library) enables high-performance GPU-to-GPU communication
 across multiple nodes. This walkthrough sets up NCCL for multi-node distributed training on
@@ -40,11 +41,9 @@ and proper GPU topology detection.
 
 ## Time & risk
 
-**Duration**: 30 minutes for setup and validation
-
-**Risk level**: Medium - involves network configuration changes
-
-**Rollback**: The NCCL & NCCL Tests repositories can be deleted from DGX Spark
+* **Duration**: 30 minutes for setup and validation
+* **Risk level**: Medium - involves network configuration changes
+* **Rollback**: The NCCL & NCCL Tests repositories can be deleted from DGX Spark
 
 ## Run on two Sparks
 
@@ -173,6 +172,8 @@ Your NCCL environment is ready for multi-node distributed training workloads on 
 Now you can try running a larger distributed workload such as TRT-LLM or vLLM inference.
 
 ## Troubleshooting
+
+## Common issues for running on two Spark
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
