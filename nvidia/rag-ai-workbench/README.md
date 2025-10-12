@@ -151,7 +151,8 @@ Upload a custom dataset, adjust the Router prompt, and submit custom queries to 
 
 This step explains how to remove the project if needed and what changes were made to your system.
 
-> **Warning:** This will permanently delete the project and all associated data.
+> [!WARNING]
+> This will permanently delete the project and all associated data.
 
 To remove the project completely:
 

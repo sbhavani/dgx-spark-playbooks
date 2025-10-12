@@ -370,8 +370,8 @@ deactivate
 rm -rf openfold_env/
 ```
 
-> **Warning:** The following will delete downloaded databases (>3TB). Only run if you need to
-> free disk space and are willing to re-download.
+> [!WARNING]
+> The following will delete downloaded databases (>3TB). Only run if you need to free disk space and are willing to re-download.
 
 ```bash
 ## Remove all databases (requires re-download)

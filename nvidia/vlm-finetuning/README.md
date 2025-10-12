@@ -104,7 +104,8 @@ sh launch.sh
 ## Enter the mounted directory within the container
 cd /vlm_finetuning
 ```
-**Note**: The same Docker container and launch commands work for both image and video VLM recipes. The container features all necessary dependencies, including FFmpeg, Decord, and optimized libraries for both workflows.
+> [!NOTE]
+> The same Docker container and launch commands work for both image and video VLM recipes. The container features all necessary dependencies, including FFmpeg, Decord, and optimized libraries for both workflows.
 
 ## Step 5. [Option A] For image VLM fine-tuning (Wildfire Detection)
 
@@ -129,7 +130,8 @@ cd ui_image/data
 
 For this fine-tuning playbook, we will use the [Wildfire Prediction Dataset](https://www.kaggle.com/datasets/abdelghaniaaba/wildfire-prediction-dataset) from Kaggle. Visit the kaggle dataset page [here](https://www.kaggle.com/datasets/abdelghaniaaba/wildfire-prediction-dataset) to click the download button. Select the `cURL` option in the `Download Via` dropdown and copy the curl command. 
 
-> **Note**: You will need to be logged into Kaggle and may need to accept the dataset terms before the download link works.
+> [!NOTE]
+> You will need to be logged into Kaggle and may need to accept the dataset terms before the download link works.
 
 Run the following commands in your container:
 
@@ -235,7 +237,8 @@ dataset/
 
 #### 6.2. Model download
 
-> **Note**: These instructions assume you are already inside the Docker container. For container setup, refer to the section above to `Build the Docker container`.
+> [!NOTE]
+> These instructions assume you are already inside the Docker container. For container setup, refer to the section above to `Build the Docker container`.
 
 ```bash
 hf download OpenGVLab/InternVL3-8B
@@ -262,7 +265,8 @@ Scroll down, enter your prompt in the chat box and hit `Generate`. Your prompt w
 
 If you are proceeding to train a fine-tuned model, ensure that the streamlit demo UI is brought down before proceeding to train. You can bring it down by interrupting the terminal with `Ctrl+C` keystroke.
 
-> **Note**: To clear out any extra occupied memory from your system, execute the following command outside the container after interrupting the ComfyUI server.
+> [!NOTE]
+> To clear out any extra occupied memory from your system, execute the following command outside the container after interrupting the ComfyUI server.
 ```bash
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 ```
@@ -294,7 +298,8 @@ You can monitor and evaluate the training progress and metrics, as they will be 
 
 After training, ensure that you shutdown the jupyter kernel in the notebook and kill the jupyter server in the terminal with a `Ctrl+C` keystroke.
 
-> **Note**: To clear out any extra occupied memory from your system, execute the following command outside the container after interrupting the ComfyUI server.
+> [!NOTE]
+> To clear out any extra occupied memory from your system, execute the following command outside the container after interrupting the ComfyUI server.
 ```bash
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 ```

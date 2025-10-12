@@ -183,7 +183,8 @@ llamafactory-cli export examples/merge_lora/llama3_lora_sft.yaml
 
 ## Step 11. Cleanup and rollback
 
-> **Warning:** This will delete all training progress and checkpoints.
+> [!WARNING]
+> This will delete all training progress and checkpoints.
 
 To remove all generated files and free up storage space:
 

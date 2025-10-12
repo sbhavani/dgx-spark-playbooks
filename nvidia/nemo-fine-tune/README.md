@@ -280,7 +280,8 @@ print('✅ Setup complete')
 
 Remove the installation and restore the original environment if needed. These commands safely remove all installed components.
 
-> **Warning:** This will delete all virtual environments and downloaded models. Ensure you have backed up any important training checkpoints.
+> [!WARNING]
+> This will delete all virtual environments and downloaded models. Ensure you have backed up any important training checkpoints.
 
 ```bash
 ## Remove virtual environment

@@ -158,7 +158,8 @@ Open a web browser and navigate to `http://<SPARK_IP>:8188` where `<SPARK_IP>` i
 
 If you need to remove the installation completely, follow these steps:
 
-> **Warning:** This will delete all installed packages and downloaded models.
+> [!WARNING]
+> This will delete all installed packages and downloaded models.
 
 ```bash
 deactivate

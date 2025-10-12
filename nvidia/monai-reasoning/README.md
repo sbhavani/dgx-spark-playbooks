@@ -266,7 +266,8 @@ You can now upload a chest X-ray image and ask questions directly in the chat in
 To stop and remove the containers and network, run the following commands. This will not 
 delete your downloaded model weights.
 
-> **Warning:** This will stop all running containers and remove the network.
+> [!WARNING]
+> This will stop all running containers and remove the network.
 
 ```bash
 ## Stop containers

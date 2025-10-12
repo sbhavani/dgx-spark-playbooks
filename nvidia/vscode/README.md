@@ -152,7 +152,8 @@ Within VS Code:
 
 ## Step 8. Uninstalling VS Code
 
-> **Warning:** Uninstalling VS Code will remove all user settings and extensions.
+> [!WARNING]
+> Uninstalling VS Code will remove all user settings and extensions.
 
 To remove VS Code if needed:
 ```bash

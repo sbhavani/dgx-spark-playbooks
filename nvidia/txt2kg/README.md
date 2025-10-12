@@ -89,7 +89,8 @@ docker exec ollama-compose ollama pull <model-name>
 
 Browse available models at [https://ollama.com/search](https://ollama.com/search)
 
-> **Note**: The unified memory architecture enables running larger models like 70B parameters, which produce significantly more accurate knowledge triples.
+> [!NOTE]
+> The unified memory architecture enables running larger models like 70B parameters, which produce significantly more accurate knowledge triples.
 
 ## Step 4. Access the web interface
 

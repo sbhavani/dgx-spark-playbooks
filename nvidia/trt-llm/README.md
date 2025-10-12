@@ -108,7 +108,8 @@ The following models are supported with TensorRT-LLM on Spark. All listed models
 | **Llama-4-Scout-17B-16E-Instruct** | NVFP4 | ✅ | `nvidia/Llama-4-Scout-17B-16E-Instruct-FP4` |
 | **Qwen3-235B-A22B (two Sparks only)** | NVFP4 | ✅ | `nvidia/Qwen3-235B-A22B-FP4` |
 
-**Note:** You can use the NVFP4 Quantization documentation to generate your own NVFP4-quantized checkpoints for your favorite models. This enables you to take advantage of the performance and memory benefits of NVFP4 quantization even for models not already published by NVIDIA.
+> [!NOTE]
+> You can use the NVFP4 Quantization documentation to generate your own NVFP4-quantized checkpoints for your favorite models. This enables you to take advantage of the performance and memory benefits of NVFP4 quantization even for models not already published by NVIDIA.
 
 Reminder: not all model architectures are supported for NVFP4 quantization.
 
@@ -396,7 +397,8 @@ curl -s http://localhost:8355/v1/chat/completions \
 
 Remove downloaded models and containers to free up space when testing is complete.
 
-> **Warning:** This will delete all cached models and may require re-downloading for future runs.
+> [!WARNING]
+> This will delete all cached models and may require re-downloading for future runs.
 
 ```bash
 ## Remove Hugging Face cache
@@ -519,7 +521,8 @@ On your primary node, deploy the TRT-LLM multi-node stack by downloading the [**
 ```bash
 docker stack deploy -c $HOME/docker-compose.yml trtllm-multinode
 ```
-**Note:** Ensure you download both files into the same directory from which you are running the command.
+> [!NOTE]
+> Ensure you download both files into the same directory from which you are running the command.
 
 You can verify the status of your worker nodes using the following
 ```bash
@@ -534,7 +537,8 @@ oe9k5o6w41le   trtllm-multinode_trtllm.1       nvcr.io/nvidia/tensorrt-llm/relea
 phszqzk97p83   trtllm-multinode_trtllm.2       nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3   spark-1b3b   Running         Running 2 minutes ago
 ```
 
-**Note:** If your "Current state" is not "Running", see troubleshooting section for more information.
+> [!NOTE]
+> If your "Current state" is not "Running", see troubleshooting section for more information.
 
 ### Step 7. Create hosts file
 
@@ -603,7 +607,8 @@ docker exec \
 
 This will start the TensorRT-LLM server on port 8355. You can then make inference requests to `http://localhost:8355` using the OpenAI-compatible API format.
 
-**Note:** You might see a warning such as `UCX  WARN  network device 'enp1s0f0np0' is not available, please use one or more of`. You can ignore this warning if your inference is successful, as it's related to only one of your two CX-7 ports being used, and the other being left unused.
+> [!NOTE]
+> You might see a warning such as `UCX  WARN  network device 'enp1s0f0np0' is not available, please use one or more of`. You can ignore this warning if your inference is successful, as it's related to only one of your two CX-7 ports being used, and the other being left unused.
 
 **Expected output:** Server startup logs and ready message.
 
@@ -630,7 +635,8 @@ Stop and remove containers by using the following command on the leader node:
 docker stack rm trtllm-multinode
 ```
 
-> **Warning:** This removes all inference data and performance reports. Copy `/opt/*perf-report.json` files before cleanup if needed.
+> [!WARNING]
+> This removes all inference data and performance reports. Copy `/opt/*perf-report.json` files before cleanup if needed.
 
 Remove downloaded models to free disk space:
 
@@ -659,7 +665,8 @@ After setting up TensorRT-LLM inference server in either single-node or multi-no
 Run the following command on the DGX Spark node where you have the TensorRT-LLM inference server running.
 For multi-node setup, this would be the primary node.
 
-**Note:** If you used a different port for your OpenAI-compatible API server, adjust the `OPENAI_API_BASE_URL="http://localhost:8355/v1"` to match the IP and port of your TensorRT-LLM inference server.
+> [!NOTE]
+> If you used a different port for your OpenAI-compatible API server, adjust the `OPENAI_API_BASE_URL="http://localhost:8355/v1"` to match the IP and port of your TensorRT-LLM inference server.
 
 ```bash
 docker run \
@@ -696,10 +703,13 @@ You should see the Open WebUI interface at http://localhost:8080 where you can:
 
 You can select your model(s) from the dropdown menu on the top left corner. That's all you need to do to start using Open WebUI with your deployed models.
 
-**Note:** If accessing from a remote machine, replace localhost with your DGX Spark's IP address.
+> [!NOTE]
+> If accessing from a remote machine, replace localhost with your DGX Spark's IP address.
 
 ### Step 3. Cleanup and rollback
-**Warning:** This removes all chat data and may require re-uploading for future runs.
+> [!WARNING]
+> This removes all chat data and may require re-uploading for future runs.
+
 Remove the container by using the following command:
 ```bash
 docker stop open-webui

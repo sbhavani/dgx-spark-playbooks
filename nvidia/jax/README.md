@@ -99,7 +99,8 @@ git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-
 ## Step 3. Build the Docker image
 
 
-> **Warning:** This command will download a base image and build a container locally to support this environment.
+> [!WARNING]
+> This command will download a base image and build a container locally to support this environment.
 
 ```bash
 cd jax/assets

@@ -244,7 +244,8 @@ Expected output includes a generated haiku response.
 
 ## Step 10. (Optional) Deploy Llama 3.1 405B model
 
-> **Warning:** 405B model has insufficient memory headroom for production use.
+> [!WARNING]
+> 405B model has insufficient memory headroom for production use.
 
 Download the quantized 405B model for testing purposes only.
 
@@ -300,7 +301,8 @@ docker exec node nvidia-smi --query-gpu=memory.used,memory.total --format=csv
 
 Remove temporary configurations and containers when testing is complete.
 
-> **Warning:** This will stop all inference services and remove cluster configuration.
+> [!WARNING]
+> This will stop all inference services and remove cluster configuration.
 
 ```bash
 ## Stop containers on both nodes

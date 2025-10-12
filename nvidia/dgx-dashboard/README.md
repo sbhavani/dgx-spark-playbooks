@@ -198,7 +198,8 @@ From the Settings page, under the "Updates" tab:
 2. Click "Update Now" to initiate the update process
 3. Wait for the update to complete and your device to reboot
 
-> **Warning**: System updates will upgrade packages, firmware if available, and trigger a reboot. Save your work before proceeding.
+> [!WARNING]
+> System updates will upgrade packages, firmware if available, and trigger a reboot. Save your work before proceeding.
 
 ## Step 7. Cleanup and rollback
 
@@ -207,7 +208,8 @@ To clean up resources and return system to original state:
 1. Stop any running JupyterLab instances via dashboard
 2. Delete the JupyterLab working directory
 
-> **Warning**: If you ran system updates, the only rollback is to restore from a system backup or recovery media.
+> [!WARNING]
+> If you ran system updates, the only rollback is to restore from a system backup or recovery media.
 
 No permanent changes are made to the system during normal dashboard usage.
 

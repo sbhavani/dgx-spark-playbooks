@@ -128,7 +128,8 @@ python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry b
 
 Test the faster Flux.1 Schnell variant with different precision formats.
 
-> **Warning**: FP16 Flux.1 Schnell requires >48GB VRAM for native export
+> [!WARNING]
+> FP16 Flux.1 Schnell requires >48GB VRAM for native export
 
 **Substep A. FP16 precision (high VRAM requirement)**
 
@@ -190,7 +191,8 @@ python3 -c "import tensorrt as trt; print(f'TensorRT version: {trt.__version__}'
 
 Remove downloaded models and exit container environment to free disk space.
 
-> **Warning**: This will delete all cached models and generated images
+> [!WARNING]
+> This will delete all cached models and generated images
 
 ```bash
 ## Exit container

@@ -128,7 +128,8 @@ Create a Docker network that will be shared between VSS services and CV pipeline
 docker network create vss-shared-network
 ```
 
-> **Warning:** If the network already exists, you may see an error. Remove it first with `docker network rm vss-shared-network` if needed.
+> [!WARNING]
+> If the network already exists, you may see an error. Remove it first with `docker network rm vss-shared-network` if needed.
 
 ## Step 6. Authenticate with NVIDIA Container Registry
 
@@ -369,7 +370,8 @@ Follow the steps [here](https://docs.nvidia.com/vss/latest/content/ui_app.html) 
 
 To completely remove the VSS deployment and free up system resources:
 
-> **Warning:** This will destroy all processed video data and analysis results.
+> [!WARNING]
+> This will destroy all processed video data and analysis results.
 
 ```bash
 ## For Event Reviewer deployment

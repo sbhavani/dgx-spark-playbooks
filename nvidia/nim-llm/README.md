@@ -152,7 +152,8 @@ Expected output should be a JSON response containing a completion field with gen
 
 Remove the running container and optionally clean up cached model files.
 
-> **Warning:** Removing cached models will require re-downloading on next run.
+> [!WARNING]
+> Removing cached models will require re-downloading on next run.
 
 ```bash
 docker stop $CONTAINER_NAME

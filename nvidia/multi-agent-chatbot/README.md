@@ -37,7 +37,8 @@ The setup includes:
 -  No other processes running on the DGX Spark GPU
 -  Enough disk space for model downloads
 
-> **Note**: This demo uses ~120 out of the 128GB of DGX Spark's memory by default. 
+> [!NOTE]
+> This demo uses ~120 out of the 128GB of DGX Spark's memory by default. 
 > Please ensure that no other workloads are running on your Spark using `nvidia-smi`, or switch to a smaller supervisor model like gpt-oss-20B.
 
 
@@ -104,7 +105,8 @@ watch 'docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Status}}"'
 
 Open your browser and go to: http://localhost:3000
 
-> **Note**: If you are running this on a remote GPU via an SSH connection, in a new terminal window, you need to run the following command to be able to access the UI at localhost:3000 and for the UI to be able to communicate to the backend at localhost:8000.
+> [!NOTE]
+> If you are running this on a remote GPU via an SSH connection, in a new terminal window, you need to run the following command to be able to access the UI at localhost:3000 and for the UI to be able to communicate to the backend at localhost:8000.
 
 >```ssh -L 3000:localhost:3000 -L 8000:localhost:8000  username@IP-address```
 

@@ -203,7 +203,8 @@ Common issues and their resolutions:
 Stop and remove containers to clean up resources. This step returns your system to its
 original state.
 
-> **Warning:** This will stop all SGLang containers and remove temporary data.
+> [!WARNING]
+> This will stop all SGLang containers and remove temporary data.
 
 ```bash
 ## Stop all SGLang containers

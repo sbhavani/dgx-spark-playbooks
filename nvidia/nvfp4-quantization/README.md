@@ -226,7 +226,8 @@ curl -X POST http://localhost:8000/v1/chat/completions \
 
 To clean up the environment and remove generated files:
 
-> **Warning:** This will permanently delete all quantized model files and cached data.
+> [!WARNING]
+> This will permanently delete all quantized model files and cached data.
 
 ```bash
 ## Remove output directory and all quantized models
