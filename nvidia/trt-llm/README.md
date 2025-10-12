@@ -30,6 +30,11 @@
   - [Step 12. Validate API server](#step-12-validate-api-server)
   - [Step 14. Cleanup and rollback](#step-14-cleanup-and-rollback)
   - [Step 15. Next steps](#step-15-next-steps)
+- [Open WebUI for TensorRT-LLM](#open-webui-for-tensorrt-llm)
+  - [Prerequisites](#prerequisites)
+  - [Step 1. Launch Open WebUI container](#step-1-launch-open-webui-container)
+  - [Step 2. Access the interface](#step-2-access-the-interface)
+  - [Step 3. Cleanup and rollback](#step-3-cleanup-and-rollback)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -129,11 +134,8 @@ If you see a permission denied error (something like `permission denied while tr
 
 ```bash
 sudo usermod -aG docker $USER
+newgrp docker
 ```
-
-> **Warning**: After running usermod, you must log out and log back in to start a new
-> session with updated group permissions.
-
 
 ### Step 2. Verify environment prerequisites
 
@@ -430,10 +432,9 @@ docker ps
 If you see a permission denied error (something like `permission denied while trying to connect to the Docker daemon socket`), add your user to the docker group:
 
 ```bash
-sudo usermod -aG docker nvidia
+sudo usermod -aG docker $USER
+newgrp docker
 ```
-Note: Replace `nvidia` with the username of the user you want to allow Docker access to.
-Note: After running usermod, you must log out and log back in to start a new session with updated group permissions.
 
 ### Step 3. Install NVIDIA Container Toolkit & setup Docker environment
 
@@ -464,7 +465,7 @@ Add or modify the file to include the nvidia runtime and GPU UUID (replace GPU-4
   },
   "default-runtime": "nvidia",
   "node-generic-resources": [
-    "gpu=GPU-45cbf7b3-f919-7228-7a26-b06628ebefa1"
+    "NVIDIA_GPU=GPU-45cbf7b3-f919-7228-7a26-b06628ebefa1"
     ]
 }
 ```
@@ -478,6 +479,8 @@ Finally, restart the Docker daemon to apply all changes:
 ```bash
 sudo systemctl restart docker
 ```
+
+Repeat these steps on all nodes.
 
 ### Step 5. Initialize Docker Swarm
 
@@ -499,17 +502,21 @@ To add a manager to this swarm, run 'docker swarm join-token manager' and follow
 
 ### Step 6. Join worker nodes and deploy
 
-Now we can proceed with setting up other nodes of your cluster.
+Now we can proceed with setting up the worker nodes of your cluster. Repeat these steps on all worker nodes.
 
 Run the command suggested by the docker swarm init on each worker node to join the Docker swarm
 ```bash
 docker swarm join --token <worker-token> <advertise-addr>:<port>
 ```
 
-On your primary node, deploy the TRT-LLM multi-node stack by downloading the [**docker-compose.yml**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/docker-compose.yml) and [**trtllm-mn-entrypoint.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/trtllm-mn-entrypoint.sh) files into your home directory and running the following command:
+On both nodes, download the [**trtllm-mn-entrypoint.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/trtllm-mn-entrypoint.sh) script into your home directory and run the following command to make it executable:
 
 ```bash
 chmod +x $HOME/trtllm-mn-entrypoint.sh
+```
+
+On your primary node, deploy the TRT-LLM multi-node stack by downloading the [**docker-compose.yml**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/docker-compose.yml) file into your home directory and running the following command:
+```bash
 docker stack deploy -c $HOME/docker-compose.yml trtllm-multinode
 ```
 Note: Ensure you download both files into the same directory from which you are running the command.
@@ -526,6 +533,8 @@ ID             NAME                            IMAGE                            
 oe9k5o6w41le   trtllm-multinode_trtllm.1       nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3   spark-1d84   Running         Running 2 minutes ago
 phszqzk97p83   trtllm-multinode_trtllm.2       nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3   spark-1b3b   Running         Running 2 minutes ago
 ```
+
+Note: If your "Current state" is not "Running", see troubleshooting section for more information.
 
 ### Step 7. Create hosts file
 
@@ -565,6 +574,7 @@ EOF'
 
 ### Step 10. Download model
 
+We can download a model using the following command. You can replace `nvidia/Qwen3-235B-A22B-FP4` with the model of your choice.
 ```bash
 ## Need to specify huggingface token for model download.
 export HF_TOKEN=<your-huggingface-token>
@@ -588,34 +598,25 @@ docker exec \
       --max_num_tokens 32768 \
       --max_batch_size 4 \
       --extra_llm_api_options /tmp/extra-llm-api-config.yml \
-      --port 8000'
+      --port 8355'
 ```
 
-This will start the TensorRT-LLM server on port 8000. You can then make inference requests to `http://localhost:8000` using the OpenAI-compatible API format.
+This will start the TensorRT-LLM server on port 8355. You can then make inference requests to `http://localhost:8355` using the OpenAI-compatible API format.
+
+Note: You might see a warning such as `UCX  WARN  network device 'enp1s0f0np0' is not available, please use one or more of`. You can ignore this warning if your inference is successful, as it's related to only one of your two CX-7 ports being used, and the other being left unused.
 
 **Expected output:** Server startup logs and ready message.
 
 ### Step 12. Validate API server
-
-Verify successful deployment by checking container status and testing the API endpoint.
-
-```bash
-docker stack ps trtllm-multinode
-```
-
-**Expected output:** Two running containers in the stack across different nodes.
-
 Once the server is running, you can test it with a CURL request. Please ensure the CURL request is run on the primary node where you previously ran Step 11.
 
 ```bash
-curl -X POST http://localhost:8000/v1/chat/completions \
+curl -s http://localhost:8355/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "model": "nvidia/Qwen3-235B-A22B-FP4",
-    "prompt": "What is artificial intelligence?",
-    "max_tokens": 100,
-    "temperature": 0.7,
-    "stream": false
+    "messages": [{"role": "user", "content": "Paris is great because"}],
+    "max_tokens": 64
   }'
 ```
 
@@ -639,7 +640,73 @@ rm -rf $HOME/.cache/huggingface/hub/models--nvidia--Qwen3*
 
 ### Step 15. Next steps
 
-Compare performance metrics between speculative decoding and baseline reports to quantify speed improvements. Use the multi-node setup as a foundation for deploying other large models requiring tensor parallelism, or scale to additional nodes for higher throughput workloads.
+You can now deploy other models on your DGX Spark cluster.
+
+## Open WebUI for TensorRT-LLM
+
+## Open WebUI for TensorRT-LLM
+
+After setting up TensorRT-LLM inference server in either single-node or multi-node configuration, you can deploy Open WebUI to interact with your models through a user-friendly interface.
+
+### Prerequisites
+
+- TensorRT-LLM inference server running and accessible at http://localhost:8355
+- Docker installed and configured (see earlier steps)
+- Port 3000 available on your DGX Spark
+
+### Step 1. Launch Open WebUI container
+
+Run the following command on the DGX Spark node where you have the TensorRT-LLM inference server running.
+For multi-node setup, this would be the primary node.
+
+Note: If you used a different port for your OpenAI-compatible API server, adjust the `OPENAI_API_BASE_URL="http://localhost:8355/v1"` to match the IP and port of your TensorRT-LLM inference server.
+
+```bash
+docker run \
+  -d \
+  -e OPENAI_API_BASE_URL="http://localhost:8355/v1" \
+  -v open-webui:/app/backend/data \
+  --network host \
+  --add-host=host.docker.internal:host-gateway \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:main
+```
+
+This command:
+- Connects to your OpenAI-compatible API server for TensorRT-LLM at http://localhost:8355
+- Provides access to the Open WebUI interface at http://localhost:8080
+- Persists chat data in a Docker volume
+- Enables automatic container restart
+- Uses the latest Open WebUI image
+
+### Step 2. Access the interface
+
+Open your web browser and navigate to:
+
+```
+http://localhost:8080
+```
+
+You should see the Open WebUI interface at http://localhost:8080 where you can:
+- Chat with your deployed models
+- Adjust model parameters
+- View chat history
+- Manage model configurations
+
+You can select your model(s) from the dropdown menu on the top left corner. That's all you need to do to start using Open WebUI with your deployed models.
+
+**Note:** If accessing from a remote machine, replace localhost with your DGX Spark's IP address.
+
+### Step 3. Cleanup and rollback
+**Warning:** This removes all chat data and may require re-uploading for future runs.
+Remove the container by using the following command:
+```bash
+docker stop open-webui
+docker rm open-webui
+docker volume rm open-webui
+docker rmi ghcr.io/open-webui/open-webui:main
+```
 
 ## Troubleshooting
 
@@ -663,6 +730,10 @@ Compare performance metrics between speculative decoding and baseline reports to
 | Cannot access gated repo for URL | Certain HuggingFace models have restricted access | Regenerate your [HuggingFace token](https://huggingface.co/docs/hub/en/security-tokens); and request access to the [gated model](https://huggingface.co/docs/hub/en/models-gated#customize-requested-information) on your web browser |
 | "CUDA out of memory" errors | Insufficient GPU memory | Reduce `--max_batch_size` or `--max_num_tokens` |
 | Container exits immediately | Missing entrypoint script | Ensure `trtllm-mn-entrypoint.sh` download succeeded and has executable permissions, also ensure you are not running the container already on your node. If port 2233 is already utilized, the entrypoint script will not start. |
+| Error response from daemon: error while validating Root CA Certificate | System clock out of sync or expired certificates | Update system time to sync with NTP server `sudo timedatectl set-ntp true`|
+| "invalid mount config for type 'bind'" | Missing or non-executable entrypoint script | Run `docker inspect <container_id>` to see full error message. Verify `trtllm-mn-entrypoint.sh` exists on both nodes in your home directory (`ls -la $HOME/trtllm-mn-entrypoint.sh`) and has executable permissions (`chmod +x $HOME/trtllm-mn-entrypoint.sh`) |
+| "task: non-zero exit (255)" | Container exit with error code 255 | Check container logs with `docker ps -a --filter "name=trtllm-multinode_trtllm"` to get container ID, then `docker logs <container_id>` to see detailed error messages |
+| Docker state stuck in "Pending" with "no suitable node (insufficien...)" | Docker daemon not properly configured for GPU access | Verify steps 2-4 were completed successfully and check that `/etc/docker/daemon.json` contains correct GPU configuration |
 
 > **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU.
 > With many applications still updating to take advantage of UMA, you may encounter memory issues even when within
