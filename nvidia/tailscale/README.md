@@ -352,10 +352,3 @@ Your Tailscale setup is complete. You can now:
 | SSH auth failure | Wrong SSH keys | Check public key in `~/.ssh/authorized_keys` |
 | Cannot ping hostname | DNS issues | Use IP from `tailscale status` instead |
 | Devices missing | Different accounts | Use same identity provider for all devices |
-
-> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
-> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
-> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```

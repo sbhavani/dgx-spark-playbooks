@@ -70,9 +70,8 @@ newgrp docker
 
 ## Step 2. Clone the repository
 
-In a terminal, clone the [GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main) repository and navigate to the root directory of the multi-agent-chatbot project.
-
 ```bash
+git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets
 cd multi-agent-chatbot/assets
 ```
 

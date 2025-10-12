@@ -208,15 +208,7 @@ Exit the SSH session
 exit
 ```
 
-## Step 6. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|--------|-----|
-| Device name doesn't resolve | mDNS blocked on network | Use IP address instead of hostname.local |
-| Connection refused/timeout | DGX Spark not booted or SSH not ready | Wait for device boot completion; SSH available after updates finish |
-| Authentication failed | SSH key setup incomplete | Re-run device setup in NVIDIA Sync; check credentials |
-
-## Step 7. Next steps
+## Step 6. Next steps
 
 Test your setup by launching a development tool:
 - Click the NVIDIA Sync system tray icon.

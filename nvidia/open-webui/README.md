@@ -324,19 +324,8 @@ Under the "Custom" section, click the `x` icon on the right of the "Open WebUI" 
 
 This will close the tunnel and stop the Open WebUI docker container.
 
-## Step 10. Troubleshooting
 
-Common issues and their solutions.
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| Permission denied on docker ps | User not in docker group | Run Step 1 completely, including terminal restart |
-| Browser doesn't open automatically | Auto-open setting disabled | Manually navigate to localhost:12000 |
-| Model download fails | Network connectivity issues | Check internet connection, retry download |
-| GPU not detected in container | Missing `--gpus=all flag` | Recreate container with correct start script |
-| Port 12000 already in use | Another application using port | Change port in Custom App settings or stop conflicting service |
-
-## Step 11. Next steps
+## Step 10. Next steps
 
 Try downloading different models from the Ollama library at https://ollama.com/library.
 
@@ -352,7 +341,7 @@ docker pull ghcr.io/open-webui/open-webui:ollama
 
 After the update, launch Open WebUI again from NVIDIA Sync.
 
-## Step 12. Cleanup and rollback
+## Step 11. Cleanup and rollback
 
 Steps to completely remove the Open WebUI installation and free up resources:
 

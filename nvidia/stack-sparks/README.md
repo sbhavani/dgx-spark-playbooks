@@ -1,4 +1,4 @@
-# Connect two Sparks
+# Connect Two Sparks
 
 > Connect two Spark devices and setup them up for inference and fine-tuning
 
@@ -6,10 +6,6 @@
 
 - [Overview](#overview)
 - [Run on two Sparks](#run-on-two-sparks)
-  - [Option 1: Automatic IP Assignment (Recommended)](#option-1-automatic-ip-assignment-recommended)
-  - [Option 2: Manual IP Assignment (Advanced)](#option-2-manual-ip-assignment-advanced)
-  - [Option 1: Automatically configure SSH](#option-1-automatically-configure-ssh)
-  - [Option 2: Manually discover and configure SSH](#option-2-manually-discover-and-configure-ssh)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -104,7 +100,7 @@ Note: The interface showing as 'Up' depends on which port you are using to conne
 
 Choose one option to setup the network interfaces. Option 1 and 2 are mutually exclusive.
 
-### Option 1: Automatic IP Assignment (Recommended)
+**Option 1: Automatic IP Assignment (Recommended)**
 
 Configure network interfaces using netplan on both DGX Spark nodes for automatic
 link-local addressing:
@@ -130,7 +126,7 @@ sudo netplan apply
 
 Note: Using this option, the IPs assigned to the interfaces will change if you reboot the system.
 
-### Option 2: Manual IP Assignment (Advanced)
+**Option 2: Manual IP Assignment (Advanced)**
 
 First, identify which network ports are available and up:
 
@@ -171,7 +167,7 @@ ip addr show enp1s0f1np1
 
 ## Step 3. Set up passwordless SSH authentication
 
-### Option 1: Automatically configure SSH
+**Option 1: Automatically configure SSH**
 
 Run the DGX Spark [**discover-sparks.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/discover-sparks) script from one of the nodes to automatically discover and configure SSH:
 
@@ -192,7 +188,7 @@ SSH setup complete! Both local and remote nodes can now SSH to each other withou
 
 Note: If you encounter any errors, please follow Option 2 below to manually configure SSH and debug the issue.
 
-### Option 2: Manually discover and configure SSH
+**Option 2: Manually discover and configure SSH**
 
 You will need to find the IP addresses for the CX-7 interfaces that are up. On both nodes, run the following command to find the IP addresses and take note of them for the next step.
 ```bash

@@ -199,10 +199,3 @@ NVIDIA Sync will automatically configure SSH key-based authentication for secure
 | `dpkg: dependency problems` during install | Missing dependencies | Run `sudo apt-get install -f` |
 | VS Code won't launch with GUI error | No display server/X11 | Verify GUI desktop is running: `echo $DISPLAY` |
 | Extensions fail to install | Network connectivity or ARM64 compatibility | Check internet connection, verify extension ARM64 support |
-
-> **Note:** DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
-> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
-> the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
-```bash
-sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-```

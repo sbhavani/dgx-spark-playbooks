@@ -42,7 +42,7 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [RAG application in AI Workbench](nvidia/rag-ai-workbench/)
 - [SGLang Inference Server](nvidia/sglang/)
 - [Speculative Decoding](nvidia/speculative-decoding/)
-- [Connect two Sparks](nvidia/stack-sparks/)
+- [Connect Two Sparks](nvidia/stack-sparks/)
 - [Set up Tailscale on your Spark](nvidia/tailscale/)
 - [TRT LLM for Inference](nvidia/trt-llm/)
 - [Text to Knowledge Graph](nvidia/txt2kg/)
