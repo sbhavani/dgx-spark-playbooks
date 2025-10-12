@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
-  - [NVFP4 on Blackwell](#nvfp4-on-blackwell)
+  - [Basic Idea](#basic-idea)
 - [Instructions](#instructions)
 - [Troubleshooting](#troubleshooting)
 
@@ -14,15 +14,17 @@
 ## Overview
 
 ## Basic idea
+### Basic Idea
 
-### NVFP4 on Blackwell
+NVFP4 is a 4-bit floating-point format introduced with NVIDIA Blackwell GPUs to maintain model accuracy while reducing memory bandwidth and storage requirements for inference workloads. 
+Unlike uniform INT4 quantization, NVFP4 retains floating-point semantics with a shared exponent and a compact mantissa, allowing higher dynamic range and more stable convergence.
+NVIDIA Blackwell Tensor Cores natively support mixed-precision execution across FP16, FP8, and FP4, enabling models to use FP4 for weights and activations while accumulating in higher precision (typically FP16). 
+This design minimizes quantization error during matrix multiplications and supports efficient conversion pipelines in TensorRT-LLM for fine-tuned layer-wise quantization.
 
-- **What it is:** A new 4-bit floating-point format for NVIDIA Blackwell GPUs
-- **How it works:** Uses two levels of scaling (local per-block + global tensor) to keep accuracy while using fewer bits
-- **Why it matters:**
-  - Cuts memory use ~3.5x vs FP16 and ~1.8x vs FP8
-  - Keeps accuracy close to FP8 (usually <1% loss)
-  - Improves speed and energy efficiency for inference
+Immediate benefits are:
+  - Cut memory use ~3.5x vs FP16 and ~1.8x vs FP8
+  - Maintain accuracy close to FP8 (usually <1% loss)
+  - Improve speed and energy efficiency for inference
 
 
 ## What you'll accomplish
