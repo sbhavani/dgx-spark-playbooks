@@ -83,12 +83,11 @@ uname -m
 docker run --gpus all --rm nvcr.io/nvidia/cuda:13.0.1-runtime-ubuntu24.04 nvidia-smi
 ```
 
-If the `docker` command fails with a permission error, you can either run the command with `sudo`, or add yourself to the `docker` group to use `docker` without `sudo`. 
+If you see a permission denied error (something like permission denied while trying to connect to the Docker daemon socket), add your user to the docker group, so that you don't need to use the command with sudo .
 
 ```bash
 sudo usermod -aG docker $USER
 newgrp docker
-sudo systemctl restart docker
 ```
 
 ## Step 2. Clone the playbook repository

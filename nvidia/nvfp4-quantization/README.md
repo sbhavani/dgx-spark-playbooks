@@ -80,14 +80,12 @@ Open a new terminal and test Docker access. In the terminal, run:
 docker ps
 ```
 
-If you see a permission denied error (something like `permission denied while trying to connect to the Docker daemon socket`), add your user to the docker group:
+If you see a permission denied error (something like permission denied while trying to connect to the Docker daemon socket), add your user to the docker group so that you don't need to run the command with sudo .
 
 ```bash
 sudo usermod -aG docker $USER
+newgrp docker
 ```
-
-> **Warning**: After running usermod, you must log out and log back in to start a new
-> session with updated group permissions.
 
 ## Step 2. Prepare the environment
 
