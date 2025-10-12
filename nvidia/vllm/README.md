@@ -91,16 +91,7 @@ curl http://localhost:8000/v1/chat/completions \
 
 Expected response should contain `"content": "204"` or similar mathematical calculation.
 
-## Step 3. Troubleshooting
-
-| Symptom | Cause | Fix |
-|---------|--------|-----|
-| CUDA version mismatch errors | Wrong CUDA toolkit version | Reinstall CUDA 12.9 using exact installer |
-| Container registry authentication fails | Invalid or expired GitLab token | Generate new auth token |
-| SM_121a architecture not recognized | Missing LLVM patches | Verify SM_121a patches applied to LLVM source |
-
-
-## Step 4. Cleanup and rollback
+## Step 3. Cleanup and rollback
 
 For container approach (non-destructive):
 
@@ -116,7 +107,7 @@ To remove CUDA 12.9:
 sudo /usr/local/cuda-12.9/bin/cuda-uninstaller
 ```
 
-## Step 5. Next steps
+## Step 4. Next steps
 
 - **Production deployment:** Configure vLLM with your specific model requirements
 - **Performance tuning:** Adjust batch sizes and memory settings for your workload
@@ -127,7 +118,7 @@ sudo /usr/local/cuda-12.9/bin/cuda-uninstaller
 
 ## Step 1. Configure network connectivity
 
-Follow the network setup instructions from the Connect two Sparks playbook to establish connectivity between your DGX Spark nodes.
+Follow the network setup instructions from the [Connect two Sparks](https://build.nvidia.com/spark/stack-sparks/stacked-sparks) playbook to establish connectivity between your DGX Spark nodes.
 
 This includes:
 - Physical QSFP cable connection
@@ -339,6 +330,15 @@ http://192.168.100.10:8265
 
 ## Troubleshooting
 
+## Common issues for running on a single Spark
+
+| Symptom | Cause | Fix |
+|---------|--------|-----|
+| CUDA version mismatch errors | Wrong CUDA toolkit version | Reinstall CUDA 12.9 using exact installer |
+| Container registry authentication fails | Invalid or expired GitLab token | Generate new auth token |
+| SM_121a architecture not recognized | Missing LLVM patches | Verify SM_121a patches applied to LLVM source |
+
+## Common Issues for running on two Starks
 | Symptom | Cause | Fix |
 |---------|--------|-----|
 | Node 2 not visible in Ray cluster | Network connectivity issue | Verify QSFP cable connection, check IP configuration |
