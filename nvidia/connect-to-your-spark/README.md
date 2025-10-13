@@ -344,6 +344,6 @@ With SSH access configured, you can:
 
 | Symptom | Cause | Fix |
 |---------|--------|-----|
-| `ssh: Could not resolve hostname` | mDNS not working | Use IP address instead of .local hostname |
-| `Connection refused` | Device not booted or SSH disabled | Wait for full boot; SSH available after system updates complete |
-| `Port forwarding fails` | Service not running or port conflict | Verify remote service is active; try different local port |
+| Device name doesn't resolve | mDNS blocked on network | Use IP address instead of hostname.local |
+| Connection refused/timeout | DGX Spark not booted or SSH not ready | Wait for device boot completion; SSH available after updates finish |
+| Port forwarding fails | Service not running or port conflict | Verify remote service is active; try different local port |
