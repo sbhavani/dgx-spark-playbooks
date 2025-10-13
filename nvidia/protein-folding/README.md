@@ -121,7 +121,7 @@ space and network bandwidth.
 
 ```bash
 ## Clone OpenFold repository
-git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets
+git clone https://github.com/NVIDIA/dgx-spark-playbooks
 cd nvidia/protein-folding/assets
 pip install -e .
 ```

@@ -72,7 +72,7 @@ newgrp docker
 ## Step 2. Clone the repository
 
 ```bash
-git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets
+git clone https://github.com/NVIDIA/dgx-spark-playbooks
 cd multi-agent-chatbot/assets
 ```
 

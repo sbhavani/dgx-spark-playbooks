@@ -72,7 +72,7 @@ newgrp docker
 In a terminal, clone the repository and navigate to the flux-finetuning directory.
 
 ```bash
-git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets
+git clone https://github.com/NVIDIA/dgx-spark-playbooks
 ```
 
 ## Step 3. Model download

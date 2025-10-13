@@ -55,7 +55,7 @@ You will accelerate popular machine learning algorithms and data analytics opera
 ## Step 4. Cloning the playbook repository
 - Clone the github repository and go the assets folder place in cuda-x-data-science folder
   ```bash
-    git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets
+    git clone https://github.com/NVIDIA/dgx-spark-playbooks
   ```
 - Place the **kaggle.json** created in Step 1 in the assets folder
 

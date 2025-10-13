@@ -76,11 +76,11 @@ inference through kernel-level optimizations, efficient memory layouts, and adva
 
 ## Ancillary files
 
-All required assets can be found [here on GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main)
+All required assets can be found [here on GitHub](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main)
 
-- [**discover-sparks.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/nvidia/trt-llm/assets/discover-sparks.sh) — script to automatically discover and configure SSH between Spark nodes
-- [**trtllm-mn-entrypoint.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/nvidia/trt-llm/assets/trtllm-mn-entrypoint.sh) — container entrypoint script for multi-node setup
-- [**docker-compose.yml**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/nvidia/trt-llm/assets/docker-compose.yml) — Docker Compose configuration for multi-node deployment
+- [**discover-sparks.sh**](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main/nvidia/trt-llm/assets/discover-sparks.sh) — script to automatically discover and configure SSH between Spark nodes
+- [**trtllm-mn-entrypoint.sh**](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main/nvidia/trt-llm/assets/trtllm-mn-entrypoint.sh) — container entrypoint script for multi-node setup
+- [**docker-compose.yml**](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main/nvidia/trt-llm/assets/docker-compose.yml) — Docker Compose configuration for multi-node deployment
 
 ## Model Support Matrix
 
@@ -511,13 +511,13 @@ Run the command suggested by the docker swarm init on each worker node to join t
 docker swarm join --token <worker-token> <advertise-addr>:<port>
 ```
 
-On both nodes, download the [**trtllm-mn-entrypoint.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/nvidia/trt-llm/assets/trtllm-mn-entrypoint.sh) script into your home directory and run the following command to make it executable:
+On both nodes, download the [**trtllm-mn-entrypoint.sh**](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main/nvidia/trt-llm/assets/trtllm-mn-entrypoint.sh) script into your home directory and run the following command to make it executable:
 
 ```bash
 chmod +x $HOME/trtllm-mn-entrypoint.sh
 ```
 
-On your primary node, deploy the TRT-LLM multi-node stack by downloading the [**docker-compose.yml**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/nvidia/trt-llm/assets/docker-compose.yml) file into your home directory and running the following command:
+On your primary node, deploy the TRT-LLM multi-node stack by downloading the [**docker-compose.yml**](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main/nvidia/trt-llm/assets/docker-compose.yml) file into your home directory and running the following command:
 ```bash
 docker stack deploy -c $HOME/docker-compose.yml trtllm-multinode
 ```
