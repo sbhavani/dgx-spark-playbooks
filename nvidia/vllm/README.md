@@ -1,4 +1,4 @@
-# vLLM for Inference
+# Install and Use vLLM for Inference
 
 > Use a container or build vLLM from source for Spark
 

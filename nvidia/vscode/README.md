@@ -1,4 +1,4 @@
-# Install VS Code
+# VS Code
 
 > Install and use VS Code locally or remotely
 

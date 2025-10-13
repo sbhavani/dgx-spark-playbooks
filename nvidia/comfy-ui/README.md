@@ -1,6 +1,6 @@
 # Comfy UI
 
-> Install and use ComfyUI to generate images
+> Install and use Comfy UI to generate images
 
 ## Table of Contents
 

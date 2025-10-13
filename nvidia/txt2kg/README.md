@@ -1,6 +1,6 @@
 # Text to Knowledge Graph
 
-> Transform unstructured text into interactive knowledge graphs using local GPU-accelerated LLM inference and graph visualization
+> Transform unstructured text into interactive knowledge graphs with LLM inference and graph visualization
 
 ## Table of Contents
 
