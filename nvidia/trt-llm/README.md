@@ -97,6 +97,7 @@ The following models are supported with TensorRT-LLM on Spark. All listed models
 | **Qwen3-8B** | NVFP4 | ✅ | `nvidia/Qwen3-8B-FP4` |
 | **Qwen3-14B** | FP8 | ✅ | `nvidia/Qwen3-14B-FP8` |
 | **Qwen3-14B** | NVFP4 | ✅ | `nvidia/Qwen3-14B-FP4` |
+| **Qwen3-32B** | NVFP4 | ✅ | `nvidia/Qwen3-32B-FP4` |
 | **Phi-4-multimodal-instruct** | FP8 | ✅ | `nvidia/Phi-4-multimodal-instruct-FP8` |
 | **Phi-4-multimodal-instruct** | NVFP4 | ✅ | `nvidia/Phi-4-multimodal-instruct-FP4` |
 | **Phi-4-reasoning-plus** | FP8 | ✅ | `nvidia/Phi-4-reasoning-plus-FP8` |

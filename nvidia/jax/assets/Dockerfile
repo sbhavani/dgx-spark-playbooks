@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+#
+# Author: William Benton <wbention@nvidia.com> 
+
+
 FROM nvidia/cuda:13.0.1-runtime-ubuntu24.04
 
 RUN ldconfig
