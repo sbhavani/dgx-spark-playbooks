@@ -70,6 +70,7 @@ cd ~/nccl/
 make -j src.build NVCC_GENCODE="-gencode=arch=compute_121,code=sm_121"
 
 ## Set environment variables
+export CUDA_HOME="/usr/local/cuda"
 export MPI_HOME="/usr/lib/aarch64-linux-gnu/openmpi"
 export NCCL_HOME="$HOME/nccl/build/"
 export LD_LIBRARY_PATH="$NCCL_HOME/lib:$CUDA_HOME/lib64/:$MPI_HOME/lib:$LD_LIBRARY_PATH"
