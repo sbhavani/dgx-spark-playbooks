@@ -32,7 +32,7 @@ You will learn how to access and use the DGX Dashboard on your DGX Spark device.
 
 ## Ancillary files
 
-- Python code snippet for SDXL found [here on GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/nvidia/dgx-dashboard/assets/jupyter-cell.py)
+- Python code snippet for SDXL found [here on GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/jupyter-cell.py)
 
 
 ## Time & risk

@@ -96,8 +96,8 @@ Expected response should contain `"content": "204"` or similar mathematical calc
 For container approach (non-destructive):
 
 ```bash
-docker rm $(docker ps -aq --filter ancestor=******:5005/dl/dgx/vllm*)
-docker rmi ******:5005/dl/dgx/vllm:main-py3.31165712-devel
+docker rm $(docker ps -aq --filter ancestor=nvcr.io/nvidia/vllm:25.09-py3)
+docker rmi nvcr.io/nvidia/vllm
 ```
 
 

@@ -44,7 +44,7 @@ parameter-efficient fine-tuning methods like LoRA and QLoRA.
 
 ## Ancillary files
 
-The Python test script can be found [here on GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/nvidia/unsloth/assets/test_unsloth.py)
+The Python test script can be found [here on GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/test_unsloth.py)
 
 
 ## Time & risk
@@ -96,10 +96,10 @@ pip install --no-deps bitsandbytes
 
 ## Step 6. Create Python test script
 
-Curl the test script [here](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/nvidia/unsloth/assets/test_unsloth.py) into the container.
+Curl the test script [here](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/test_unsloth.py) into the container.
 
 ```bash
-curl -O https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/nvidia/unsloth/assets/test_unsloth.py
+curl -O https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/test_unsloth.py
 ```
 
 We will use this test script to validate the installation with a simple fine-tuning task.
