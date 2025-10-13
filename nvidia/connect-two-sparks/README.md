@@ -125,7 +125,8 @@ sudo chmod 600 /etc/netplan/40-cx7.yaml
 sudo netplan apply
 ```
 
-Note: Using this option, the IPs assigned to the interfaces will change if you reboot the system.
+> [!NOTE]
+> Using this option, the IPs assigned to the interfaces will change if you reboot the system.
 
 **Option 2: Manual IP Assignment (Advanced)**
 
@@ -187,7 +188,8 @@ You may be prompted for your password for each node.
 SSH setup complete! Both local and remote nodes can now SSH to each other without passwords.
 ```
 
-Note: If you encounter any errors, please follow Option 2 below to manually configure SSH and debug the issue.
+> [!NOTE]
+> If you encounter any errors, please follow Option 2 below to manually configure SSH and debug the issue.
 
 #### Option 2: Manually discover and configure SSH
 

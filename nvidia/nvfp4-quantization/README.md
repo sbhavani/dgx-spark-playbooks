@@ -5,7 +5,6 @@
 ## Table of Contents
 
 - [Overview](#overview)
-  - [Basic Idea](#basic-idea)
 - [Instructions](#instructions)
 - [Troubleshooting](#troubleshooting)
 
@@ -14,7 +13,6 @@
 ## Overview
 
 ## Basic idea
-### Basic Idea
 
 NVFP4 is a 4-bit floating-point format introduced with NVIDIA Blackwell GPUs to maintain model accuracy while reducing memory bandwidth and storage requirements for inference workloads. 
 Unlike uniform INT4 quantization, NVFP4 retains floating-point semantics with a shared exponent and a compact mantissa, allowing higher dynamic range and more stable convergence.

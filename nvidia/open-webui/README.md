@@ -116,11 +116,7 @@ Once complete, select "gpt-oss:20b" from the model dropdown.
 This step verifies that the complete setup is working properly by testing model
 inference through the web interface.
 
-In the chat textarea at the bottom of the Open WebUI interface, enter:
-
-```
-Write me a haiku about GPUs
-```
+In the chat text area at the bottom of the Open WebUI interface, enter: **Write me a haiku about GPUs**
 
 Press Enter to send the message and wait for the model's response.
 
@@ -303,11 +299,7 @@ Once complete, select "gpt-oss:20b" from the model dropdown.
 
 ## Step 8. Test the model
 
-In the chat textarea at the bottom of the Open WebUI interface, enter:
-
-```
-Write me a haiku about GPUs
-```
+In the chat textarea at the bottom of the Open WebUI interface, enter: **Write me a haiku about GPUs**
 
 Press Enter to send the message and wait for the model's response.
 

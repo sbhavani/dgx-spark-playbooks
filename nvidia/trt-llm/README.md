@@ -31,10 +31,10 @@
   - [Step 14. Cleanup and rollback](#step-14-cleanup-and-rollback)
   - [Step 15. Next steps](#step-15-next-steps)
 - [Open WebUI for TensorRT-LLM](#open-webui-for-tensorrt-llm)
-  - [Prerequisites](#prerequisites)
-  - [Step 1. Launch Open WebUI container](#step-1-launch-open-webui-container)
-  - [Step 2. Access the interface](#step-2-access-the-interface)
-  - [Step 3. Cleanup and rollback](#step-3-cleanup-and-rollback)
+  - [Step 1. Set up the prerequisites to use Open WebUI with TRT-LLM](#step-1-set-up-the-prerequisites-to-use-open-webui-with-trt-llm)
+  - [Step 2. Launch Open WebUI container](#step-2-launch-open-webui-container)
+  - [Step 3. Access the Open WebUI interface](#step-3-access-the-open-webui-interface)
+  - [Step 4. Cleanup and rollback](#step-4-cleanup-and-rollback)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -650,17 +650,17 @@ You can now deploy other models on your DGX Spark cluster.
 
 ## Open WebUI for TensorRT-LLM
 
-## Open WebUI for TensorRT-LLM
+### Step 1. Set up the prerequisites to use Open WebUI with TRT-LLM
 
-After setting up TensorRT-LLM inference server in either single-node or multi-node configuration, you can deploy Open WebUI to interact with your models through a user-friendly interface.
-
-### Prerequisites
+After setting up TensorRT-LLM inference server in either single-node or multi-node configuration, 
+you can deploy Open WebUI to interact with your models through Open WebUI. To get setup, just make sure the following 
+is in order
 
 - TensorRT-LLM inference server running and accessible at http://localhost:8355
 - Docker installed and configured (see earlier steps)
 - Port 3000 available on your DGX Spark
 
-### Step 1. Launch Open WebUI container
+### Step 2. Launch Open WebUI container
 
 Run the following command on the DGX Spark node where you have the TensorRT-LLM inference server running.
 For multi-node setup, this would be the primary node.
@@ -687,7 +687,7 @@ This command:
 - Enables automatic container restart
 - Uses the latest Open WebUI image
 
-### Step 2. Access the interface
+### Step 3. Access the Open WebUI interface
 
 Open your web browser and navigate to:
 
@@ -706,7 +706,7 @@ You can select your model(s) from the dropdown menu on the top left corner. That
 > [!NOTE]
 > If accessing from a remote machine, replace localhost with your DGX Spark's IP address.
 
-### Step 3. Cleanup and rollback
+### Step 4. Cleanup and rollback
 > [!WARNING]
 > This removes all chat data and may require re-uploading for future runs.
 

@@ -12,7 +12,7 @@
 
 ## Overview
 
-* Basic idea
+## Basic idea
 
 Multi-modal inference combines different data types, such as **text, images, and audio**, within a single model pipeline to generate or interpret richer outputs.  
 Instead of processing one input type at a time, multi-modal systems have shared representations that  **text-to-image generation**, **image captioning**, or **vision-language reasoning**.  
@@ -54,12 +54,16 @@ All necessary files can be found in the TensorRT repository [here on GitHub](htt
 
 ## Time & risk
 
-**Duration**: 45-90 minutes depending on model downloads and optimization steps
+- **Duration**: 45-90 minutes depending on model downloads and optimization steps
 
-**Risks**: Large model downloads may timeout; high VRAM requirements may cause OOM errors; 
-quantized models may show quality degradation
+- **Risks**: 
+  - Large model downloads may timeout
+  - High VRAM requirements may cause OOM errors
+  - Quantized models may show quality degradation
 
-**Rollback**: Remove downloaded models from HuggingFace cache, exit container environment
+- **Rollback**: 
+  - Remove downloaded models from HuggingFace cache
+  - Then exit the container environment
 
 ## Instructions
 
