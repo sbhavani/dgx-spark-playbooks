@@ -208,19 +208,16 @@ Once the container image is downloaded, continue to setup NVIDIA Sync.
 
 ## Step 4. Add Open WebUI custom port configuration
 
-Setting up a new Custom port will XXXX
+A Custom port is used to automatically start the Open WebUI container and set up port forwarding.
 
 Click the "Add New" button on the Custom tab.
 
 Fill out the form with these values:
 
-**Name**: Open WebUI
-
-**Port**: 12000
-
-**Auto open in browser at the following path**: Check this checkbox
-
-**Start Script**: Copy and paste this entire script:
+- **Name**: Open WebUI
+- **Port**: 12000
+- **Auto open in browser at the following path**: Check this checkbox
+- **Start Script**: Copy and paste this entire script:
 
 ```bash
 #!/usr/bin/env bash
@@ -265,7 +262,7 @@ echo "Running. Press Ctrl+C to stop ${NAME}."
 while :; do sleep 86400; done
 ```
 
-Click the "Add" button to save configuration to your DGX Spark.
+- Click the "Add" button to save configuration to your DGX Spark.
 
 ## Step 5. Launch Open WebUI
 
