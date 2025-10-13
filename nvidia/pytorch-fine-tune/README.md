@@ -34,7 +34,7 @@ Recipes are specifically for DIGITS SPARK. Please make sure that OS and drivers 
 
 ## Ancillary files
 
-ALl files required for fine-tuning are included in the folder in [the GitHub repository here](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}).
+ALl files required for fine-tuning are included in the folder in [the GitHub repository here](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/nvidia/pytorch-fine-tune).
 
 ## Time & risk
 
@@ -93,7 +93,7 @@ huggingface-cli login
 
 ```bash
 git clone https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets
-cd ${MODEL}/assets
+cd nvidia/pytorch-fine-tune/assets
 ```
 
 ## Step7: Run the fine-tuning recipes
