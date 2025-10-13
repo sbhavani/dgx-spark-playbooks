@@ -44,7 +44,7 @@ vision-language tasks using models like DeepSeek-V2-Lite.
 
 ## Ancillary files
 
-- An offline inference python script [found here on GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets/offline-inference.py)
+- An offline inference python script [found here on GitHub](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/nvidia/sglang/assets/offline-inference.py)
 
 ### Time & risk
 
@@ -168,7 +168,7 @@ print(f"Response: {response.json()['text']}")
 Launch a new container instance for offline inference to demonstrate local model usage without
 HTTP server. This runs entirely within the container for batch processing scenarios.
 
-TO DO: NEEDS TO HAVE SCRIPT FROM ASSETS PROPERLY INCORPORATED. [See here](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/${MODEL}/assets)
+TO DO: NEEDS TO HAVE SCRIPT FROM ASSETS PROPERLY INCORPORATED. [See here](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/nvidia/sglang/assets)
 
 ## Step 8. Validate installation
 
