@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Run on two Sparks](#run-on-two-sparks)
+- [Run on Two Sparks](#run-on-two-sparks)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -46,13 +46,13 @@ All required files for this playbook can be found [here on GitHub](https://gitla
 
 ## Time & risk
 
-**Duration:** 1 hour including validation
+- **Duration:** 1 hour including validation
 
-**Risk level:** Medium - involves network reconfiguration
+- **Risk level:** Medium - involves network reconfiguration
 
-**Rollback:** Network changes can be reversed by removing netplan configs or IP assignments
+- **Rollback:** Network changes can be reversed by removing netplan configs or IP assignments
 
-## Run on two Sparks
+## Run on Two Sparks
 
 ## Step 1. Ensure Same Username on Both Systems
 
@@ -93,8 +93,9 @@ rocep1s0f0 port 1 ==> enp1s0f0np0 (Down)
 rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
 ```
 
-Note: If none of the interfaces are showing as 'Up', please check the QSFP cable connection, reboot the systems and try again.
-Note: The interface showing as 'Up' depends on which port you are using to connect the two nodes. Each physical port has two names, for example, enp1s0f1np1 and enP2p1s0f1np1 refer to the same physical port. Please disregard enP2p1s0f0np0 and enP2p1s0f1np1, and use enp1s0f0np0 and enp1s0f1np1 only.
+> [!NOTE] 
+> If none of the interfaces are showing as 'Up', please check the QSFP cable connection, reboot the systems and try again.
+> The interface showing as 'Up' depends on which port you are using to connect the two nodes. Each physical port has two names, for example, enp1s0f1np1 and enP2p1s0f1np1 refer to the same physical port. Please disregard enP2p1s0f0np0 and enP2p1s0f1np1, and use enp1s0f0np0 and enp1s0f1np1 only.
 
 ## Step 3. Network Interface Configuration
 
@@ -167,7 +168,7 @@ ip addr show enp1s0f1np1
 
 ## Step 3. Set up passwordless SSH authentication
 
-**Option 1: Automatically configure SSH**
+#### Option 1: Automatically configure SSH
 
 Run the DGX Spark [**discover-sparks.sh**](https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets/-/blob/main/nvidia/connect-two-sparks/assets/discover-sparks) script from one of the nodes to automatically discover and configure SSH:
 
@@ -188,7 +189,7 @@ SSH setup complete! Both local and remote nodes can now SSH to each other withou
 
 Note: If you encounter any errors, please follow Option 2 below to manually configure SSH and debug the issue.
 
-**Option 2: Manually discover and configure SSH**
+#### Option 2: Manually discover and configure SSH
 
 You will need to find the IP addresses for the CX-7 interfaces that are up. On both nodes, run the following command to find the IP addresses and take note of them for the next step.
 ```bash
