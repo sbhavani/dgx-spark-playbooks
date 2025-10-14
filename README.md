@@ -50,10 +50,12 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 
 ## Resources
 
-- **Documentation**: https://docs.nvidia.com/dgx/dgx-spark/
+- **Documentation**: https://www.nvidia.com/en-us/products/workstations/dgx-spark/
 - **Developer Forum**: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
-- **Terms of Service**: https://www.nvidia.com/en-us/agreements/enterprise-software/product-specific-terms-for-ai-products/
+- **Terms of Service**: https://assets.ngc.nvidia.com/products/api-catalog/legal/NVIDIA%20API%20Trial%20Terms%20of%20Service.pdf
 
 ## License
 
+See:
 - [LICENSE](LICENSE) for licensing information.
+- [LICENSE-3rd-party](LICENSE-3rd-party) for third-party licensing information.

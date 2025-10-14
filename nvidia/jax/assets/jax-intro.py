@@ -24,7 +24,7 @@
 # limitations under the License.
 #
 #
-# Author: William Benton <wbention@nvidia.com> 
+# Author: William Benton <wbenton@nvidia.com> 
 
 import marimo
 
