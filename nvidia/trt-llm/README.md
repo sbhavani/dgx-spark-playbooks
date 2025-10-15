@@ -78,7 +78,6 @@ inference through kernel-level optimizations, efficient memory layouts, and adva
 
 All required assets can be found [here on GitHub](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main)
 
-- [**discover-sparks.sh**](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main/nvidia/trt-llm/assets/discover-sparks.sh) — script to automatically discover and configure SSH between Spark nodes
 - [**trtllm-mn-entrypoint.sh**](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main/nvidia/trt-llm/assets/trtllm-mn-entrypoint.sh) — container entrypoint script for multi-node setup
 - [**docker-compose.yml**](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main/nvidia/trt-llm/assets/docker-compose.yml) — Docker Compose configuration for multi-node deployment
 
