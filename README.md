@@ -24,7 +24,6 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [Comfy UI](nvidia/comfy-ui/)
 - [Set Up Local Network Access](nvidia/connect-to-your-spark/)
 - [Connect Two Sparks](nvidia/connect-two-sparks/)
-- [CUDA-X Data Science](nvidia/cuda-x-data-science/)
 - [DGX Dashboard](nvidia/dgx-dashboard/)
 - [FLUX.1 Dreambooth LoRA Fine-tuning](nvidia/flux-finetuning/)
 - [Optimized JAX](nvidia/jax/)
@@ -44,11 +43,10 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [TRT LLM for Inference](nvidia/trt-llm/)
 - [Text to Knowledge Graph](nvidia/txt2kg/)
 - [Unsloth on DGX Spark](nvidia/unsloth/)
-- [Vibe Coding in VS Code](nvidia/vibe-coding/)
 - [Install and Use vLLM for Inference](nvidia/vllm/)
 - [Vision-Language Model Fine-tuning](nvidia/vlm-finetuning/)
 - [VS Code](nvidia/vscode/)
-- [Video Search and Summarization](nvidia/vss/)
+- [Build a Video Search and Summarization (VSS) Agent](nvidia/vss/)
 
 ## Resources
 
