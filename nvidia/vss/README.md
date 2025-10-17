@@ -1,4 +1,4 @@
-# Video Search and Summarization
+# Build a Video Search and Summarization (VSS) Agent
 
 > Run the VSS Blueprint on your Spark
 
@@ -30,8 +30,8 @@ You will deploy NVIDIA's VSS AI Blueprint on NVIDIA Spark hardware with Blackwel
 ## Prerequisites
 
 - NVIDIA Spark device with ARM64 architecture and Blackwell GPU
-- FastOS 1.81.38 or compatible ARM64 system
-- Driver version 580.82.09 or higher installed: `nvidia-smi | grep "Driver Version"`
+- NVIDIA DGX OS 7.2.3 or higher
+- Driver version 580.95.05 or higher installed: `nvidia-smi | grep "Driver Version"`
 - CUDA version 13.0 installed: `nvcc --version`
 - Docker installed and running: `docker --version && docker compose version`
 - Access to NVIDIA Container Registry with [NGC API Key](https://org.ngc.nvidia.com/setup/api-keys)
@@ -277,6 +277,10 @@ Open these URLs in your browser:
 **[Standard VSS](https://docs.nvidia.com/vss/latest/content/architecture.html) (Hybrid Deployment)**
 
 In this hybrid deployment, we would use NIMs from [build.nvidia.com](https://build.nvidia.com/). Alternatively, you can configure your own hosted endpoints by following the instructions in the [VSS remote deployment guide](https://docs.nvidia.com/vss/latest/content/installation-remote-docker-compose.html).
+
+> [!NOTE]
+> Fully local deployment using smaller LLM (Llama 3.1 8B) is also possible.  
+> To set up a fully local VSS deployment, follow the [instructions in the VSS documentation](https://docs.nvidia.com/vss/latest/content/vss_dep_docker_compose_arm.html#local-deployment-single-gpu-dgx-spark).
 
 **9.1 Get NVIDIA API Key**
 

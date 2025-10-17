@@ -118,7 +118,7 @@ sudo /usr/local/cuda-12.9/bin/cuda-uninstaller
 
 ## Step 1. Configure network connectivity
 
-Follow the network setup instructions from the [Connect two Sparks](https://build.nvidia.com/spark/stack-sparks/stacked-sparks) playbook to establish connectivity between your DGX Spark nodes.
+Follow the network setup instructions from the [Connect two Sparks](https://build.nvidia.com/spark/connect-two-sparks) playbook to establish connectivity between your DGX Spark nodes.
 
 This includes:
 - Physical QSFP cable connection
@@ -340,7 +340,7 @@ http://192.168.100.10:8265
 | Container registry authentication fails | Invalid or expired GitLab token | Generate new auth token |
 | SM_121a architecture not recognized | Missing LLVM patches | Verify SM_121a patches applied to LLVM source |
 
-## Common Issues for running on two Starks
+## Common Issues for running on two Sparks
 | Symptom | Cause | Fix |
 |---------|--------|-----|
 | Node 2 not visible in Ray cluster | Network connectivity issue | Verify QSFP cable connection, check IP configuration |
