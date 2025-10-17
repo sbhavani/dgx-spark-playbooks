@@ -48,7 +48,7 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [Install and Use vLLM for Inference](nvidia/vllm/)
 - [Vision-Language Model Fine-tuning](nvidia/vlm-finetuning/)
 - [VS Code](nvidia/vscode/)
-- [Build a Video Search and Summarization (VSS) Agent](nvidia/vss/)
+- [Video Search and Summarization](nvidia/vss/)
 
 ## Resources
 
