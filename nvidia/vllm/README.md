@@ -340,7 +340,7 @@ http://192.168.100.10:8265
 | Container registry authentication fails | Invalid or expired GitLab token | Generate new auth token |
 | SM_121a architecture not recognized | Missing LLVM patches | Verify SM_121a patches applied to LLVM source |
 
-## Common Issues for running on two Starks
+## Common Issues for running on two Sparks
 | Symptom | Cause | Fix |
 |---------|--------|-----|
 | Node 2 not visible in Ray cluster | Network connectivity issue | Verify QSFP cable connection, check IP configuration |

@@ -52,7 +52,7 @@ All necessary files for the playbook can be found [here on GitHub](https://githu
 
 ## Step 1. Verify system requirements
 
-Check your NVIDIA Spark device meets the prerequisites for [NeMo AutoModel](https://github.com/NVIDIA-NeMo/Automodel) installation. This step runs on the host system to confirm CUDA toolkit availability and Python version compatibility.
+Check your NVIDIA Spark device meets the prerequisites for NeMo AutoModel installation. This step runs on the host system to confirm CUDA toolkit availability and Python version compatibility.
 
 ```bash
 ## Verify CUDA installation
@@ -169,19 +169,6 @@ uv run --frozen --no-sync python -c "import nemo_automodel; print('✅ NeMo Auto
 
 ## Check available examples
 ls -la examples/
-
-## Example output:
-$ ls -la examples/
-total 36
-drwxr-xr-x  9 akoumparouli domain-users 4096 Oct 16 14:52 .
-drwxr-xr-x 16 akoumparouli domain-users 4096 Oct 16 14:52 ..
-drwxr-xr-x  3 akoumparouli domain-users 4096 Oct 16 14:52 benchmark
-drwxr-xr-x  3 akoumparouli domain-users 4096 Oct 16 14:52 diffusion
-drwxr-xr-x 20 akoumparouli domain-users 4096 Oct 16 14:52 llm_finetune
-drwxr-xr-x  3 akoumparouli domain-users 4096 Oct 14 09:27 llm_kd
-drwxr-xr-x  2 akoumparouli domain-users 4096 Oct 16 14:52 llm_pretrain
-drwxr-xr-x  6 akoumparouli domain-users 4096 Oct 14 09:27 vlm_finetune
-drwxr-xr-x  2 akoumparouli domain-users 4096 Oct 14 09:27 vlm_generate
 ```
 
 ## Step 8. Explore available examples
@@ -206,37 +193,36 @@ First, export your HF_TOKEN so that gated models can be downloaded.
 export HF_TOKEN=<your_huggingface_token>
 ```
 > [!NOTE]
-> Replace `<your_huggingface_token>` with your personal Hugging Face access token. A valid token is required to download any gated model.
->
-> - Generate a token: [Hugging Face tokens](https://huggingface.co/settings/tokens), guide available [here](https://huggingface.co/docs/hub/en/security-tokens).
-> - Request and receive access on each model's page (and accept license/terms) before attempting downloads.
->   - Llama-3.1-8B: [meta-llama/Llama-3.1-8B](https://huggingface.co/meta-llama/Llama-3.1-8B)
->   - Qwen3-8B: [Qwen/Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B)
->   - Mixtral-8x7B: [mistralai/Mixtral-8x7B](https://huggingface.co/mistralai/Mixtral-8x7B)
->
-> The same steps apply for any other gated model you use: visit its model card on Hugging Face, request access, accept the license, and wait for approval.
+> Please Replace `<your_huggingface_token>` with your Hugging Face access token to access gated models (e.g., Llama).
+
+**Full Fine-tuning example:**
+
+Once inside the `Automodel` directory you cloned from github, run:
+
+```bash
+uv run --frozen --no-sync \
+examples/llm_finetune/finetune.py \
+-c examples/llm_finetune/llama3_2/llama3_2_1b_squad.yaml \
+--step_scheduler.local_batch_size 1 \
+--loss_fn._target_ nemo_automodel.components.loss.te_parallel_ce.TEParallelCrossEntropy \
+--model.pretrained_model_name_or_path Qwen/Qwen3-8B
+```
+These overrides ensure the Qwen3-8B SFT run behaves as expected:
+- `--model.pretrained_model_name_or_path`: selects the Qwen/Qwen3-8B model to fine-tune (weights fetched via your Hugging Face token).
+- `--loss_fn._target_`: uses the TransformerEngine-parallel cross-entropy loss variant compatible with tensor-parallel training for large LLMs.
+- `--step_scheduler.local_batch_size`: sets the per-GPU micro-batch size to 1 to fit in memory; overall effective batch size is still driven by gradient accumulation and data/tensor parallel settings from the recipe.
 
 **LoRA fine-tuning example:**
 
 Execute a basic fine-tuning example to validate the complete setup. This demonstrates parameter-efficient fine-tuning using a small model suitable for testing.
-For the examples below, we are using YAML for configuration, and parameter overrides are passed as command line arguments.
 
 ```bash
 ## Run basic LLM fine-tuning example
 uv run --frozen --no-sync \
 examples/llm_finetune/finetune.py \
 -c examples/llm_finetune/llama3_2/llama3_2_1b_squad_peft.yaml \
---model.pretrained_model_name_or_path meta-llama/Llama-3.1-8B \
---packed_sequence.packed_sequence_size 1024 \
---step_scheduler.max_steps 100
+--model.pretrained_model_name_or_path meta-llama/Llama-3.1-8B
 ```
-
-These overrides ensure the Llama-3.1-8B LoRA run behaves as expected:
-- `--model.pretrained_model_name_or_path`: selects the Llama-3.1-8B model to fine-tune from the Hugging Face model hub (weights fetched via your Hugging Face token).
-- `--packed_sequence.packed_sequence_size`: sets the packed sequence size to 1024 to enable packed sequence training.
-- `--step_scheduler.max_steps`: sets the maximum number of training steps. We set it to 100 for demonstation purposes, please adjust this based on your needs.
-
-
 **QLoRA fine-tuning example:**
 
 We can use QLoRA to fine-tune large models in a memory-efficient manner.
@@ -247,61 +233,50 @@ examples/llm_finetune/finetune.py \
 -c examples/llm_finetune/llama3_1/llama3_1_8b_squad_qlora.yaml \
 --model.pretrained_model_name_or_path meta-llama/Meta-Llama-3-70B \
 --loss_fn._target_ nemo_automodel.components.loss.te_parallel_ce.TEParallelCrossEntropy \
---step_scheduler.local_batch_size 1 \
---packed_sequence.packed_sequence_size 1024 \
---step_scheduler.max_steps 100
+--step_scheduler.local_batch_size 1
 ```
 
 These overrides ensure the 70B QLoRA run behaves as expected:
 - `--model.pretrained_model_name_or_path`: selects the 70B base model to fine-tune (weights fetched via your Hugging Face token).
 - `--loss_fn._target_`: uses the TransformerEngine-parallel cross-entropy loss variant compatible with tensor-parallel training for large LLMs.
 - `--step_scheduler.local_batch_size`: sets the per-GPU micro-batch size to 1 to fit 70B in memory; overall effective batch size is still driven by gradient accumulation and data/tensor parallel settings from the recipe. 
-- `--step_scheduler.max_steps`: sets the maximum number of training steps. We set it to 100 for demonstation purposes, please adjust this based on your needs.
-- `--packed_sequence.packed_sequence_size`: sets the packed sequence size to 1024 to enable packed sequence training.
 
-**Full Fine-tuning example:**
+## Step 10. Validate training output
 
-Once inside the `Automodel` directory you cloned from GitHub, run:
+Check that fine-tuning completed successfully and inspect the generated model artifacts. This confirms the training pipeline works correctly on your Spark device.
 
 ```bash
-uv run --frozen --no-sync \
-examples/llm_finetune/finetune.py \
--c examples/llm_finetune/qwen/qwen3_8b_squad_spark.yaml \
---model.pretrained_model_name_or_path Qwen/Qwen3-8B \
---step_scheduler.local_batch_size 1 \
---step_scheduler.max_steps 100 \
---packed_sequence.packed_sequence_size 1024
+## Check training logs
+ls -la logs/
+
+## Verify model checkpoint creation
+ls -la checkpoints/
+
+## Test model inference (if applicable)
+uv run python -c "
+import torch
+print('GPU available:', torch.cuda.is_available())
+print('GPU count:', torch.cuda.device_count())
+"
 ```
-These overrides ensure the Qwen3-8B SFT run behaves as expected:
-- `--model.pretrained_model_name_or_path`: selects the Qwen/Qwen3-8B model to fine-tune from the Hugging Face model hub (weights fetched via your Hugging Face token). Adjust this if you want to fine-tune a different model.
-- `--step_scheduler.max_steps`: sets the maximum number of training steps. We set it to 100 for demonstation purposes, please adjust this based on your needs.
-- `--step_scheduler.local_batch_size`: sets the per-GPU micro-batch size to 1 to fit in memory; overall effective batch size is still driven by gradient accumulation and data/tensor parallel settings from the recipe.
 
+## Step 11. Validate complete setup
 
-## Step 10. Validate successful training completion
-
-Validate the fine-tuned model by inspecting artifacts contained in the checkpoint directory.
+Perform final validation to ensure all components are working correctly. This comprehensive check confirms the environment is ready for production fine-tuning workflows.
 
 ```bash
-## Inspect logs and checkpoint output.
-## The LATEST is a symlink pointing to the latest checkpoint.
-## The checkpoint is the one that was saved during training.
-## below is an example of the expected output (username and domain-users are placeholders).
-ls -lah checkpoints/LATEST/
-
-## $ ls -lah checkpoints/LATEST/
-## total 32K
-## drwxr-xr-x 6 akoumparouli domain-users 4.0K Oct 16 22:33 .
-## drwxr-xr-x 4 akoumparouli domain-users 4.0K Oct 16 22:33 ..
-## -rw-r--r-- 1 akoumparouli domain-users 1.6K Oct 16 22:33 config.yaml
-## drwxr-xr-x 2 akoumparouli domain-users 4.0K Oct 16 22:33 dataloader
-## drwxr-xr-x 2 akoumparouli domain-users 4.0K Oct 16 22:33 model
-## drwxr-xr-x 2 akoumparouli domain-users 4.0K Oct 16 22:33 optim
-## drwxr-xr-x 2 akoumparouli domain-users 4.0K Oct 16 22:33 rng
-## -rw-r--r-- 1 akoumparouli domain-users 1.3K Oct 16 22:33 step_scheduler.pt
+## Test complete pipeline
+uv run python -c "
+import nemo_automodel
+import torch
+print('✅ NeMo AutoModel version:', nemo_automodel.__version__)
+print('✅ CUDA available:', torch.cuda.is_available())
+print('✅ GPU count:', torch.cuda.device_count())
+print('✅ Setup complete')
+"
 ```
 
-## Step 11. Cleanup and rollback (Optional)
+## Step 13. Cleanup and rollback
 
 Remove the installation and restore the original environment if needed. These commands safely remove all installed components.
 
@@ -322,42 +297,8 @@ pip3 uninstall uv
 ## Clear Python cache
 rm -rf ~/.cache/pip
 ```
-## Step 12. Optional: Publish your fine-tuned model checkpoint on Hugging Face Hub
 
-Publish your fine-tuned model checkpoint on Hugging Face Hub.
-> [!NOTE]
-> This is an optional step and is not required for using the fine-tuned model.
-> It is useful if you want to share your fine-tuned model with others or use it in other projects.
-> You can also use the fine-tuned model in other projects by cloning the repository and using the checkpoint.
-> To use the fine-tuned model in other projects, you need to have the Hugging Face CLI installed.
-> You can install the Hugging Face CLI by running `pip install huggingface-cli`.
-> For more information, please refer to the [Hugging Face CLI documentation](https://huggingface.co/docs/huggingface_hub/en/guides/cli).
-
-> [!TIP]
-> You can use the `hf` command to upload the fine-tuned model checkpoint to Hugging Face Hub.
-> For more information, please refer to the [Hugging Face CLI documentation](https://huggingface.co/docs/huggingface_hub/en/guides/cli).
-
-```bash
-## Publish the fine-tuned model checkpoint to Hugging Face Hub
-## will be published under the namespace <your_huggingface_username>/my-cool-model, adjust name as needed.
-hf upload my-cool-model checkpoints/LATEST/model
-```
-
-> [!TIP]
-> The above command can fail if you don't have write permissions to the Hugging Face Hub, with the HF_TOKEN you used.
-> Sample error message:
-> ```bash
-> akoumparouli@1604ab7-lcedt:/mnt/4tb/auto/Automodel8$ hf upload my-cool-model checkpoints/LATEST/model
-> Traceback (most recent call last):
->   File "/home/akoumparouli/.local/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 409, in hf_raise_for_status
->     response.raise_for_status()
->   File "/home/akoumparouli/.local/lib/python3.10/site-packages/requests/models.py", line 1024, in raise_for_status
->     raise HTTPError(http_error_msg, response=self)
-> requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://huggingface.co/api/repos/create
-> ```
-> To fix this, you need to create an access token with *write* permissions, please see the Hugging Face guide [here](https://huggingface.co/docs/hub/en/security-tokens) for instructions.
-
-## Step 12. Next steps
+## Step 14. Next steps
 
 Begin using NeMo AutoModel for your specific fine-tuning tasks. Start with provided recipes and customize based on your model requirements and dataset.
 
@@ -369,7 +310,7 @@ cp recipes/llm_finetune/finetune.py my_custom_training.py
 ## Then run: uv run my_custom_training.py
 ```
 
-Explore the [NeMo AutoModel GitHub repository](https://github.com/NVIDIA-NeMo/Automodel) for more recipes, documentation, and community examples. Consider setting up custom datasets, experimenting with different model architectures, and scaling to multi-node distributed training for larger models.
+Explore the [NeMo AutoModel GitHub repository](https://github.com/NVIDIA-NeMo/Automodel) for advanced recipes, documentation, and community examples. Consider setting up custom datasets, experimenting with different model architectures, and scaling to multi-node distributed training for larger models.
 
 ## Troubleshooting
 
@@ -383,8 +324,8 @@ Explore the [NeMo AutoModel GitHub repository](https://github.com/NVIDIA-NeMo/Au
 | Cannot access gated repo for URL | Certain HuggingFace models have restricted access | Regenerate your [HuggingFace token](https://huggingface.co/docs/hub/en/security-tokens); and request access to the [gated model](https://huggingface.co/docs/hub/en/models-gated#customize-requested-information) on your web browser |
 
 > [!NOTE]
-> DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU.
-> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within
+> DGX Spark uses a Unified Memory Architecture (UMA), which enables dynamic memory sharing between the GPU and CPU. 
+> With many applications still updating to take advantage of UMA, you may encounter memory issues even when within 
 > the memory capacity of DGX Spark. If that happens, manually flush the buffer cache with:
 ```bash
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'

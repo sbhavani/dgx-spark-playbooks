@@ -167,7 +167,10 @@ Add additional model entries for any other Ollama models you wish to host remote
 ## Common Issues
 
 **1. Ollama not starting**
-- Verify Docker and GPU drivers are installed correctly. 
+- Verify GPU drivers are installed correctly.
+  Run `nvidia-smi` in the terminal. If the command fails check DGX Dashboard for updates to your DGX Spark.
+  If there are no updates or updates do not correct the issue, create a thread on the DGX Spark/GB10 User forum here :
+    https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10/dgx-spark-gb10/
 - Run `ollama serve` on the DGX Spark to view Ollama logs.
 
 **2. Continue can't connect over the network**
