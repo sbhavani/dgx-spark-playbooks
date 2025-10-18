@@ -414,7 +414,7 @@ docker rmi nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev
 
 ### Step 1. Configure network connectivity
 
-Follow the network setup instructions from the [Connect two Sparks](https://build.nvidia.com/spark/stack-sparks/stacked-sparks) playbook to establish connectivity between your DGX Spark nodes.
+Follow the network setup instructions from the [Connect two Sparks](https://build.nvidia.com/spark/connect-two-sparks/stacked-sparks) playbook to establish connectivity between your DGX Spark nodes.
 
 This includes:
 - Physical QSFP cable connection

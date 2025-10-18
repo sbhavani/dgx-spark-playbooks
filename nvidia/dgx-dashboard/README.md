@@ -126,6 +126,11 @@ Verify your setup by running a simple Stable Diffusion XL image generation examp
 3. Add a new cell and paste the following code:
 
 ```python
+import warnings
+warnings.filterwarnings('ignore', message='.*cuda capability.*')
+import tqdm.auto
+tqdm.auto.tqdm = tqdm.std.tqdm
+
 from diffusers import DiffusionPipeline
 import torch
 from PIL import Image
