@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import remoteBackendInstance from '@/lib/remote-backend';
-import { Neo4jService } from '@/lib/neo4j';
-import neo4jService from '@/lib/neo4j';
+import { getGraphDbService } from '@/lib/graph-db-util';
+import { getGraphDbType } from '../settings/route';
 import { PineconeService } from '@/lib/pinecone';
 import RAGService from '@/lib/rag';
 import queryLoggerService, { QueryLogSummary } from '@/lib/query-logger';
@@ -11,16 +11,31 @@ import queryLoggerService, { QueryLogSummary } from '@/lib/query-logger';
  */
 export async function GET(request: NextRequest) {
   try {
-    // Initialize services
-    const neo4j = Neo4jService.getInstance();
+    // Initialize services with the correct graph database type
+    const graphDbType = getGraphDbType();
+    const graphDbService = getGraphDbService(graphDbType);
     const pineconeService = PineconeService.getInstance();
     
-    if (!neo4j.isInitialized()) {
-      neo4j.initialize();
+    // Initialize graph database if needed
+    if (!graphDbService.isInitialized()) {
+      if (graphDbType === 'arangodb') {
+        await graphDbService.initialize(
+          process.env.ARANGODB_URL,
+          process.env.ARANGODB_DB,
+          process.env.ARANGODB_USER,
+          process.env.ARANGODB_PASSWORD
+        );
+      } else if (graphDbType === 'neo4j') {
+        graphDbService.initialize(
+          process.env.NEO4J_URI,
+          process.env.NEO4J_USER || process.env.NEO4J_USERNAME,
+          process.env.NEO4J_PASSWORD
+        );
+      }
     }
     
-    // Get graph stats from Neo4j
-    const graphData = await neo4j.getGraphData();
+    // Get graph stats from the active graph database
+    const graphData = await graphDbService.getGraphData();
     
     // Get unique entities (nodes)
     const uniqueEntities = new Set<string>();
