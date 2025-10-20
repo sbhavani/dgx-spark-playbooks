@@ -74,7 +74,7 @@ services:
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility  # Required capabilities for CUDA
       - OLLAMA_FLASH_ATTENTION=1          # Enable flash attention for better performance
       - OLLAMA_KEEP_ALIVE=30m             # Keep models loaded for 30 minutes
-      - OLLAMA_NUM_PARALLEL=1             # Process one request at a time for 70B models
+      - OLLAMA_NUM_PARALLEL=4             # Process 4 requests in parallel - DGX Spark has unified memory
       - OLLAMA_MAX_LOADED_MODELS=1        # Load only one model at a time to avoid VRAM contention
       - OLLAMA_KV_CACHE_TYPE=q8_0         # Reduce KV cache VRAM usage with minimal performance impact
     networks:
