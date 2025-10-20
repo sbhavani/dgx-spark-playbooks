@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Network, Database, Zap, AlertCircle, RefreshCw, ChevronDown, ChevronUp, InfoIcon, Trash2 } from "lucide-react"
+import { Network, Database, Zap, AlertCircle, RefreshCw, ChevronDown, ChevronUp, InfoIcon, Trash2, LogOut } from "lucide-react"
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Button } from "@/components/ui/button"
@@ -364,39 +364,65 @@ export function DatabaseConnection({ className }: DatabaseConnectionProps) {
             )}
             
             <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={checkGraphConnection}
-                disabled={graphConnectionStatus === "checking"}
-                className="flex-1 text-xs h-7"
-              >
-                {graphConnectionStatus === "checking" ? "Checking..." : "Refresh"}
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={checkGraphConnection}
+                      disabled={graphConnectionStatus === "checking"}
+                      className="flex-1 text-xs h-7 px-2"
+                    >
+                      <RefreshCw className={`h-3 w-3 ${graphConnectionStatus === "checking" ? "animate-spin" : ""}`} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{graphConnectionStatus === "checking" ? "Checking..." : "Refresh connection"}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               
               {graphConnectionStatus === "connected" ? (
                 <>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={disconnectGraph}
-                    className="flex-1 text-xs h-7"
-                  >
-                    Disconnect
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={disconnectGraph}
+                          className="flex-1 text-xs h-7 px-2"
+                        >
+                          <LogOut className="h-3 w-3" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Disconnect</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   
                   <Dialog open={showClearDialog} onOpenChange={setShowClearDialog}>
-                    <DialogTrigger asChild>
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
-                        className="flex-1 text-xs h-7"
-                        disabled={isClearingDB}
-                      >
-                        <Trash2 className="h-3 w-3 mr-1" />
-                        Clear
-                      </Button>
-                    </DialogTrigger>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <DialogTrigger asChild>
+                            <Button 
+                              variant="destructive" 
+                              size="sm" 
+                              className="flex-1 text-xs h-7 px-2"
+                              disabled={isClearingDB}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </DialogTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Clear database</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle className="text-destructive">Clear Database</DialogTitle>
