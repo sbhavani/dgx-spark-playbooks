@@ -12,6 +12,7 @@ import { ArrowLeft, BarChart2, Search as SearchIcon } from "lucide-react";
 export default function RagPage() {
   const router = useRouter();
   const [results, setResults] = useState<Triple[] | null>(null);
+  const [llmAnswer, setLlmAnswer] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [vectorEnabled, setVectorEnabled] = useState(false);
@@ -84,6 +85,14 @@ export default function RagPage() {
     let resultCount = 0;
     let relevanceScore = 0;
     
+    // Debug logging
+    console.log('🔍 Query params:', {
+      usePureRag: params.usePureRag,
+      useVectorSearch: params.useVectorSearch,
+      vectorEnabled,
+      queryMode: params.queryMode
+    });
+    
     try {
       // If using pure RAG (Pinecone + LangChain) without graph search
       if (params.usePureRag) {
@@ -136,8 +145,8 @@ export default function RagPage() {
         }
       }
       
-      // If we have vector embeddings, use enhanced query with metadata
-      if (vectorEnabled && params.useVectorSearch) {
+      // If we have vector embeddings AND explicitly selected vector search, use enhanced query with metadata
+      if (vectorEnabled && params.useVectorSearch && !params.usePureRag) {
         queryMode = 'vector-search';
         try {
           console.log('Using enhanced RAG with LangChain for query:', query);
@@ -184,35 +193,71 @@ export default function RagPage() {
         }
       }
       
-      // Call the traditional backend API as fallback or if explicitly selected
+      // Call the LLM-enhanced graph query API
+      console.log('✅ Using Traditional Graph + LLM approach');
       queryMode = 'traditional';
-      const response = await fetch(`/api/query`, {
+      
+      // Get selected LLM model from localStorage
+      let llmModel = undefined;
+      let llmProvider = undefined;
+      try {
+        const savedModel = localStorage.getItem("selectedModelForRAG");
+        if (savedModel) {
+          const modelData = JSON.parse(savedModel);
+          llmModel = modelData.model;
+          llmProvider = modelData.provider;
+          console.log(`Using LLM: ${llmModel} (${llmProvider})`);
+        }
+      } catch (e) {
+        console.warn("Could not load selected LLM model, using default");
+      }
+      
+      const response = await fetch(`/api/graph-query-llm`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           query,
-          kNeighbors: params.kNeighbors,
-          fanout: params.fanout,
-          numHops: params.numHops,
-          topK: params.topK,
-          queryMode: queryMode, // Explicitly pass the query mode
-          useTraditional: true  // Force use of the direct pattern matching approach
+          topK: params.topK || 5,
+          useTraditional: true,
+          llmModel,
+          llmProvider
         }),
       });
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to query the RAG backend');
+        throw new Error(errorData.error || 'Failed to query with LLM');
       }
       
       const data = await response.json();
       
-      // Update the results
-      setResults(data.relevantTriples || []);
+      // Log the retrieved triples for debugging
+      console.log('📊 Retrieved Triples:', data.triples);
+      console.log('🤖 LLM-Generated Answer:', data.answer);
+      console.log('📈 Triple Count:', data.count);
+      
+      // Update the results with the triples (for display)
+      setResults(data.triples || []);
       resultCount = data.count || 0;
-      relevanceScore = data.relevanceScore || 0;
+      relevanceScore = 0; // No relevance score for traditional search
+      
+      // Store the LLM answer for display
+      console.log('🔍 Checking answer:', { 
+        hasAnswer: !!data.answer, 
+        answerLength: data.answer?.length,
+        answerPreview: data.answer?.substring(0, 100)
+      });
+      
+      if (data.answer) {
+        console.log('💬 Full Answer:', data.answer);
+        console.log('✅ Setting llmAnswer state');
+        setLlmAnswer(data.answer);
+      } else {
+        console.log('⚠️ No answer in response, setting null');
+        setLlmAnswer(null);
+      }
       
       // Log the query with performance metrics
       logQuery(query, queryMode, {
@@ -279,6 +324,7 @@ export default function RagPage() {
 
   const clearResults = () => {
     setResults(null);
+    setLlmAnswer(null);
     setErrorMessage(null);
   };
 
@@ -349,6 +395,23 @@ export default function RagPage() {
               vectorEnabled={vectorEnabled}
             />
             
+            {/* LLM Answer Section */}
+            {llmAnswer && (
+              <div className="mt-8 nvidia-build-card">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-6 h-6 rounded-md bg-nvidia-green/15 flex items-center justify-center">
+                    <SearchIcon className="h-3 w-3 text-nvidia-green" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">Answer</h3>
+                </div>
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <div className="bg-muted/20 border border-border/20 p-6 rounded-xl">
+                    <p className="text-foreground leading-relaxed whitespace-pre-wrap">{llmAnswer}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {/* Results Section */}
             {results && results.length > 0 && (
               <div className="mt-8 nvidia-build-card">
@@ -356,7 +419,9 @@ export default function RagPage() {
                   <div className="w-6 h-6 rounded-md bg-nvidia-green/15 flex items-center justify-center">
                     <SearchIcon className="h-3 w-3 text-nvidia-green" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground">Results ({results.length})</h3>
+                  <h3 className="text-lg font-semibold text-foreground">
+                    {llmAnswer ? `Supporting Triples (${results.length})` : `Results (${results.length})`}
+                  </h3>
                 </div>
                 <div className="space-y-4">
                   {results.map((triple, index) => (
