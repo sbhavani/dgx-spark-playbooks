@@ -29,7 +29,7 @@ You will accelerate popular machine learning algorithms and data analytics opera
 
 ## Time & risk
 * **Duration:** 20-30 minutes setup time and 2-3 minutes to run each notebook. 
-* **Risk level:** 
+* **Risks:** 
   * Data download slowness or failure due to network issues
   * Kaggle API generation failure requiring retries
 * **Rollback:** No permanent system changes made during normal usage.
@@ -42,19 +42,18 @@ You will accelerate popular machine learning algorithms and data analytics opera
 - Create Kaggle API key using [these instructions](https://www.kaggle.com/discussions/general/74235) and place the **kaggle.json** file in the same folder as the notebook
 
 ## Step 2. Installing Data Science libraries
-- Use the following command to install the CUDA-X libraries (this will create a new conda environment)
+Use the following command to install the CUDA-X libraries (this will create a new conda environment)
   ```bash
     conda create -n rapids-test -c rapidsai-nightly -c conda-forge -c nvidia  \
     rapids=25.10 python=3.12 'cuda-version=13.0' \
     jupyter hdbscan umap-learn
   ```
 ## Step 3. Activate the conda environment
-- Activate the conda environment
   ```bash
     conda activate rapids-test
   ```
 ## Step 4. Cloning the playbook repository
-- Clone the github repository and go the assets folder place in cuda-x-data-science folder
+- Clone the github repository and go the assets folder place in **cuda-x-data-science** folder
   ```bash
     git clone https://github.com/NVIDIA/dgx-spark-playbooks
   ```
@@ -63,12 +62,12 @@ You will accelerate popular machine learning algorithms and data analytics opera
 ## Step 5. Run the notebooks
 There are two notebooks in the GitHub repository. 
 One runs an example of a large strings data processing workflow with pandas code on GPU.
-- Run the cudf_pandas_demo.ipynb notebook and use `localhost:8888` in your browser to access the notebook
+- Run the **cudf_pandas_demo.ipynb** notebook and use `localhost:8888` in your browser to access the notebook
   ```bash
     jupyter notebook cudf_pandas_demo.ipynb
   ```
 The other goes over an example of machine learning algorithms including UMAP and HDBSCAN.
-- Run the cuml_sklearn_demo.ipynb notebook and use `localhost:8888` in your browser to access the notebook
+- Run the **cuml_sklearn_demo.ipynb** notebook and use `localhost:8888` in your browser to access the notebook
   ```bash
     jupyter notebook cuml_sklearn_demo.ipynb
   ```
