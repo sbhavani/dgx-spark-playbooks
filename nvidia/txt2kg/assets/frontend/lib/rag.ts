@@ -51,7 +51,7 @@ export class RAGService {
     }
 
     this.isInitializing = true;
-    
+
     try {
       console.log('Initializing RAG service...');
 
@@ -59,18 +59,24 @@ export class RAGService {
       await this.pineconeService.initialize();
       await this.embeddingsService.initialize();
 
-      // Initialize LLM - Try NVIDIA first, then fall back to error
-      const nvidiaApiKey = process.env.NVIDIA_API_KEY;
-      if (!nvidiaApiKey) {
-        throw new Error('RAG service requires NVIDIA_API_KEY to be set in environment variables. xAI integration has been removed.');
-      }
-      
-      // Note: This is a placeholder - NVIDIA LLM integration would need to be implemented
-      // For now, we'll throw an error to indicate RAG service is not available
-      throw new Error('RAG service is temporarily unavailable after xAI removal. Please implement alternative LLM provider.');
+      // Initialize LLM - Use Ollama (running on port 11434)
+      const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434/v1';
+      const ollamaModel = process.env.OLLAMA_MODEL || 'llama3.1:8b';
+
+      console.log(`Initializing Ollama LLM at ${ollamaBaseUrl} with model ${ollamaModel}`);
+
+      this.llm = new ChatOpenAI({
+        openAIApiKey: 'ollama', // Dummy key for Ollama
+        modelName: ollamaModel,
+        temperature: 0.1,
+        maxTokens: 2048,
+        configuration: {
+          baseURL: ollamaBaseUrl
+        }
+      });
 
       this.initialized = true;
-      console.log('RAG service initialized successfully');
+      console.log('RAG service initialized successfully with Ollama LLM');
     } catch (error) {
       console.error('Error initializing RAG service:', error);
       throw error;

@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     console.log(`Using embeddings provider: ${process.env.EMBEDDINGS_PROVIDER || 'local'}`);
     
     // Generate chunks from content
-    const chunkSize = 200; // Size of each text chunk
+    const chunkSize = 1000; // Size of each text chunk (increased from 200 for better context)
     const chunks = generateChunks(content, chunkSize);
     console.log(`Generated ${chunks.length} chunks from document`);
     
@@ -104,10 +104,10 @@ export async function POST(request: NextRequest) {
  * Generate chunks from text content
  * @param content Text content
  * @param chunkSize Size of each chunk
- * @param overlap Overlap between chunks
+ * @param overlap Overlap between chunks (default 20% of chunk size)
  * @returns Array of text chunks
  */
-function generateChunks(content: string, chunkSize: number, overlap: number = 50): string[] {
+function generateChunks(content: string, chunkSize: number, overlap: number = 200): string[] {
   const chunks: string[] = [];
   const sentences = content.split(/(?<=[.!?])\s+/);
   
