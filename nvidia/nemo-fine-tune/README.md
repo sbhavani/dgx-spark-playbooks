@@ -170,18 +170,18 @@ uv run --frozen --no-sync python -c "import nemo_automodel; print('✅ NeMo Auto
 ## Check available examples
 ls -la examples/
 
-## Example output:
-$ ls -la examples/
-total 36
-drwxr-xr-x  9 akoumparouli domain-users 4096 Oct 16 14:52 .
-drwxr-xr-x 16 akoumparouli domain-users 4096 Oct 16 14:52 ..
-drwxr-xr-x  3 akoumparouli domain-users 4096 Oct 16 14:52 benchmark
-drwxr-xr-x  3 akoumparouli domain-users 4096 Oct 16 14:52 diffusion
-drwxr-xr-x 20 akoumparouli domain-users 4096 Oct 16 14:52 llm_finetune
-drwxr-xr-x  3 akoumparouli domain-users 4096 Oct 14 09:27 llm_kd
-drwxr-xr-x  2 akoumparouli domain-users 4096 Oct 16 14:52 llm_pretrain
-drwxr-xr-x  6 akoumparouli domain-users 4096 Oct 14 09:27 vlm_finetune
-drwxr-xr-x  2 akoumparouli domain-users 4096 Oct 14 09:27 vlm_generate
+## Below is an example of the expected output (username and domain-users are placeholders).
+## $ ls -la examples/
+## total 36
+## drwxr-xr-x  9 username domain-users 4096 Oct 16 14:52 .
+## drwxr-xr-x 16 username domain-users 4096 Oct 16 14:52 ..
+## drwxr-xr-x  3 username domain-users 4096 Oct 16 14:52 benchmark
+## drwxr-xr-x  3 username domain-users 4096 Oct 16 14:52 diffusion
+## drwxr-xr-x 20 username domain-users 4096 Oct 16 14:52 llm_finetune
+## drwxr-xr-x  3 username domain-users 4096 Oct 14 09:27 llm_kd
+## drwxr-xr-x  2 username domain-users 4096 Oct 16 14:52 llm_pretrain
+## drwxr-xr-x  6 username domain-users 4096 Oct 14 09:27 vlm_finetune
+## drwxr-xr-x  2 username domain-users 4096 Oct 14 09:27 vlm_generate
 ```
 
 ## Step 8. Explore available examples
@@ -291,14 +291,14 @@ ls -lah checkpoints/LATEST/
 
 ## $ ls -lah checkpoints/LATEST/
 ## total 32K
-## drwxr-xr-x 6 akoumparouli domain-users 4.0K Oct 16 22:33 .
-## drwxr-xr-x 4 akoumparouli domain-users 4.0K Oct 16 22:33 ..
-## -rw-r--r-- 1 akoumparouli domain-users 1.6K Oct 16 22:33 config.yaml
-## drwxr-xr-x 2 akoumparouli domain-users 4.0K Oct 16 22:33 dataloader
-## drwxr-xr-x 2 akoumparouli domain-users 4.0K Oct 16 22:33 model
-## drwxr-xr-x 2 akoumparouli domain-users 4.0K Oct 16 22:33 optim
-## drwxr-xr-x 2 akoumparouli domain-users 4.0K Oct 16 22:33 rng
-## -rw-r--r-- 1 akoumparouli domain-users 1.3K Oct 16 22:33 step_scheduler.pt
+## drwxr-xr-x 6 username domain-users 4.0K Oct 16 22:33 .
+## drwxr-xr-x 4 username domain-users 4.0K Oct 16 22:33 ..
+## -rw-r--r-- 1 username domain-users 1.6K Oct 16 22:33 config.yaml
+## drwxr-xr-x 2 username domain-users 4.0K Oct 16 22:33 dataloader
+## drwxr-xr-x 2 username domain-users 4.0K Oct 16 22:33 model
+## drwxr-xr-x 2 username domain-users 4.0K Oct 16 22:33 optim
+## drwxr-xr-x 2 username domain-users 4.0K Oct 16 22:33 rng
+## -rw-r--r-- 1 username domain-users 1.3K Oct 16 22:33 step_scheduler.pt
 ```
 
 ## Step 11. Cleanup and rollback (Optional)
