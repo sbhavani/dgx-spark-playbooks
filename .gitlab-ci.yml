@@ -1,0 +1,43 @@
+# Global variables - these are additive with included pipeline vars
+.models:
+  - MODEL:
+    - nvidia/comfy-ui
+    - nvidia/connect-to-your-spark
+    - nvidia/cuda-x-data-science
+    - nvidia/dgx-dashboard
+    - nvidia/flux-finetuning
+    - nvidia/jax
+    - nvidia/llama-factory
+
+variables:
+  # Base URLs used for substitution in ux-conf.yaml
+  GITLAB_ASSET_BASEURL: "https://github.com/NVIDIA/dgx-spark-playbooks/blob/main"
+  GITLAB_REPO_BASEURL: "https://github.com/NVIDIA/dgx-spark-playbooks"
+
+  # Source repository for assets (internal GitLab)
+  SRC_ASSETS_URL: "https://gitlab-master.nvidia.com/spark-playbooks/dgx-spark-playbook.git"
+  
+  # Destination repositories (JSON array format for parsing in script)
+  # Cutover to Github.com supported via the public_github alias
+  # Format: [{"alias": "name", "url": "git-url", "token_var": "ENV_VAR_NAME"}, ...]
+  #### All publishing: DST_REPOS_JSON: '[{"alias":"public_gitlab","url":"https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets","token_var":"GITLAB_TOKEN_DGX_SPARK_PLAYBOOKS"}, {"alias":"public_github","url":"git@github.com:NVIDIA/dgx-spark-playbooks.git","token_var":"GITHUB_TOKEN_DGX_SPARK_PLAYBOOKS"}]'
+
+  # Only publish to temp gitlab location for testing
+  DST_REPOS_JSON: '[{"alias":"public_gitlab","url":"https://gitlab.com/nvidia/spark-playbooks/test-spark-playbooks","token_var":"GITLAB_TOKEN_DGX_SPARK_PLAYBOOKS"}]'
+  
+  # Forbidden reference patterns (regex) - blocks internal references in public docs
+  # Job will FAIL if these patterns are detected in generated markdown
+  # Override in GitLab UI if needed: Settings > CI/CD > Variables
+  FORBIDDEN_PATTERNS_JSON: '["sw-docs-dgx-station","gitlab-master\\.nvidia\\.com","urm\\.nvidia\\.com"]'
+  
+  # Root files to copy from source assets repo (glob patterns)
+  # These files are copied from source assets repo root to each destination repo root
+  ROOT_FILE_GLOBS_JSON: '["LICENSE*","CONTRIBUTING.md","CODE_OF_CONDUCT.md"]'
+  
+  # Root directories to copy from project root (directory names)
+  # These directories are copied from CI project root to each destination repo root
+  # Used for images and assets referenced in README-Public.md
+  ROOT_DIRS_JSON: '["src"]'
+
+  # Models to skip from publication to Github/Gitlab (this does not affect build.nvidia.com publication)
+  SKIP_MODELS_JSON: '["nvidia/monai-reasoning", "nvidia/protein-folding", "nvidia/sglang"]'

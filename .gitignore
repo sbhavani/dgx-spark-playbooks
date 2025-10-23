@@ -1,0 +1,28 @@
+# Ignore saved model directories
+saved_model/
+data/
+
+# Python cache files
+__pycache__/
+*.pyc
+.cache/
+unsloth_compiled_cache/
+
+# Virtual environments
+.venv/
+venv/
+.env
+
+# Weights & Biases
+wandb/
+
+# Model files
+*.pt
+*.pth
+*.npz
+*.safetensors
+
+# IDE files
+.vscode/
+.DS_Store
+
