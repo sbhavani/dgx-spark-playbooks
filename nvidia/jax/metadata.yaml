@@ -1,0 +1,30 @@
+catalog_name: nvidia/jax
+kind: PLAYBOOK
+name: jax
+displayName: Optimized JAX
+short_description: Optimize JAX to Run on Spark
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 2 HRS
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: JAX Documentation
+  url: https://docs.jax.dev/en/latest/
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
+cta:
+  text: View on GitHub
+  url: ${GITLAB_ASSET_BASEURL}/${MODEL}/

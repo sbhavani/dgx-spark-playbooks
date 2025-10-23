@@ -1,0 +1,28 @@
+catalog_name: nvidia/llama-factory
+kind: PLAYBOOK
+name: llama-factory
+displayName: LLaMA Factory
+short_description: Install and fine-tune models with LLaMA Factory
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 1 HR
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
+cta:
+  text: View GitHub
+  url: https://github.com/hiyouga/LLaMA-Factory

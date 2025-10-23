@@ -1,0 +1,34 @@
+catalog_name: nvidia/flux-finetuning
+kind: PLAYBOOK
+name: flux-finetuning
+displayName: FLUX.1 Dreambooth LoRA Fine-tuning
+short_description: Fine-tune FLUX.1-dev 12B model using Dreambooth LoRA for custom
+  image generation
+publisher: nvidia
+labels:
+- DGX
+- Spark
+- Text-to-Image
+- Image Generation
+- Fine-tuning
+- LoRA
+- ComfyUI
+duration: 1 HR
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
+cta:
+  text: View on GitHub
+  url: ${GITLAB_ASSET_BASEURL}/${MODEL}
