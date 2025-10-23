@@ -1,0 +1,34 @@
+catalog_name: nvidia/cuda-x-data-science
+kind: PLAYBOOK
+name: cuda-x-data-science
+displayName: CUDA-X Data Science
+short_description: Install and use NVIDIA cuML and NVIDIA cuDF to accelerate UMAP,
+  HDBSCAN, pandas and more with zero code changes
+publisher: nvidia
+labels:
+- DGX
+- Spark
+- pandas
+- clustering
+- data science
+- data analytics
+- dimensionality reduction
+- machine learning
+duration: 30 MIN
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+resources:
+- name: NVIDIA RAPIDS Documentation
+  url: https://docs.rapids.ai/index.html
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark DevZone Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
+cta:
+  text: View on GitHub
+  url: ${GITLAB_ASSET_BASEURL}/${MODEL}/

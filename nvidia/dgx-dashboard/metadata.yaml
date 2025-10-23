@@ -1,0 +1,28 @@
+catalog_name: nvidia/dgx-dashboard
+kind: PLAYBOOK
+name: dgx-dashboard
+displayName: DGX Dashboard
+short_description: Monitor your DGX system and launch JupyterLab
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 30 MIN
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
+cta:
+  text: View on GitHub
+  url: ${GITLAB_ASSET_BASEURL}/${MODEL}/

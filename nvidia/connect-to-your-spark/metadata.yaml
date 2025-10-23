@@ -1,0 +1,28 @@
+catalog_name: nvidia/connect-to-your-spark
+kind: PLAYBOOK
+name: connect-to-your-spark
+displayName: Set Up Local Network Access
+short_description: NVIDIA Sync helps set up and configure SSH access
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 5 MIN
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: sync
+  label: Connect with NVIDIA Sync
+  filename: sync.md
+- id: manual-ssh
+  label: Connect with Manual SSH
+  filename: manual-ssh.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10

@@ -1,0 +1,28 @@
+catalog_name: nvidia/connect-two-sparks
+kind: PLAYBOOK
+name: connect-two-sparks
+displayName: Connect Two Sparks
+short_description: Connect two Spark devices and setup them up for inference and fine-tuning
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 1 HR
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: stacked-sparks
+  label: Run on Two Sparks
+  filename: stacked-sparks.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
+cta:
+  text: View on GitHub
+  url: ${GITLAB_ASSET_BASEURL}/${MODEL}/
