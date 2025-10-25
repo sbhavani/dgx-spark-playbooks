@@ -39,7 +39,7 @@ export function RagQuery({
     kNeighbors: 4096,
     fanout: 400,
     numHops: 2,
-    topK: 5,
+    topK: 40,  // Increased to 40 for multi-hop paths (was 20, originally 5)
     useVectorSearch: false,
     usePureRag: false,
     queryMode: 'traditional'
@@ -327,7 +327,7 @@ export function RagQuery({
                 <input
                   type="range"
                   min="1"
-                  max="20"
+                  max="50"
                   step="1"
                   value={params.topK}
                   onChange={(e) => updateParam('topK', parseInt(e.target.value))}
