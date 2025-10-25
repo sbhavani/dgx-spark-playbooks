@@ -814,20 +814,21 @@ function TriplesContent({
         <h4 className="text-sm font-semibold text-foreground">Processing Options</h4>
         
         <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Switch 
-              id="use-langchain-triples" 
+          {/* Hidden: Use LangChain toggle - LangChain is always used for triple extraction */}
+          {/* <div className="flex items-center space-x-2">
+            <Switch
+              id="use-langchain-triples"
               checked={useLangChain}
               onCheckedChange={setUseLangChain}
               disabled={isProcessing}
             />
             <Label htmlFor="use-langchain-triples" className="text-sm cursor-pointer">Use LangChain</Label>
-          </div>
+          </div> */}
           {/* <p className="text-xs text-muted-foreground pl-7">
             Leverages LangChain for knowledge extraction from documents
           </p> */}
-          
-          {useLangChain && (
+
+          {false && useLangChain && (
             <div className="mt-3">
               <AdvancedOptions title="LangChain Options" defaultOpen={false}>
                 <div className="space-y-3">

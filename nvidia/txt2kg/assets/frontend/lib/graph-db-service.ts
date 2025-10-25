@@ -167,6 +167,30 @@ export class GraphDBService {
   }
 
   /**
+   * Perform graph traversal using native database capabilities
+   * Only available for ArangoDB
+   */
+  public async graphTraversal(
+    keywords: string[],
+    maxDepth: number = 2,
+    maxResults: number = 100
+  ): Promise<Array<{
+    subject: string;
+    predicate: string;
+    object: string;
+    confidence: number;
+    depth?: number;
+  }>> {
+    if (this.activeDBType === 'arangodb') {
+      return await this.arangoDBService.graphTraversal(keywords, maxDepth, maxResults);
+    } else {
+      // Neo4j doesn't have this method yet, return empty array
+      console.warn('graphTraversal is only available for ArangoDB');
+      return [];
+    }
+  }
+
+  /**
    * Clear all data from the active graph database
    */
   public async clearDatabase(): Promise<void> {

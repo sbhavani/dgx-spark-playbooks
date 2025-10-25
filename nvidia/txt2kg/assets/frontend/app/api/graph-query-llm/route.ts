@@ -27,7 +27,12 @@ export async function POST(request: NextRequest) {
     
     // Query the backend with LLM enhancement
     const result = await backendService.queryWithLLM(query, topK, useTraditional, llmModel, llmProvider);
-    
+
+    // DEBUG: Log first triple in API route to verify depth/pathLength
+    if (result.triples && result.triples.length > 0) {
+      console.log('API route - first triple:', JSON.stringify(result.triples[0], null, 2));
+    }
+
     // Return results
     return NextResponse.json({
       query,
