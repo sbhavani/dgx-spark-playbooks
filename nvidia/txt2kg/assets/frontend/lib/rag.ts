@@ -1,6 +1,6 @@
 /**
- * Retrieval Augmented Generation (RAG) implementation using Pinecone and LangChain
- * This module provides a RetrievalQA chain using Pinecone as the vector store
+ * Retrieval Augmented Generation (RAG) implementation using Qdrant and LangChain
+ * This module provides a RetrievalQA chain using Qdrant as the vector store
  * Note: xAI integration has been removed - needs alternative LLM provider implementation
  */
 
@@ -9,11 +9,11 @@ import { Document } from "@langchain/core/documents";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { PromptTemplate } from "@langchain/core/prompts";
-import { PineconeService, DocumentSearchResult } from './pinecone';
+import { QdrantService, DocumentSearchResult } from './qdrant';
 import { EmbeddingsService } from './embeddings';
 
-// Interface for records to store in Pinecone
-interface PineconeRecord {
+// Interface for records to store in Qdrant
+interface QdrantRecord {
   id: string;
   values: number[];
   metadata?: Record<string, any>;
@@ -21,14 +21,14 @@ interface PineconeRecord {
 
 export class RAGService {
   private static instance: RAGService;
-  private pineconeService: PineconeService;
+  private pineconeService: QdrantService;
   private embeddingsService: EmbeddingsService;
   private llm: ChatOpenAI | null = null;
   private initialized: boolean = false;
   private isInitializing: boolean = false;
 
   private constructor() {
-    this.pineconeService = PineconeService.getInstance();
+    this.pineconeService = QdrantService.getInstance();
     this.embeddingsService = EmbeddingsService.getInstance();
   }
 

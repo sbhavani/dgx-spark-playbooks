@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import remoteBackendInstance from '@/lib/remote-backend';
 import { getGraphDbService } from '@/lib/graph-db-util';
 import { getGraphDbType } from '../settings/route';
-import { PineconeService } from '@/lib/pinecone';
+import { QdrantService } from '@/lib/qdrant';
 import RAGService from '@/lib/rag';
 import queryLoggerService, { QueryLogSummary } from '@/lib/query-logger';
 
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     // Initialize services with the correct graph database type
     const graphDbType = getGraphDbType();
     const graphDbService = getGraphDbService(graphDbType);
-    const pineconeService = PineconeService.getInstance();
+    const pineconeService = QdrantService.getInstance();
     
     // Initialize graph database if needed
     if (!graphDbService.isInitialized()) {

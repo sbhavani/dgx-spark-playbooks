@@ -1,15 +1,15 @@
 import axios from 'axios';
 import { GraphDBService, GraphDBType } from './graph-db-service';
-import { PineconeService } from './pinecone';
+import { QdrantService } from './qdrant';
 import { getGraphDbService } from './graph-db-util';
 import type { Triple } from '@/types/graph';
 
 /**
- * Backend service that combines graph database for storage and Pinecone for embeddings
+ * Backend service that combines graph database for storage and Qdrant for embeddings
  */
 export class BackendService {
   private graphDBService: GraphDBService;
-  private pineconeService: PineconeService;
+  private pineconeService: QdrantService;
   private sentenceTransformerUrl: string = 'http://sentence-transformers:80';
   private modelName: string = 'all-MiniLM-L6-v2';
   private static instance: BackendService;
@@ -18,7 +18,7 @@ export class BackendService {
   
   private constructor() {
     this.graphDBService = GraphDBService.getInstance();
-    this.pineconeService = PineconeService.getInstance();
+    this.pineconeService = QdrantService.getInstance();
     
     // Use environment variables if available
     if (process.env.SENTENCE_TRANSFORMER_URL) {
