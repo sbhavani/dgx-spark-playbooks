@@ -47,7 +47,7 @@ export function RagQuery({
 
   // Update query mode when vectorEnabled changes - but don't override user selection
   useEffect(() => {
-    // Only set default mode on initial load, not when user selects Traditional Graph
+    // Only set default mode on initial load, not when user selects Graph Search
     if (vectorEnabled && queryMode === 'traditional') {
       console.log('Not forcing mode change - respecting user selection');
       // No longer forcing mode change - let user select what they want
@@ -164,7 +164,7 @@ export function RagQuery({
             <div className="w-5 h-5 rounded-md bg-nvidia-green/15 flex items-center justify-center mb-1.5">
               <Database className="h-2.5 w-2.5 text-nvidia-green" />
             </div>
-            <span className="text-sm font-semibold">Traditional Graph</span>
+            <span className="text-sm font-semibold">Graph Search</span>
             <span className="text-[10px] mt-0.5 text-center text-muted-foreground leading-tight">
               Graph DB + LLM
             </span>
