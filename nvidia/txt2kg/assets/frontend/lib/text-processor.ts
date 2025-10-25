@@ -76,6 +76,7 @@ export class TextProcessor {
   private ollamaBaseUrl: string = 'http://localhost:11434/v1';
   private vllmModel: string = 'meta-llama/Llama-3.2-3B-Instruct';
   private vllmBaseUrl: string = 'http://localhost:8001/v1';
+  private nvidiaModel: string = 'nvidia/llama-3.3-nemotron-super-49b-v1.5'; // Default NVIDIA model
 
   private constructor() {
     this.sentenceTransformerUrl = process.env.SENTENCE_TRANSFORMER_URL || "http://localhost:8000";
@@ -343,6 +344,7 @@ Text: ${chunk}
 ${formatInstructions}`;
 
         // Call NVIDIA API directly using fetch
+        console.log(`🖥️ Calling NVIDIA API with model: ${this.nvidiaModel}`);
         const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -350,7 +352,7 @@ ${formatInstructions}`;
             'Authorization': `Bearer ${apiKey}`
           },
           body: JSON.stringify({
-            model: 'nvidia/llama-3.3-nemotron-super-49b-v1.5',
+            model: this.nvidiaModel, // Use the configured model
             messages: [
               {
                 role: 'user',
@@ -561,11 +563,15 @@ ${formatInstructions}`;
     ollamaBaseUrl?: string;
     vllmModel?: string;
     vllmBaseUrl?: string;
+    nvidiaModel?: string;
   }): void {
     this.selectedLLMProvider = provider;
     if (provider === 'ollama') {
       this.ollamaModel = options?.ollamaModel || this.ollamaModel;
       this.ollamaBaseUrl = options?.ollamaBaseUrl || this.ollamaBaseUrl;
+    } else if (provider === 'nvidia') {
+      this.nvidiaModel = options?.nvidiaModel || this.nvidiaModel;
+      console.log(`🖥️ TextProcessor: NVIDIA model set to: ${this.nvidiaModel}`);
     } else if (provider === 'vllm') {
       this.vllmModel = options?.vllmModel || this.vllmModel;
       this.vllmBaseUrl = options?.vllmBaseUrl || this.vllmBaseUrl;
