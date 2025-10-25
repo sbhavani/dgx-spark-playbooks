@@ -235,11 +235,18 @@ export default function RagPage() {
       }
       
       const data = await response.json();
-      
-      // Log the retrieved triples for debugging
-      console.log('📊 Retrieved Triples:', data.triples);
-      console.log('🤖 LLM-Generated Answer:', data.answer);
+
+      // Log sample of retrieved triples for debugging
+      console.log('📊 Retrieved Triples (sample):', data.triples.slice(0, 3));
+      console.log('🤖 LLM-Generated Answer (preview):', data.answer?.substring(0, 200) + '...');
       console.log('📈 Triple Count:', data.count);
+
+      // DEBUG: Check if depth/pathLength are present in received data
+      if (data.triples && data.triples.length > 0) {
+        console.log('🔍 First triple structure:', JSON.stringify(data.triples[0], null, 2));
+        console.log('🔍 Has depth?', 'depth' in data.triples[0]);
+        console.log('🔍 Has pathLength?', 'pathLength' in data.triples[0]);
+      }
       
       // Update the results with the triples (for display)
       setResults(data.triples || []);
@@ -247,18 +254,11 @@ export default function RagPage() {
       relevanceScore = 0; // No relevance score for traditional search
       
       // Store the LLM answer for display
-      console.log('🔍 Checking answer:', { 
-        hasAnswer: !!data.answer, 
-        answerLength: data.answer?.length,
-        answerPreview: data.answer?.substring(0, 100)
-      });
-      
       if (data.answer) {
-        console.log('💬 Full Answer:', data.answer);
-        console.log('✅ Setting llmAnswer state');
+        console.log('✅ Setting llmAnswer state (length:', data.answer.length, 'chars)');
         setLlmAnswer(data.answer);
       } else {
-        console.log('⚠️ No answer in response, setting null');
+        console.log('⚠️ No answer in response');
         setLlmAnswer(null);
       }
       
@@ -438,9 +438,9 @@ export default function RagPage() {
                     return (
                       <>
                         {thinkContent && (
-                          <details className="mb-4 bg-muted/10 border border-border/20 rounded-xl overflow-hidden">
+                          <details className="mb-4 bg-muted/10 border border-border/20 rounded-xl overflow-hidden group">
                             <summary className="cursor-pointer p-4 hover:bg-muted/20 transition-colors flex items-center gap-2">
-                              <svg className="w-4 h-4 transform transition-transform" style={{ transform: 'rotate(0deg)' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg className="w-4 h-4 transform transition-transform group-open:rotate-90" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                               </svg>
                               <span className="text-sm font-medium text-muted-foreground">Reasoning Process</span>
@@ -477,6 +477,14 @@ export default function RagPage() {
                   <h3 className="text-lg font-semibold text-foreground">
                     {llmAnswer ? `Retrieved Knowledge (${results.length})` : `Results (${results.length})`}
                   </h3>
+                  {results.some((r: any) => r.pathLength && r.pathLength > 1) && (
+                    <span className="text-xs px-2.5 py-1 rounded-full font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1.5">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      Multi-hop enabled
+                    </span>
+                  )}
                 </div>
                 <div className="space-y-4">
                   {results.map((triple, index) => (
@@ -509,8 +517,33 @@ export default function RagPage() {
                         </div>
                       )}
                       {triple.confidence && !currentParams.usePureRag && (
-                        <div className="mt-2 text-xs text-muted-foreground">
-                          Confidence: {(triple.confidence * 100).toFixed(1)}%
+                        <div className="mt-3 flex items-center gap-4 text-xs">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full bg-nvidia-green/60"></div>
+                            <span className="text-muted-foreground">
+                              Confidence: <span className="font-medium text-foreground">{(triple.confidence * 100).toFixed(1)}%</span>
+                            </span>
+                          </div>
+                          {triple.depth !== undefined && (
+                            <div className="flex items-center gap-1.5">
+                              <svg className="w-3 h-3 text-nvidia-green/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                              <span className="text-muted-foreground">
+                                Hop: <span className="font-medium text-foreground">{triple.depth}</span>
+                              </span>
+                            </div>
+                          )}
+                          {triple.pathLength !== undefined && triple.pathLength > 1 && (
+                            <div className="flex items-center gap-1.5">
+                              <svg className="w-3 h-3 text-amber-500/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                              </svg>
+                              <span className="text-amber-600/80 dark:text-amber-400/80">
+                                Multi-hop path (length: <span className="font-medium">{triple.pathLength}</span>)
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
