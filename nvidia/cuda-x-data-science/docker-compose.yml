@@ -4,7 +4,6 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: cuda-x-data-science
-    runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
@@ -13,8 +12,9 @@ services:
     volumes:
       # Mount the assets directory to persist notebooks and data
       - ./assets:/workspace/assets
-      # Optional: mount kaggle credentials if available
-      - ./kaggle.json:/root/.kaggle/kaggle.json:ro
+      # Mount kaggle credentials to both locations
+      - ./kaggle.json:/root/.kaggle/kaggle.json
+      - ./kaggle.json:/workspace/assets/kaggle.json
     deploy:
       resources:
         reservations:

@@ -13,7 +13,8 @@ COPY assets/ /workspace/assets/
 COPY README.md /workspace/
 
 # Install any additional dependencies needed
-RUN pip install --no-cache-dir jupyter notebook
+RUN pip uninstall -y umap && \
+    pip install --no-cache-dir jupyter notebook umap-learn hdbscan
 
 # Create a startup script
 RUN echo '#!/bin/bash' > /start-jupyter.sh && \
