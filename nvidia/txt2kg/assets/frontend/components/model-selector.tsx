@@ -18,10 +18,10 @@ const baseModels = [
   },
   {
     id: "nvidia-nemotron-nano",
-    name: "llama-3.1-nemotron-nano-8b-v1",
+    name: "NVIDIA Nemotron Nano 9B v2",
     icon: <Cpu className="h-4 w-4 text-green-500" />,
-    description: "NVIDIA hosted Nemotron Nano 8B model",
-    model: "nvdev/nvidia/llama-3.1-nemotron-nano-8b-instruct",
+    description: "NVIDIA hosted Nemotron Nano 9B v2 - Faster and more efficient",
+    model: "nvidia/nvidia-nemotron-nano-9b-v2",
     apiKeyName: "NVIDIA_API_KEY",
     baseURL: "https://integrate.api.nvidia.com/v1",
   },
