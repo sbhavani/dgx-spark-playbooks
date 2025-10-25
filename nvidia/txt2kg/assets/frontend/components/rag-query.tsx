@@ -145,7 +145,7 @@ export function RagQuery({
             </div>
             <span className="text-sm font-semibold">Pure RAG</span>
             <span className="text-[10px] mt-0.5 text-center text-muted-foreground leading-tight">
-              Pinecone + LangChain
+              Vector DB + LLM
             </span>
             {queryMode === 'pure-rag' && (
               <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-nvidia-green rounded-full"></div>
@@ -166,7 +166,7 @@ export function RagQuery({
             </div>
             <span className="text-sm font-semibold">Traditional Graph</span>
             <span className="text-[10px] mt-0.5 text-center text-muted-foreground leading-tight">
-              Graph database only
+              Graph DB + LLM
             </span>
             {queryMode === 'traditional' && (
               <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-nvidia-green rounded-full"></div>
@@ -176,28 +176,20 @@ export function RagQuery({
           <button
             type="button"
             onClick={() => handleQueryModeChange('vector-search')}
-            disabled={!vectorEnabled}
-            className={`relative flex flex-col items-center p-3 border rounded-lg transition-all duration-200 hover:shadow-md ${
-              queryMode === 'vector-search' 
-                ? 'border-nvidia-green bg-nvidia-green/10 text-nvidia-green shadow-sm' 
-                : vectorEnabled 
-                  ? 'border-border/40 hover:border-border/60 hover:bg-muted/20' 
-                  : 'border-border/30 opacity-50 cursor-not-allowed'
-            }`}
+            disabled={true}
+            title="GraphRAG requires a GNN model (not yet available)"
+            className="relative flex flex-col items-center p-3 border rounded-lg border-border/30 opacity-50 cursor-not-allowed"
           >
-            <div className="w-5 h-5 rounded-md bg-nvidia-green/15 flex items-center justify-center mb-1.5">
-              <Cpu className="h-2.5 w-2.5 text-nvidia-green" />
+            <div className="w-5 h-5 rounded-md bg-muted/15 flex items-center justify-center mb-1.5">
+              <Cpu className="h-2.5 w-2.5 text-muted-foreground" />
             </div>
-            <span className="text-sm font-semibold">GraphRAG</span>
+            <span className="text-sm font-semibold text-muted-foreground">GraphRAG</span>
             <span className="text-[10px] mt-0.5 text-center text-muted-foreground leading-tight">
               RAG + GNN
             </span>
-            <div className="text-[9px] px-1.5 py-0.5 bg-nvidia-green/20 text-nvidia-green rounded mt-1 font-medium">
-              NEW
+            <div className="text-[9px] px-1.5 py-0.5 bg-amber-500/20 text-amber-700 dark:text-amber-500 rounded mt-1 font-medium">
+              COMING SOON
             </div>
-            {queryMode === 'vector-search' && (
-              <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-nvidia-green rounded-full"></div>
-            )}
           </button>
         </div>
       </div>

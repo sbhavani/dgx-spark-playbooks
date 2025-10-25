@@ -66,11 +66,12 @@ export async function GET(request: NextRequest) {
 
     // Get real query logs instead of mock data
     let queryLogs: QueryLogSummary[] = [];
-    let precision = 0; 
+    let precision = 0;
     let recall = 0;
     let f1Score = 0;
     let avgQueryTime = vectorStats.avgQueryTime || 0;
     let avgRelevance = 0;
+    let queryTimesByMode: Record<string, number> = {};
 
     // Get query logs from file-based logger instead of Neo4j
     try {
@@ -87,25 +88,42 @@ export async function GET(request: NextRequest) {
       // Calculate metrics from the query logs
       if (queryLogs.length > 0) {
         // Calculate metrics from logs with actual data
-        const logsWithMetrics = queryLogs.filter(log => 
-          log.metrics.avgPrecision > 0 || 
-          log.metrics.avgRecall > 0 || 
+        const logsWithMetrics = queryLogs.filter(log =>
+          log.metrics.avgPrecision > 0 ||
+          log.metrics.avgRecall > 0 ||
           log.metrics.avgExecutionTimeMs > 0
         );
-        
+
         const logsWithRelevance = queryLogs.filter(log => log.metrics.avgRelevanceScore > 0);
-        
+
         if (logsWithMetrics.length > 0) {
           precision = logsWithMetrics.reduce((sum, log) => sum + (log.metrics.avgPrecision || 0), 0) / logsWithMetrics.length;
           recall = logsWithMetrics.reduce((sum, log) => sum + (log.metrics.avgRecall || 0), 0) / logsWithMetrics.length;
           avgQueryTime = logsWithMetrics.reduce((sum, log) => sum + (log.metrics.avgExecutionTimeMs || 0), 0) / logsWithMetrics.length;
           f1Score = precision > 0 && recall > 0 ? 2 * (precision * recall) / (precision + recall) : 0;
         }
-        
+
         if (logsWithRelevance.length > 0) {
           avgRelevance = logsWithRelevance.reduce((sum, log) => sum + (log.metrics.avgRelevanceScore || 0), 0) / logsWithRelevance.length;
         }
       }
+
+      // Calculate per-mode query times
+      const logsByMode = queryLogs.reduce((acc, log) => {
+        const mode = log.queryMode || 'traditional';
+        if (!acc[mode]) acc[mode] = [];
+        acc[mode].push(log);
+        return acc;
+      }, {} as Record<string, typeof queryLogs>);
+
+      Object.entries(logsByMode).forEach(([mode, logs]) => {
+        const logsWithTime = logs.filter(log => log.metrics.avgExecutionTimeMs > 0);
+        if (logsWithTime.length > 0) {
+          queryTimesByMode[mode] = logsWithTime.reduce((sum, log) =>
+            sum + log.metrics.avgExecutionTimeMs, 0
+          ) / logsWithTime.length;
+        }
+      });
     } catch (error) {
       console.warn('Error getting query logs from file:', error);
       // Keep values at 0 instead of using defaults
@@ -132,6 +150,7 @@ export async function GET(request: NextRequest) {
       recall,
       f1Score,
       topQueries,
+      queryTimesByMode: queryTimesByMode || {},
       // Add metadata about query logs
       queryLogStats: {
         totalQueryLogs: queryLogs.length,
