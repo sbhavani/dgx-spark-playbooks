@@ -6,6 +6,8 @@
 
 - [Overview](#overview)
 - [Instructions](#instructions)
+  - [Option 1: Docker (Recommended)](#option-1-docker-recommended)
+  - [Option 2: Local Installation](#option-2-local-installation)
 
 ---
 
@@ -36,7 +38,51 @@ You will accelerate popular machine learning algorithms and data analytics opera
 
 ## Instructions
 
-## Step 1. Verify system requirements
+## Option 1: Docker (Recommended)
+
+Using Docker simplifies the setup process and ensures consistent environments across different systems.
+
+### Step 1. Install Docker and NVIDIA Container Toolkit
+- Install Docker following [these instructions](https://docs.docker.com/engine/install/)
+- Install NVIDIA Container Toolkit following [these instructions](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
+- Verify GPU access with: `docker run --rm --runtime=nvidia nvidia/cuda:13.0.0-base-ubuntu22.04 nvidia-smi`
+
+### Step 2. Prepare Kaggle API credentials (optional)
+- Create Kaggle API key using [these instructions](https://www.kaggle.com/discussions/general/74235)
+- Place the **kaggle.json** file in the **cuda-x-data-science** folder (same directory as docker-compose.yml)
+
+### Step 3. Build and run with Docker Compose
+```bash
+cd cuda-x-data-science
+docker-compose up --build
+```
+
+### Step 4. Access Jupyter Notebook
+- Open your browser and navigate to `http://localhost:8888`
+- The notebooks are located in the `/workspace/assets` directory
+- Run **cudf_pandas_demo.ipynb** for pandas acceleration demo
+- Run **cuml_sklearn_demo.ipynb** for machine learning algorithms demo
+
+### Step 5. Stop the container
+```bash
+docker-compose down
+```
+
+**Alternative Docker commands:**
+If you prefer to use Docker directly without Docker Compose:
+```bash
+# Build the image
+docker build -t cuda-x-data-science .
+
+# Run the container
+docker run --rm --runtime=nvidia --gpus all -p 8888:8888 -v $(pwd)/assets:/workspace/assets cuda-x-data-science
+```
+
+---
+
+## Option 2: Local Installation
+
+### Step 1. Verify system requirements
 - Verify the system has CUDA 13 installed using `nvcc --version` or `nvidia-smi` 
 - Install conda using [these instructions](https://docs.anaconda.com/miniconda/install/)
 - Create Kaggle API key using [these instructions](https://www.kaggle.com/discussions/general/74235) and place the **kaggle.json** file in the same folder as the notebook
