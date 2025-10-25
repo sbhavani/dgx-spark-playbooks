@@ -221,28 +221,52 @@ export class BackendService {
    */
   public async queryTraditional(queryText: string): Promise<Triple[]> {
     console.log(`Performing traditional graph query: "${queryText}"`);
-    
+
+    // Extract keywords from query
+    const keywords = this.extractKeywords(queryText);
+    console.log(`Extracted keywords: ${keywords.join(', ')}`);
+
+    // Filter out stop words
+    const filteredKeywords = keywords.filter(kw => !this.isStopWord(kw));
+
+    // If using ArangoDB, use its native graph traversal capabilities
+    if (this.activeGraphDbType === 'arangodb') {
+      console.log(`Using ArangoDB native graph traversal for keywords: ${filteredKeywords.join(', ')}`);
+
+      try {
+        const results = await this.graphDBService.graphTraversal(filteredKeywords, 2, 100);
+        console.log(`ArangoDB graph traversal found ${results.length} relevant triples`);
+
+        // Log top 10 results with confidence scores for debugging
+        console.log('Top 10 triples by confidence:');
+        results.slice(0, 10).forEach((triple, idx) => {
+          console.log(`  ${idx + 1}. [${triple.confidence.toFixed(3)}] ${triple.subject} -> ${triple.predicate} -> ${triple.object} (depth: ${triple.depth})`);
+        });
+
+        return results;
+      } catch (error) {
+        console.error('Error using ArangoDB graph traversal, falling back to traditional method:', error);
+        // Fall through to traditional method if ArangoDB traversal fails
+      }
+    }
+
+    // Fallback to traditional keyword matching for Neo4j or if ArangoDB traversal fails
+    console.log(`Using fallback keyword-based search`);
+
     // Get graph data from graph database
     const graphData = await this.graphDBService.getGraphData();
     console.log(`Retrieved graph from ${this.activeGraphDbType} with ${graphData.nodes.length} nodes and ${graphData.relationships.length} relationships`);
-    
+
     // Create a map of node IDs to names
     const nodeIdToName = new Map<string, string>();
     for (const node of graphData.nodes) {
       nodeIdToName.set(node.id, node.name);
     }
-    
-    // Extract keywords from query
-    const keywords = this.extractKeywords(queryText);
-    console.log(`Extracted keywords: ${keywords.join(', ')}`);
-    
+
     // Find matching nodes based on keywords
     const matchingNodeIds = new Set<string>();
     for (const node of graphData.nodes) {
-      for (const keyword of keywords) {
-        // Skip common words
-        if (this.isStopWord(keyword)) continue;
-        
+      for (const keyword of filteredKeywords) {
         // Simple text matching - convert to lowercase for case-insensitive matching
         if (node.name.toLowerCase().includes(keyword.toLowerCase())) {
           matchingNodeIds.add(node.id);
@@ -250,37 +274,36 @@ export class BackendService {
         }
       }
     }
-    
+
     console.log(`Found ${matchingNodeIds.size} nodes matching keywords directly`);
-    
+
     // Find relationships where either subject or object matches
     const relevantTriples: Triple[] = [];
-    
+
     for (const rel of graphData.relationships) {
       // Check if either end of the relationship matches our search
       const isSourceMatching = matchingNodeIds.has(rel.source);
       const isTargetMatching = matchingNodeIds.has(rel.target);
-      
+
       if (isSourceMatching || isTargetMatching) {
         const sourceName = nodeIdToName.get(rel.source);
         const targetName = nodeIdToName.get(rel.target);
-        
+
         if (sourceName && targetName) {
           // Check if the relationship type matches keywords
           let matchesRelationship = false;
-          for (const keyword of keywords) {
-            if (this.isStopWord(keyword)) continue;
+          for (const keyword of filteredKeywords) {
             if (rel.type.toLowerCase().includes(keyword.toLowerCase())) {
               matchesRelationship = true;
               break;
             }
           }
-          
+
           // Higher relevance to relationships that match the query directly
-          const relevance = (isSourceMatching ? 1 : 0) + 
-                           (isTargetMatching ? 1 : 0) + 
+          const relevance = (isSourceMatching ? 1 : 0) +
+                           (isTargetMatching ? 1 : 0) +
                            (matchesRelationship ? 2 : 0);
-          
+
           if (relevance > 0) {
             relevantTriples.push({
               subject: sourceName,
@@ -292,12 +315,12 @@ export class BackendService {
         }
       }
     }
-    
+
     // Sort by confidence (highest first)
-    relevantTriples.sort((a, b) => 
+    relevantTriples.sort((a, b) =>
       (b.confidence || 0) - (a.confidence || 0)
     );
-    
+
     // Return all relevant triples, sorted by relevance
     console.log(`Found ${relevantTriples.length} relevant triples with traditional search`);
     return relevantTriples;
@@ -451,6 +474,11 @@ export class BackendService {
     // Step 2: Take top K triples for context
     const topTriples = allTriples.slice(0, topK);
     console.log(`Using top ${topTriples.length} triples as context for LLM`);
+
+    // DEBUG: Log first triple to verify depth/pathLength are present
+    if (topTriples.length > 0) {
+      console.log('First triple structure:', JSON.stringify(topTriples[0], null, 2));
+    }
     
     if (topTriples.length === 0) {
       return {
@@ -474,44 +502,98 @@ export class BackendService {
     
     // Step 4: Use LLM to generate answer from context
     try {
-      // Research-backed prompt structure for KG-enhanced RAG
-      // Based on: "Retrieval-Augmented Generation with Knowledge Graphs" (Lewis et al.)
-      // and "Enhancing LLMs with Structured Knowledge" (Pan et al.)
-      const prompt = `You are a knowledgeable research assistant with access to a curated scientific knowledge base.
+      // Simplified prompt to work better with NVIDIA Nemotron's natural reasoning format
+      const prompt = `Answer the question based on the following context from the knowledge graph.
 
-Context: ${context}
-
-Based on the information provided above, please answer the following question. Be direct and informative, synthesizing the key facts into a coherent response. Draw reasonable scientific inferences when appropriate, but clearly distinguish between what is directly stated and what is inferred. If critical information is missing, note this briefly.
+Context:
+${context}
 
 Question: ${queryText}
 
 Answer:`;
 
-      // Determine LLM endpoint and model
+      // Determine LLM endpoint and model based on provider
       const finalProvider = llmProvider || 'ollama';
-      const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434/v1';
       const finalModel = llmModel || process.env.OLLAMA_MODEL || 'llama3.1:8b';
-      
+
       console.log(`Using LLM: provider=${finalProvider}, model=${finalModel}`);
-      
-      const response = await axios.post(`${ollamaUrl}/chat/completions`, {
-        model: finalModel,
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a knowledgeable research assistant specializing in biomedical and scientific literature. Provide accurate, well-structured answers based on the provided context. Maintain a professional yet accessible tone, and clearly indicate when information is limited or uncertain.'
+
+      let response;
+
+      if (finalProvider === 'nvidia') {
+        // Use NVIDIA API
+        const nvidiaApiKey = process.env.NVIDIA_API_KEY;
+        if (!nvidiaApiKey) {
+          throw new Error('NVIDIA_API_KEY is required for NVIDIA provider. Please set the NVIDIA_API_KEY environment variable.');
+        }
+
+        const nvidiaUrl = 'https://integrate.api.nvidia.com/v1';
+
+        // Note: NVIDIA API doesn't support streaming in axios, so we'll use non-streaming
+        // and format the thinking content into <think> tags manually
+        response = await axios.post(`${nvidiaUrl}/chat/completions`, {
+          model: finalModel,
+          messages: [
+            {
+              role: 'system',
+              content: '/think'  // Special NVIDIA API command to activate thinking mode
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          temperature: 0.2,
+          max_tokens: 4096,
+          top_p: 0.95,
+          frequency_penalty: 0,
+          presence_penalty: 0,
+          stream: false,  // We need non-streaming to get thinking tokens
+          // NVIDIA-specific thinking token parameters
+          min_thinking_tokens: 1024,
+          max_thinking_tokens: 2048
+        }, {
+          headers: {
+            'Authorization': `Bearer ${nvidiaApiKey}`,
+            'Content-Type': 'application/json'
           },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.2,  // Lower for more factual, consistent responses
-        max_tokens: 800    // Increased for more comprehensive answers
-      });
-      
-      const answer = response.data.choices[0].message.content;
-      
+          timeout: 120000  // 120 second timeout
+        });
+      } else {
+        // Use Ollama (default)
+        const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434/v1';
+
+        response = await axios.post(`${ollamaUrl}/chat/completions`, {
+          model: finalModel,
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a knowledgeable research assistant specializing in biomedical and scientific literature. Provide accurate, well-structured answers based on the provided context. Maintain a professional yet accessible tone, and clearly indicate when information is limited or uncertain.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          temperature: 0.2,  // Lower for more factual, consistent responses
+          max_tokens: 800    // Increased for more comprehensive answers
+        });
+      }
+
+      // Extract answer and reasoning (if using NVIDIA with thinking tokens)
+      const messageData = response.data.choices[0].message;
+      let answer = messageData.content || '';
+
+      // Check if NVIDIA API returned reasoning_content (thinking tokens)
+      if (finalProvider === 'nvidia' && messageData.reasoning_content) {
+        // Format with <think> tags for UI parsing
+        answer = `<think>\n${messageData.reasoning_content}\n</think>\n\n${answer}`;
+        console.log('Formatted response with thinking content');
+      }
+
+      // DEBUG: Log triples before returning to verify they still have depth/pathLength
+      console.log('Returning triples (first one):', JSON.stringify(topTriples[0], null, 2));
+
       return {
         answer,
         triples: topTriples,
