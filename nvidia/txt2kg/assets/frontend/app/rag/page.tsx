@@ -197,7 +197,7 @@ export default function RagPage() {
       }
       
       // Call the LLM-enhanced graph query API
-      console.log('✅ Using Traditional Graph + LLM approach');
+      console.log('✅ Using Graph Search + LLM approach');
       queryMode = 'traditional';
       
       // Get selected LLM model from localStorage
@@ -373,19 +373,19 @@ export default function RagPage() {
                       {metrics.queryTimesByMode['pure-rag'] !== undefined && (
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Pure RAG:</span>
-                          <span className="font-medium">{metrics.queryTimesByMode['pure-rag'].toFixed(2)}ms</span>
+                          <span className="font-medium">{(metrics.queryTimesByMode['pure-rag'] / 1000).toFixed(2)}s</span>
                         </div>
                       )}
                       {metrics.queryTimesByMode['traditional'] !== undefined && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Traditional Graph:</span>
-                          <span className="font-medium">{metrics.queryTimesByMode['traditional'].toFixed(2)}ms</span>
+                          <span className="text-muted-foreground">Graph Search:</span>
+                          <span className="font-medium">{(metrics.queryTimesByMode['traditional'] / 1000).toFixed(2)}s</span>
                         </div>
                       )}
                       {metrics.queryTimesByMode['vector-search'] !== undefined && (
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">GraphRAG:</span>
-                          <span className="font-medium">{metrics.queryTimesByMode['vector-search'].toFixed(2)}ms</span>
+                          <span className="font-medium">{(metrics.queryTimesByMode['vector-search'] / 1000).toFixed(2)}s</span>
                         </div>
                       )}
                     </>
@@ -422,7 +422,7 @@ export default function RagPage() {
                     <span className="text-xs px-2.5 py-1 rounded-full font-medium bg-nvidia-green/10 text-nvidia-green border border-nvidia-green/20">
                       {currentParams.queryMode === 'pure-rag' ? 'Pure RAG' :
                        currentParams.queryMode === 'vector-search' ? 'GraphRAG' :
-                       'Traditional Graph'}
+                       'Graph Search'}
                     </span>
                   )}
                 </div>
