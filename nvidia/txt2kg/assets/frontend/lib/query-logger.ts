@@ -17,6 +17,7 @@ export interface QueryLogEntry {
 
 export interface QueryLogSummary {
   query: string;
+  queryMode: 'traditional' | 'vector-search' | 'pure-rag';
   count: number;
   firstQueried: string;
   lastQueried: string;
@@ -148,9 +149,10 @@ export class QueryLoggerService {
         return [];
       }
 
-      // Group logs by query
+      // Group logs by query AND queryMode
       const querySummaries = new Map<string, {
         query: string;
+        queryMode: 'traditional' | 'vector-search' | 'pure-rag';
         count: number;
         timestamps: string[];
         executionTimes: number[];
@@ -161,8 +163,11 @@ export class QueryLoggerService {
       }>();
 
       logs.forEach(entry => {
-        const existing = querySummaries.get(entry.query) || {
+        // Use composite key: query + mode
+        const key = `${entry.query}|||${entry.queryMode}`;
+        const existing = querySummaries.get(key) || {
           query: entry.query,
+          queryMode: entry.queryMode,
           count: 0,
           timestamps: [],
           executionTimes: [],
@@ -180,12 +185,13 @@ export class QueryLoggerService {
         if (entry.metrics.recall !== undefined) existing.recalls.push(entry.metrics.recall);
         existing.resultCounts.push(entry.metrics.resultCount);
 
-        querySummaries.set(entry.query, existing);
+        querySummaries.set(key, existing);
       });
 
       // Convert to array and format
       const result: QueryLogSummary[] = Array.from(querySummaries.values()).map(summary => ({
         query: summary.query,
+        queryMode: summary.queryMode,
         count: summary.count,
         firstQueried: summary.timestamps[0],
         lastQueried: summary.timestamps[summary.timestamps.length - 1],
