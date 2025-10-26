@@ -531,13 +531,6 @@ export function DatabaseConnection({ className }: DatabaseConnectionProps) {
                     <span>{vectorStats.nodes.toLocaleString()} vectors indexed</span>
                   </div>
 
-                  {(vectorStats as any).status && (
-                    <div className="flex items-center gap-2">
-                      <Zap className="h-3.5 w-3.5" />
-                      <span>Status: <span className="capitalize">{(vectorStats as any).status}</span></span>
-                    </div>
-                  )}
-
                   {(vectorStats as any).vectorSize && (
                     <div className="flex items-center gap-2">
                       <InfoIcon className="h-3.5 w-3.5" />

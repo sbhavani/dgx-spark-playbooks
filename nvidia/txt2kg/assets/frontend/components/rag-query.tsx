@@ -198,7 +198,6 @@ export function RagQuery({
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold text-foreground mb-1">LLM Model</h3>
-          <p className="text-xs text-muted-foreground">Select the LLM for answer generation</p>
         </div>
         <LLMSelectorCompact />
       </div>

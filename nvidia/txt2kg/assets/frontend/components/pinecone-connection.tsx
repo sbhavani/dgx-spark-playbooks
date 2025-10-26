@@ -142,6 +142,7 @@ export function PineconeConnection({ className }: PineconeConnectionProps) {
         </div>
       )}
       
+      {/* Vector DB Statistics */}
       <div className="text-sm space-y-1 w-full">
         <div className="flex justify-between">
           <span className="text-muted-foreground">Qdrant</span>
@@ -151,12 +152,6 @@ export function PineconeConnection({ className }: PineconeConnectionProps) {
           <span className="text-muted-foreground">Vectors:</span>
           <span>{stats.nodes} indexed</span>
         </div>
-        {(stats as any).status && (
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Status:</span>
-            <span className="capitalize">{(stats as any).status}</span>
-          </div>
-        )}
         {(stats as any).vectorSize && (
           <div className="flex justify-between">
             <span className="text-muted-foreground">Dimensions:</span>
