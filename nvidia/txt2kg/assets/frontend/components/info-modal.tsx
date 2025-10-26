@@ -19,18 +19,18 @@ export function InfoModal() {
         </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[550px] max-h-[85vh] overflow-y-auto">
-        <DialogHeader className="pb-6 border-b border-border/10">
-          <div className="flex items-center gap-3 mb-4">
+        <DialogHeader className="pb-8 border-b border-border/10">
+          <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl bg-nvidia-green/15 flex items-center justify-center">
               <Sparkles className="h-5 w-5 text-nvidia-green" />
             </div>
-            <DialogTitle className="text-2xl font-bold text-foreground nvidia-build-gradient-text">
+            <DialogTitle className="text-3xl font-bold text-foreground nvidia-build-gradient-text tracking-tight">
               Text to Knowledge Graph
             </DialogTitle>
           </div>
-          <DialogDescription className="text-base text-muted-foreground leading-relaxed">
-            An AI-powered platform that transforms your documents into structured knowledge graphs. 
-            Extract meaningful relationships from text using state-of-the-art language models and visualize 
+          <DialogDescription className="text-base text-muted-foreground leading-relaxed mt-2">
+            An AI-powered platform that transforms your documents into structured knowledge graphs.
+            Extract meaningful relationships from text using state-of-the-art language models and visualize
             your data in interactive, explorable formats.
           </DialogDescription>
         </DialogHeader>
@@ -41,31 +41,31 @@ export function InfoModal() {
               <div className="w-8 h-8 rounded-lg bg-nvidia-green/15 flex items-center justify-center">
                 <Sparkles className="h-4 w-4 text-nvidia-green" />
               </div>
-              <h4 className="text-lg font-semibold text-foreground">Key Features</h4>
+              <h3 className="text-xl font-bold text-foreground tracking-tight">Key Features</h3>
             </div>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-nvidia-green mt-2 flex-shrink-0"></div>
-                <p className="text-sm text-foreground leading-relaxed">
-                  <span className="font-semibold">Knowledge Triple Extraction:</span> Automatically identify subject-predicate-object relationships from your text documents
+                <p className="text-sm text-foreground/90 leading-relaxed">
+                  <span className="font-semibold text-foreground">Knowledge Triple Extraction:</span> Automatically identify subject-predicate-object relationships from your text documents
                 </p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-nvidia-green mt-2 flex-shrink-0"></div>
-                <p className="text-sm text-foreground leading-relaxed">
-                  <span className="font-semibold">Interactive Visualization:</span> Explore relationships through dynamic, interactive knowledge graphs
+                <p className="text-sm text-foreground/90 leading-relaxed">
+                  <span className="font-semibold text-foreground">Interactive Visualization:</span> Explore relationships through dynamic, interactive knowledge graphs
                 </p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-nvidia-green mt-2 flex-shrink-0"></div>
-                <p className="text-sm text-foreground leading-relaxed">
-                  <span className="font-semibold">Multi-Format Export:</span> Export your knowledge graphs in JSON, CSV, and PNG formats
+                <p className="text-sm text-foreground/90 leading-relaxed">
+                  <span className="font-semibold text-foreground">Multi-Format Export:</span> Export your knowledge graphs in JSON, CSV, and PNG formats
                 </p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-nvidia-green mt-2 flex-shrink-0"></div>
-                <p className="text-sm text-foreground leading-relaxed">
-                  <span className="font-semibold">AI-Powered:</span> Leverage cutting-edge language models including NVIDIA, OpenAI, and Ollama
+                <p className="text-sm text-foreground/90 leading-relaxed">
+                  <span className="font-semibold text-foreground">AI-Powered:</span> Leverage cutting-edge language models including NVIDIA, OpenAI, and Ollama
                 </p>
               </div>
             </div>
@@ -77,7 +77,7 @@ export function InfoModal() {
               <div className="w-8 h-8 rounded-lg bg-nvidia-green/15 flex items-center justify-center">
                 <Info className="h-4 w-4 text-nvidia-green" />
               </div>
-              <h4 className="text-lg font-semibold text-foreground">How to Use</h4>
+              <h3 className="text-xl font-bold text-foreground tracking-tight">How to Use</h3>
             </div>
             <div className="space-y-4">
               <div className="flex items-start gap-4">
@@ -85,8 +85,8 @@ export function InfoModal() {
                   <Upload className="h-3 w-3 text-nvidia-green" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground mb-1">1. Upload Documents</p>
-                  <p className="text-xs text-muted-foreground">Upload markdown, CSV, text, or JSON files to get started</p>
+                  <p className="text-sm font-bold text-foreground mb-1">1. Upload Documents</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">Upload markdown, CSV, text, or JSON files to get started</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -94,8 +94,8 @@ export function InfoModal() {
                   <Sparkles className="h-3 w-3 text-nvidia-green" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground mb-1">2. Configure Models</p>
-                  <p className="text-xs text-muted-foreground">Select your preferred language model and configure processing options</p>
+                  <p className="text-sm font-bold text-foreground mb-1">2. Configure Models</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">Select your preferred language model and configure processing options</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -103,8 +103,8 @@ export function InfoModal() {
                   <Zap className="h-3 w-3 text-nvidia-green" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground mb-1">3. Extract Knowledge</p>
-                  <p className="text-xs text-muted-foreground">Process your documents to generate structured knowledge triples</p>
+                  <p className="text-sm font-bold text-foreground mb-1">3. Extract Knowledge</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">Process your documents to generate structured knowledge triples</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -112,8 +112,8 @@ export function InfoModal() {
                   <Eye className="h-3 w-3 text-nvidia-green" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground mb-1">4. Visualize & Explore</p>
-                  <p className="text-xs text-muted-foreground">Navigate your knowledge graph in 2D or 3D interactive visualizations</p>
+                  <p className="text-sm font-bold text-foreground mb-1">4. Visualize & Explore</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">Navigate your knowledge graph in 2D or 3D interactive visualizations</p>
                 </div>
               </div>
             </div>
