@@ -6,6 +6,13 @@ services:
       dockerfile: deploy/app/Dockerfile
     ports:
       - '3001:3000'
+    volumes:
+      # Mount source code for instant hot reload in development
+      - ../../frontend:/app:delegated
+      # Preserve node_modules and .next from the image (don't overwrite with host's)
+      - /app/node_modules
+      - /app/.next
+    user: "0:0"  # Run as root to avoid permission issues with mounted volumes
     environment:
       - ARANGODB_URL=http://arangodb:8529
       - ARANGODB_DB=txt2kg

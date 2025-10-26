@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Set environment variables
 ENV NEXT_TELEMETRY_DISABLED 1
-ENV NODE_ENV production
+ENV NODE_ENV development
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
@@ -29,15 +29,16 @@ RUN pnpm config set auto-install-peers true && \
 # Copy source code
 COPY ./frontend/ ./
 
-# Build the application
-RUN pnpm build
+# Delete any existing .next folder to ensure clean build
+RUN rm -rf .next
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+    adduser --system --uid 1001 --home /home/nextjs nextjs
 
 # Set ownership
-RUN chown -R nextjs:nodejs /app
+RUN chown -R nextjs:nodejs /app && \
+    chown -R nextjs:nodejs /home/nextjs
 
 # Create data directory for query logs
 RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
@@ -46,4 +47,5 @@ USER nextjs
 
 EXPOSE 3000
 
-CMD ["node", ".next/standalone/server.js"]
+# Run development server instead of production build
+CMD ["pnpm", "dev"]

@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Info, Sparkles, Eye, Upload, Zap } from "lucide-react"
+import { Info, ExternalLink } from "lucide-react"
 
 export function InfoModal() {
   return (
@@ -18,118 +18,34 @@ export function InfoModal() {
           <Info className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
         </button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[550px] max-h-[85vh] overflow-y-auto">
-        <DialogHeader className="pb-8 border-b border-border/10">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-nvidia-green/15 flex items-center justify-center">
-              <Sparkles className="h-5 w-5 text-nvidia-green" />
-            </div>
-            <DialogTitle className="text-3xl font-bold text-foreground nvidia-build-gradient-text tracking-tight">
-              Text to Knowledge Graph
-            </DialogTitle>
-          </div>
-          <DialogDescription className="text-base text-muted-foreground leading-relaxed mt-2">
-            An AI-powered platform that transforms your documents into structured knowledge graphs.
-            Extract meaningful relationships from text using state-of-the-art language models and visualize
-            your data in interactive, explorable formats.
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold">Text to Knowledge Graph</DialogTitle>
+          <DialogDescription className="text-base leading-relaxed pt-4 space-y-4">
+            <p>
+              Transform unstructured text into structured knowledge graphs using AI-powered triple extraction.
+              This NVIDIA Spark playbook automatically identifies entities and relationships from your documents,
+              then visualizes them as interactive 2D or 3D graphs powered by ArangoDB and advanced language models.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Extract subject-predicate-object triples, perform graph-based queries, and explore your data through
+              multiple visualization modes including traditional graph search and vector-enhanced semantic search.
+            </p>
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-8 pt-6">
-          {/* Key Features Section */}
-          <div className="nvidia-build-card">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-nvidia-green/15 flex items-center justify-center">
-                <Sparkles className="h-4 w-4 text-nvidia-green" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground tracking-tight">Key Features</h3>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full bg-nvidia-green mt-2 flex-shrink-0"></div>
-                <p className="text-sm text-foreground/90 leading-relaxed">
-                  <span className="font-semibold text-foreground">Knowledge Triple Extraction:</span> Automatically identify subject-predicate-object relationships from your text documents
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full bg-nvidia-green mt-2 flex-shrink-0"></div>
-                <p className="text-sm text-foreground/90 leading-relaxed">
-                  <span className="font-semibold text-foreground">Interactive Visualization:</span> Explore relationships through dynamic, interactive knowledge graphs
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full bg-nvidia-green mt-2 flex-shrink-0"></div>
-                <p className="text-sm text-foreground/90 leading-relaxed">
-                  <span className="font-semibold text-foreground">Multi-Format Export:</span> Export your knowledge graphs in JSON, CSV, and PNG formats
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full bg-nvidia-green mt-2 flex-shrink-0"></div>
-                <p className="text-sm text-foreground/90 leading-relaxed">
-                  <span className="font-semibold text-foreground">AI-Powered:</span> Leverage cutting-edge language models including NVIDIA, OpenAI, and Ollama
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* How to Use Section */}
-          <div className="nvidia-build-card">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-nvidia-green/15 flex items-center justify-center">
-                <Info className="h-4 w-4 text-nvidia-green" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground tracking-tight">How to Use</h3>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 rounded-full bg-nvidia-green/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Upload className="h-3 w-3 text-nvidia-green" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-foreground mb-1">1. Upload Documents</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Upload markdown, CSV, text, or JSON files to get started</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 rounded-full bg-nvidia-green/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Sparkles className="h-3 w-3 text-nvidia-green" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-foreground mb-1">2. Configure Models</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Select your preferred language model and configure processing options</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 rounded-full bg-nvidia-green/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Zap className="h-3 w-3 text-nvidia-green" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-foreground mb-1">3. Extract Knowledge</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Process your documents to generate structured knowledge triples</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 rounded-full bg-nvidia-green/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Eye className="h-3 w-3 text-nvidia-green" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-foreground mb-1">4. Visualize & Explore</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Navigate your knowledge graph in 2D or 3D interactive visualizations</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Powered by NVIDIA Section */}
-          <div className="bg-nvidia-green/5 border border-nvidia-green/20 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="text-xs px-3 py-1.5 rounded-full bg-nvidia-green/15 text-nvidia-green border border-nvidia-green/20 font-medium">
-                POWERED BY NVIDIA AI
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Built with NVIDIA's advanced AI infrastructure and optimized for enterprise-grade knowledge extraction workflows.
-            </p>
-          </div>
+        <div className="flex flex-col gap-3 pt-4">
+          <a
+            href="https://build.nvidia.com/spark/txt2kg"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-nvidia-green text-black font-semibold rounded-lg hover:bg-nvidia-green/90 transition-colors"
+          >
+            View on NVIDIA Spark
+            <ExternalLink className="h-4 w-4" />
+          </a>
+          <p className="text-xs text-center text-muted-foreground">
+            Part of the NVIDIA Spark Playbooks collection
+          </p>
         </div>
       </DialogContent>
     </Dialog>

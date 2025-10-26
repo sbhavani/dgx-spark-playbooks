@@ -1,3 +1,16 @@
+# IMPORTANT: Never ignore source code directories
+!src/
+!app/
+!pages/
+!components/
+!frontend/
+!frontend/**
+!**/src/
+!**/app/
+!**/pages/
+!**/components/
+!**/frontend/
+
 # Dependencies
 node_modules
 .pnpm-store

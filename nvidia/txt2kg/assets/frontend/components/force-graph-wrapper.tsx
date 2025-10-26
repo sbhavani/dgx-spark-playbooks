@@ -1869,6 +1869,27 @@ export function ForceGraphWrapper({
   useEffect(() => {
     if (!graphRef.current) return;
 
+    // Helper function to extract ID reliably - defined at the top to avoid hoisting issues
+    const getNodeId = (nodeObj: any): string => {
+      if (!nodeObj) return '';
+
+      // If it's a string, return it directly
+      if (typeof nodeObj === 'string') return nodeObj;
+
+      // If it has an ID property, use that
+      if (nodeObj.id && typeof nodeObj.id === 'string') {
+        return nodeObj.id;
+      }
+
+      // If it's a ThreeJS object with userData
+      if (nodeObj.__threeObj && nodeObj.__threeObj.userData) {
+        return nodeObj.__threeObj.userData.id || '';
+      }
+
+      // Fallback
+      return '';
+    };
+
     // If there's no selected node, restore cluster colors if enabled, otherwise do nothing
     if (!selectedNode) {
       console.log("🔄 Selection effect with no selected node", {
@@ -1894,28 +1915,7 @@ export function ForceGraphWrapper({
     }
 
     console.log("Effect triggered: Updating visual highlighting for selected node and connections");
-    
-    // Helper function to extract ID reliably
-    const getNodeId = (nodeObj: any): string => {
-      if (!nodeObj) return '';
-      
-      // If it's a string, return it directly
-      if (typeof nodeObj === 'string') return nodeObj;
-      
-      // If it has an ID property, use that
-      if (nodeObj.id && typeof nodeObj.id === 'string') {
-        return nodeObj.id;
-      }
-      
-      // If it's a ThreeJS object with userData
-      if (nodeObj.__threeObj && nodeObj.__threeObj.userData) {
-        return nodeObj.__threeObj.userData.id || '';
-      }
-      
-      // Fallback
-      return '';
-    };
-    
+
     // Refresh the graph to update colors and highlighting
     try {
       // Get selected node ID for comparison
