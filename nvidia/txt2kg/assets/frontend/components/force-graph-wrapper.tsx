@@ -395,6 +395,9 @@ export function ForceGraphWrapper({
   // Track if clustering is enabled
   const [isClusteringEnabled, setIsClusteringEnabled] = useState<boolean>(false);
 
+  // Store colored nodes for cluster color preservation
+  const coloredNodesRef = useRef<any[]>([]);
+
   // Helper function to extract node ID reliably
   const getNodeId = (nodeObj: any): string => {
     if (!nodeObj) return '';
@@ -1865,7 +1868,31 @@ export function ForceGraphWrapper({
   // Effect to update graph visualization when selected node or connections change
   useEffect(() => {
     if (!graphRef.current) return;
-    
+
+    // If there's no selected node, restore cluster colors if enabled, otherwise do nothing
+    if (!selectedNode) {
+      console.log("🔄 Selection effect with no selected node", {
+        enableClusterColors,
+        coloredNodesRefLength: coloredNodesRef.current.length,
+        hasGraphRef: !!graphRef.current
+      });
+
+      if (enableClusterColors && coloredNodesRef.current.length > 0) {
+        console.log("🔄 No selection - restoring cluster colors from ref");
+        graphRef.current.nodeColor((node: any) => {
+          const nodeId = getNodeId(node);
+          const coloredNode = coloredNodesRef.current.find(n => getNodeId(n) === nodeId);
+          return coloredNode?.color || '#50fa7b';
+        });
+        graphRef.current.linkColor(() => '#ffffff30');
+        graphRef.current.linkWidth(() => 1);
+        graphRef.current.refresh();
+      } else {
+        console.log("⚠️ Not restoring cluster colors - conditions not met");
+      }
+      return; // Exit early - don't process selection logic
+    }
+
     console.log("Effect triggered: Updating visual highlighting for selected node and connections");
     
     // Helper function to extract ID reliably
@@ -2009,13 +2036,21 @@ export function ForceGraphWrapper({
         .nodeColor((node: any) => {
           // Get reliable ID for comparison
           const nodeId = getNodeId(node);
-          
+
           const isSelected = selectedNodeId && nodeId === selectedNodeId;
           const isConnected = selectedNodeId && connectedNodeIds.has(nodeId);
-          
+
           if (isSelected) return '#50fa7b'; // Bright green for selected
           if (isConnected) return '#bd93f9'; // Purple for connected nodes
-          
+
+          // If cluster colors are enabled, look up the node's cluster color from the ref
+          if (enableClusterColors && coloredNodesRef.current.length > 0) {
+            const coloredNode = coloredNodesRef.current.find(n => getNodeId(n) === nodeId);
+            if (coloredNode?.color) {
+              return coloredNode.color;
+            }
+          }
+
           // Default colors based on group
           const group = node.group || 'default';
           switch (group) {
@@ -2215,7 +2250,7 @@ export function ForceGraphWrapper({
     } catch (error) {
       console.error("Error updating graph visual state:", error);
     }
-  }, [selectedNode, nodeConnections, graphData]);
+  }, [selectedNode, nodeConnections, graphData, enableClusterColors]);
 
   // Add a toggle for clustering
   const toggleClustering = () => {
@@ -2311,34 +2346,43 @@ export function ForceGraphWrapper({
   useEffect(() => {
     if (graphRef.current && graphData?.nodes) {
       console.log("🎨 Cluster colors setting changed:", enableClusterColors);
-      
+
       if (enableClusterColors) {
+        console.log("🎨 About to assign cluster colors to nodes");
         // Apply cluster colors
         const coloredNodes = assignClusterColors(graphData.nodes, true, isClusteringEnabled);
-        
+        console.log("🎨 Cluster colors assigned, node count:", coloredNodes?.length || 0);
+
+        // Store colored nodes in ref for later use by selection effect
+        coloredNodesRef.current = coloredNodes;
+        console.log("✅ Stored colored nodes in ref, count:", coloredNodesRef.current?.length || 0);
+
         // Update the graph with new colors
         graphRef.current.nodeColor((node: any) => {
           const coloredNode = coloredNodes.find(n => getNodeId(n) === getNodeId(node));
           return coloredNode?.color || node.color || '#4CAF50';
         });
-        
+
         // Refresh to show changes
         graphRef.current.refresh();
-        
+
         // Update notification based on actual clustering type used
         const hasActualSemanticClusters = graphData.nodes.some((node: any) => node.clusterId !== undefined || node.clusterIndex !== undefined);
-        const clusteringType = isClusteringEnabled && hasActualSemanticClusters 
-          ? `${clusteringMethod} - ${semanticAlgorithm}` 
+        const clusteringType = isClusteringEnabled && hasActualSemanticClusters
+          ? `${clusteringMethod} - ${semanticAlgorithm}`
           : "spatial";
         showNotification(
           `Cluster colors applied - nodes are colored by ${clusteringType} cluster`,
           "success"
         );
       } else {
+        // Clear colored nodes ref
+        coloredNodesRef.current = [];
+
         // Reset to original colors
         graphRef.current.nodeColor((node: any) => node.color || '#4CAF50');
         graphRef.current.refresh();
-        
+
         showNotification(
           "Cluster colors disabled - using original node colors",
           "info"
@@ -2893,4 +2937,4 @@ export function ForceGraphWrapper({
   )
 }
 
-export default ForceGraphWrapper;
+export default ForceGraphWrapper;// Force rebuild Sat Oct 25 07:10:20 PM PDT 2025
