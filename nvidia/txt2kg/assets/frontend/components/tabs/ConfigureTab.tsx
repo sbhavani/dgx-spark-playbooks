@@ -118,9 +118,9 @@ export function ConfigureTab() {
     "Using sentence-transformers service model"
   
   return (
-    <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+    <div className="grid md:grid-cols-5 gap-8 lg:gap-12">
       {/* Left column: Model selection */}
-      <div className="space-y-8">
+      <div className="space-y-8 md:col-span-2">
         <div className="nvidia-build-card">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-8 h-8 rounded-lg bg-nvidia-green/15 flex items-center justify-center">
@@ -138,7 +138,7 @@ export function ConfigureTab() {
                 <span className="text-foreground font-medium">{selectedModelInfo.name}</span>
               </div>
             </div>
-            
+
             <div className="bg-muted/10 border border-border/20 p-4 rounded-xl">
               <h3 className="text-sm font-semibold text-foreground mb-3">Embedding Model</h3>
               <div className="flex items-center gap-3 text-sm">
@@ -148,11 +148,11 @@ export function ConfigureTab() {
                 <span className="text-foreground font-medium truncate flex-1">{displayEmbeddingModel}</span>
               </div>
             </div>
-            
+
             <ProcessingSummary />
           </div>
         </div>
-        
+
         <div className="nvidia-build-card">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-8 h-8 rounded-lg bg-nvidia-green/15 flex items-center justify-center">
@@ -160,15 +160,15 @@ export function ConfigureTab() {
             </div>
             <h2 className="text-lg font-semibold text-foreground">Select Triple Extraction Model</h2>
           </div>
-          
+
           <div className="space-y-4">
             <ModelSelector />
           </div>
         </div>
       </div>
-      
+
       {/* Right column: Document Processing */}
-      <div className="space-y-8">
+      <div className="space-y-8 md:col-span-3">
         <div className="nvidia-build-card">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-8 h-8 rounded-lg bg-nvidia-green/15 flex items-center justify-center">

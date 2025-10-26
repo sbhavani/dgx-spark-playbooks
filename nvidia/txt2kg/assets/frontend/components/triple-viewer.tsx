@@ -66,8 +66,10 @@ export function TripleViewer() {
   const [editingEntityIndex, setEditingEntityIndex] = useState<number | null>(null)
   const [isAddingEntity, setIsAddingEntity] = useState(false)
   const [newEntityName, setNewEntityName] = useState('')
-  const [isStoringToDb, setIsStoringToDb] = useState(false)
-  const [storeStatus, setStoreStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [isStoringSingle, setIsStoringSingle] = useState(false)
+  const [storeSingleStatus, setStoreSingleStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [isStoringAll, setIsStoringAll] = useState(false)
+  const [storeAllStatus, setStoreAllStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -285,8 +287,8 @@ export function TripleViewer() {
     }
 
     try {
-      setIsStoringToDb(true);
-      setStoreStatus('loading');
+      setIsStoringSingle(true);
+      setStoreSingleStatus('loading');
 
       const response = await fetch('/api/graph-db/triples', {
         method: 'POST',
@@ -304,14 +306,14 @@ export function TripleViewer() {
         throw new Error(errorData.error || 'Failed to store triples in the database');
       }
 
-      setStoreStatus('success');
-      setTimeout(() => setStoreStatus('idle'), 3000);
+      setStoreSingleStatus('success');
+      setTimeout(() => setStoreSingleStatus('idle'), 3000);
     } catch (error) {
       console.error("Error storing triples in graph database:", error);
-      setStoreStatus('error');
+      setStoreSingleStatus('error');
       alert(error instanceof Error ? error.message : 'An error occurred while storing triples');
     } finally {
-      setIsStoringToDb(false);
+      setIsStoringSingle(false);
     }
   };
 
@@ -319,19 +321,19 @@ export function TripleViewer() {
   const storeAllTriplesInGraphDb = async () => {
     // Get all documents with triples
     const docsWithTriples = documents.filter(doc => doc.triples && doc.triples.length > 0);
-    
+
     if (docsWithTriples.length === 0) {
       alert("No documents with triples to store in the database");
       return;
     }
 
     try {
-      setIsStoringToDb(true);
-      setStoreStatus('loading');
+      setIsStoringAll(true);
+      setStoreAllStatus('loading');
 
       // Collect all triples from all documents
       const allTriples = docsWithTriples.flatMap(doc => doc.triples || []);
-      
+
       const response = await fetch('/api/graph-db/triples', {
         method: 'POST',
         headers: {
@@ -348,14 +350,14 @@ export function TripleViewer() {
         throw new Error(errorData.error || 'Failed to store all triples in the database');
       }
 
-      setStoreStatus('success');
-      setTimeout(() => setStoreStatus('idle'), 3000);
+      setStoreAllStatus('success');
+      setTimeout(() => setStoreAllStatus('idle'), 3000);
     } catch (error) {
       console.error("Error storing all triples in graph database:", error);
-      setStoreStatus('error');
+      setStoreAllStatus('error');
       alert(error instanceof Error ? error.message : 'An error occurred while storing all triples');
     } finally {
-      setIsStoringToDb(false);
+      setIsStoringAll(false);
     }
   };
 
@@ -433,20 +435,20 @@ export function TripleViewer() {
         <div className="flex justify-end">
           <button
             onClick={storeAllTriplesInGraphDb}
-            disabled={isStoringToDb || documents.filter(doc => doc.triples && doc.triples.length > 0).length === 0}
+            disabled={isStoringAll || documents.filter(doc => doc.triples && doc.triples.length > 0).length === 0}
             className={`inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all shadow-sm ${
-              storeStatus === 'success' 
-                ? 'bg-green-50 border border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400' 
-                : storeStatus === 'error' 
-                  ? 'bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400' 
+              storeAllStatus === 'success'
+                ? 'bg-green-50 border border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400'
+                : storeAllStatus === 'error'
+                  ? 'bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400'
                   : 'bg-nvidia-green hover:bg-nvidia-green/90 text-white border-nvidia-green hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed'
             }`}
           >
             <Database className="h-4 w-4" />
             <span>
-              {storeStatus === 'loading' ? 'Storing All Documents...' : 
-               storeStatus === 'success' ? 'All Documents Stored!' : 
-               storeStatus === 'error' ? 'Failed' : 
+              {storeAllStatus === 'loading' ? 'Storing All Documents...' :
+               storeAllStatus === 'success' ? 'All Documents Stored!' :
+               storeAllStatus === 'error' ? 'Failed' :
                'Store All in Graph DB'}
             </span>
           </button>
@@ -542,20 +544,20 @@ export function TripleViewer() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={storeInGraphDb}
-                        disabled={isStoringToDb || !selectedDoc.triples || selectedDoc.triples.length === 0}
+                        disabled={isStoringSingle || !selectedDoc.triples || selectedDoc.triples.length === 0}
                         className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all shadow-sm ${
-                          storeStatus === 'success' 
-                            ? 'bg-green-50 border border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400' 
-                            : storeStatus === 'error' 
-                              ? 'bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400' 
+                          storeSingleStatus === 'success'
+                            ? 'bg-green-50 border border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400'
+                            : storeSingleStatus === 'error'
+                              ? 'bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400'
                               : 'bg-background border border-border hover:bg-muted/50 text-foreground hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed'
                         }`}
                       >
                         <Database className="h-4 w-4" />
                         <span>
-                          {storeStatus === 'loading' ? 'Storing...' :
-                           storeStatus === 'success' ? 'Stored!' :
-                           storeStatus === 'error' ? 'Failed' : 
+                          {storeSingleStatus === 'loading' ? 'Storing...' :
+                           storeSingleStatus === 'success' ? 'Stored!' :
+                           storeSingleStatus === 'error' ? 'Failed' :
                            'Store in Graph DB'}
                         </span>
                       </button>
