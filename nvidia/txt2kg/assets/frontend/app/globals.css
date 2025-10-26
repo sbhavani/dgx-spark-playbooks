@@ -1,9 +1,9 @@
+/* Import NVIDIA Build typography patterns with Inter font */
+@import url('../styles/nvidia-build-typography.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import NVIDIA Build typography patterns with Inter font */
-@import url('../styles/nvidia-build-typography.css');
 
 :root {
   --foreground-rgb: 255, 255, 255;

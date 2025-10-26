@@ -21,16 +21,18 @@ export function InfoModal() {
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">Text to Knowledge Graph</DialogTitle>
-          <DialogDescription className="text-base leading-relaxed pt-4 space-y-4">
-            <p>
-              Transform unstructured text into structured knowledge graphs using AI-powered triple extraction.
-              This NVIDIA Spark playbook automatically identifies entities and relationships from your documents,
-              then visualizes them as interactive 2D or 3D graphs powered by ArangoDB and advanced language models.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Extract subject-predicate-object triples, perform graph-based queries, and explore your data through
-              multiple visualization modes including traditional graph search and vector-enhanced semantic search.
-            </p>
+          <DialogDescription asChild>
+            <div className="text-base leading-relaxed pt-4 space-y-4">
+              <p>
+                Transform unstructured text into structured knowledge graphs using AI-powered triple extraction.
+                This NVIDIA Spark playbook automatically identifies entities and relationships from your documents,
+                then visualizes them as interactive 2D or 3D graphs powered by ArangoDB and advanced language models.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Extract subject-predicate-object triples, perform graph-based queries, and explore your data through
+                multiple visualization modes including traditional graph search and vector-enhanced semantic search.
+              </p>
+            </div>
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3 pt-4">

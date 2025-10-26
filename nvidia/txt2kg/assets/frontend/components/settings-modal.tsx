@@ -28,12 +28,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
@@ -175,159 +174,157 @@ export function SettingsModal() {
     setPineconeIndex(localStorage.getItem("pinecone_index") || "")
   }, [isOpen])
   
-  // Save database settings
-  const saveDbSettings = async (e: React.FormEvent) => {
+  // Save all settings
+  const saveSettings = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // Save graph DB type
-    localStorage.setItem("graph_db_type", graphDbType)
-    
-    // Save Neo4j settings
-    localStorage.setItem("neo4j_url", neo4jUrl)
-    localStorage.setItem("neo4j_user", neo4jUser)
-    localStorage.setItem("neo4j_password", neo4jPassword)
-    
-    // Save ArangoDB settings
-    localStorage.setItem("arango_url", arangoUrl)
-    localStorage.setItem("arango_db", arangoDb)
-    localStorage.setItem("arango_user", arangoUser)
-    localStorage.setItem("arango_password", arangoPassword)
-    
-    // Sync settings with server
-    try {
-      await fetch('/api/settings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          settings: {
-            graph_db_type: graphDbType,
-            neo4j_url: neo4jUrl,
-            neo4j_user: neo4jUser,
-            neo4j_password: neo4jPassword,
-            arango_url: arangoUrl,
-            arango_db: arangoDb,
-            arango_user: arangoUser,
-            arango_password: arangoPassword
-          }
-        }),
-      });
-    } catch (error) {
-      console.error('Error syncing settings:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to sync settings with server"
-      });
-    }
-    
-    toast({
-      title: "Success",
-      description: "Graph database settings saved"
-    });
-    setIsOpen(false)
-  }
-  
-  // Save vector database settings
-  const saveVectorDbSettings = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    localStorage.setItem("pinecone_api_key", pineconeApiKey)
-    localStorage.setItem("pinecone_environment", pineconeEnvironment)
-    localStorage.setItem("pinecone_index", pineconeIndex)
-    
-    // Sync settings with server
-    try {
-      await fetch('/api/settings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          settings: {
-            pinecone_api_key: pineconeApiKey,
-            pinecone_environment: pineconeEnvironment,
-            pinecone_index: pineconeIndex,
-          }
-        }),
-      });
-    } catch (error) {
-      console.error('Error syncing settings:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to sync settings with server"
-      });
-    }
-    
-    toast({
-      title: "Success",
-      description: "Vector database settings saved"
-    })
-  }
-  
-  // Save S3 settings and check connection
-  const saveS3Settings = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    setIsConnecting(true)
-    setS3Error(null)
-    
-    try {
-      // Save S3 settings to localStorage
-      localStorage.setItem("S3_ENDPOINT", s3Endpoint)
-      localStorage.setItem("S3_BUCKET", s3Bucket)
-      localStorage.setItem("S3_ACCESS_KEY", s3AccessKey)
-      localStorage.setItem("S3_SECRET_KEY", s3SecretKey)
 
-      // Set these in window for runtime access
-      window.process = window.process || {}
-      window.process.env = window.process.env || {}
-      window.process.env.S3_ENDPOINT = s3Endpoint
-      window.process.env.S3_BUCKET = s3Bucket
-      window.process.env.S3_ACCESS_KEY = s3AccessKey
-      window.process.env.S3_SECRET_KEY = s3SecretKey
-      
-      // Try to list files to verify connection
-      const files = await listFilesInS3()
-      setS3FileCount(files.length)
-      setIsS3Connected(true)
-      
-      // Save connection status to localStorage
-      localStorage.setItem("S3_CONNECTED", "true")
-      
-      // Dispatch event to notify other components
-      window.dispatchEvent(new CustomEvent('s3ConnectionChanged', { 
-        detail: { isConnected: true } 
-      }))
-      
-      toast({
-        title: "Success",
-        description: `Connected to S3 bucket. Found ${files.length} files.`
-      })
-    } catch (error) {
-      console.error("Failed to connect to S3:", error)
-      setIsS3Connected(false)
-      
-      // Save connection status to localStorage
-      localStorage.setItem("S3_CONNECTED", "false")
-      
-      // Dispatch event to notify other components
-      window.dispatchEvent(new CustomEvent('s3ConnectionChanged', { 
-        detail: { isConnected: false } 
-      }))
-      
-      setS3Error(error instanceof Error ? error.message : "Could not connect to S3 storage")
-      toast({
-        variant: "destructive",
-        title: "S3 Connection Failed",
-        description: error instanceof Error ? error.message : "Unknown error"
-      })
-    } finally {
-      setIsConnecting(false)
+    let successMessage = ""
+
+    // Save based on active tab
+    if (activeTab === "graph") {
+      localStorage.setItem("graph_db_type", graphDbType)
+      localStorage.setItem("neo4j_url", neo4jUrl)
+      localStorage.setItem("neo4j_user", neo4jUser)
+      localStorage.setItem("neo4j_password", neo4jPassword)
+      localStorage.setItem("arango_url", arangoUrl)
+      localStorage.setItem("arango_db", arangoDb)
+      localStorage.setItem("arango_user", arangoUser)
+      localStorage.setItem("arango_password", arangoPassword)
+
+      try {
+        await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            settings: {
+              graph_db_type: graphDbType,
+              neo4j_url: neo4jUrl,
+              neo4j_user: neo4jUser,
+              neo4j_password: neo4jPassword,
+              arango_url: arangoUrl,
+              arango_db: arangoDb,
+              arango_user: arangoUser,
+              arango_password: arangoPassword
+            }
+          }),
+        });
+      } catch (error) {
+        console.error('Error syncing settings:', error);
+      }
+      successMessage = "Graph database settings saved"
+    } else if (activeTab === "vectordb") {
+      localStorage.setItem("pinecone_api_key", pineconeApiKey)
+      localStorage.setItem("pinecone_environment", pineconeEnvironment)
+      localStorage.setItem("pinecone_index", pineconeIndex)
+
+      try {
+        await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            settings: {
+              pinecone_api_key: pineconeApiKey,
+              pinecone_environment: pineconeEnvironment,
+              pinecone_index: pineconeIndex,
+            }
+          }),
+        });
+      } catch (error) {
+        console.error('Error syncing settings:', error);
+      }
+      successMessage = "Vector database settings saved"
+    } else if (activeTab === "s3") {
+      setIsConnecting(true)
+      setS3Error(null)
+
+      try {
+        localStorage.setItem("S3_ENDPOINT", s3Endpoint)
+        localStorage.setItem("S3_BUCKET", s3Bucket)
+        localStorage.setItem("S3_ACCESS_KEY", s3AccessKey)
+        localStorage.setItem("S3_SECRET_KEY", s3SecretKey)
+
+        window.process = window.process || {}
+        window.process.env = window.process.env || {}
+        window.process.env.S3_ENDPOINT = s3Endpoint
+        window.process.env.S3_BUCKET = s3Bucket
+        window.process.env.S3_ACCESS_KEY = s3AccessKey
+        window.process.env.S3_SECRET_KEY = s3SecretKey
+
+        const files = await listFilesInS3()
+        setS3FileCount(files.length)
+        setIsS3Connected(true)
+        localStorage.setItem("S3_CONNECTED", "true")
+
+        window.dispatchEvent(new CustomEvent('s3ConnectionChanged', {
+          detail: { isConnected: true }
+        }))
+
+        successMessage = `Connected to S3. Found ${files.length} files.`
+      } catch (error) {
+        console.error("Failed to connect to S3:", error)
+        setIsS3Connected(false)
+        localStorage.setItem("S3_CONNECTED", "false")
+
+        window.dispatchEvent(new CustomEvent('s3ConnectionChanged', {
+          detail: { isConnected: false }
+        }))
+
+        setS3Error(error instanceof Error ? error.message : "Could not connect to S3 storage")
+        toast({
+          variant: "destructive",
+          title: "S3 Connection Failed",
+          description: error instanceof Error ? error.message : "Unknown error"
+        })
+        setIsConnecting(false)
+        return
+      } finally {
+        setIsConnecting(false)
+      }
+    } else if (activeTab === "embeddings") {
+      localStorage.setItem("embeddings_provider", embeddingsProvider);
+
+      if (embeddingsProvider === "nvidia") {
+        localStorage.setItem("nvidia_embeddings_model", nvidiaEmbeddingsModel);
+      }
+
+      process.env.EMBEDDINGS_PROVIDER = embeddingsProvider;
+
+      if (embeddingsProvider === "nvidia") {
+        process.env.NVIDIA_EMBEDDINGS_MODEL = nvidiaEmbeddingsModel;
+      }
+
+      try {
+        import("@/lib/embeddings").then(({ EmbeddingsService }) => {
+          EmbeddingsService.reset();
+          console.log("EmbeddingsService reset successfully");
+
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('embeddings-settings-changed'));
+          }
+        });
+      } catch (error) {
+        console.error("Error resetting EmbeddingsService:", error);
+      }
+
+      successMessage = "Embeddings settings saved"
+    } else if (activeTab === "models") {
+      localStorage.setItem("selected_ollama_models", JSON.stringify(selectedOllamaModels))
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('ollama-models-updated', {
+          detail: { selectedModels: selectedOllamaModels }
+        }))
+      }
+
+      successMessage = "Ollama model settings saved"
     }
+
+    toast({
+      title: "Success",
+      description: successMessage
+    });
   }
+
   
   // Fetch available Ollama models
   const fetchOllamaModels = async () => {
@@ -361,26 +358,6 @@ export function SettingsModal() {
     }
   }
 
-  // Save Ollama model settings
-  const saveOllamaSettings = (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    // Save selected models to localStorage
-    localStorage.setItem("selected_ollama_models", JSON.stringify(selectedOllamaModels))
-    
-    // Dispatch event to notify model selector to refresh
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('ollama-models-updated', {
-        detail: { selectedModels: selectedOllamaModels }
-      }))
-    }
-    
-    toast({
-      title: "Success",
-      description: "Ollama model settings saved"
-    })
-  }
-
   // Toggle Ollama model selection
   const toggleOllamaModel = (modelName: string) => {
     setSelectedOllamaModels(prev => {
@@ -391,47 +368,6 @@ export function SettingsModal() {
       }
     })
   }
-
-  // Save embeddings settings
-  const saveEmbeddingsSettings = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Save embeddings provider to localStorage
-    localStorage.setItem("embeddings_provider", embeddingsProvider);
-    
-    // If using NVIDIA API, also save the model
-    if (embeddingsProvider === "nvidia") {
-      localStorage.setItem("nvidia_embeddings_model", nvidiaEmbeddingsModel);
-    }
-    
-    // Save to environment variables (this works in development; in production needs server-side implementation)
-    process.env.EMBEDDINGS_PROVIDER = embeddingsProvider;
-    
-    if (embeddingsProvider === "nvidia") {
-      process.env.NVIDIA_EMBEDDINGS_MODEL = nvidiaEmbeddingsModel;
-    }
-    
-    // Reset the EmbeddingsService instance to pick up new settings
-    try {
-      // Import dynamically to avoid issues with circular dependencies
-      import("@/lib/embeddings").then(({ EmbeddingsService }) => {
-        EmbeddingsService.reset();
-        console.log("EmbeddingsService reset successfully");
-        
-        // Dispatch a custom event to notify components that embeddings settings have changed
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('embeddings-settings-changed'));
-        }
-      });
-    } catch (error) {
-      console.error("Error resetting EmbeddingsService:", error);
-    }
-    
-    toast({
-      title: "Success",
-      description: "Embeddings settings saved"
-    })
-  }
   
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -440,67 +376,67 @@ export function SettingsModal() {
           <Settings className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
         </button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-background border-border">
-        <DialogHeader className="pb-6 border-b border-border/10">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-nvidia-green/15 flex items-center justify-center">
-              <Settings className="h-4 w-4 text-nvidia-green" />
+      <DialogContent className="max-w-5xl max-h-[85vh] p-0 gap-0 bg-background border-border flex flex-col">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b border-border/10 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-nvidia-green/15 flex items-center justify-center">
+              <Settings className="h-5 w-5 text-nvidia-green" />
             </div>
-            <DialogTitle className="text-xl font-semibold text-foreground">
-              Settings
-            </DialogTitle>
+            <div>
+              <DialogTitle className="text-2xl font-semibold text-foreground">
+                Settings
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground mt-1">
+                Configure your API keys and database connections
+              </DialogDescription>
+            </div>
           </div>
-          <DialogDescription className="text-sm text-muted-foreground leading-relaxed">
-            Configure your API keys and DB connections
-          </DialogDescription>
         </DialogHeader>
-        
-        <div className="mt-4">
-          <div className="mb-4">
-            <Select value={activeTab} onValueChange={setActiveTab}>
-              <SelectTrigger className="w-full border-border/60 bg-background text-foreground focus:border-primary/50 focus:ring-primary/20">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="graph">
-                  <div className="flex items-center gap-3">
-                    <Database className="h-4 w-4 text-nvidia-green" />
-                    <span>Graph Database</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="vectordb">
-                  <div className="flex items-center gap-3">
-                    <SearchIcon className="h-4 w-4 text-nvidia-green" />
-                    <span>Vector Database</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="s3">
-                  <div className="flex items-center gap-3">
-                    <HardDrive className="h-4 w-4 text-nvidia-green" />
-                    <span>S3 Storage</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="embeddings">
-                  <div className="flex items-center gap-3">
-                    <Cpu className="h-4 w-4 text-nvidia-green" />
-                    <span>Embeddings</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="models">
-                  <div className="flex items-center gap-3">
-                    <Server className="h-4 w-4 text-nvidia-green" />
-                    <span>Model Management</span>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
 
-          {activeTab === "graph" && (
-            <div className="bg-muted/30 border border-border/40 rounded-xl p-4">
-              <form onSubmit={saveDbSettings} className="space-y-4">
-                <div className="space-y-2">
+        <form onSubmit={saveSettings} className="flex flex-col flex-1 overflow-hidden">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-1 overflow-hidden">
+          <TabsList className="flex-col h-full w-56 rounded-none bg-muted/30 p-2 space-y-1 justify-start border-r border-border/40">
+            <TabsTrigger
+              value="graph"
+              className="w-full justify-start gap-3 data-[state=active]:bg-background data-[state=active]:text-foreground"
+            >
+              <Database className="h-4 w-4" />
+              Graph Database
+            </TabsTrigger>
+            <TabsTrigger
+              value="vectordb"
+              className="w-full justify-start gap-3 data-[state=active]:bg-background data-[state=active]:text-foreground"
+            >
+              <SearchIcon className="h-4 w-4" />
+              Vector Database
+            </TabsTrigger>
+            <TabsTrigger
+              value="s3"
+              className="w-full justify-start gap-3 data-[state=active]:bg-background data-[state=active]:text-foreground"
+            >
+              <HardDrive className="h-4 w-4" />
+              S3 Storage
+            </TabsTrigger>
+            <TabsTrigger
+              value="embeddings"
+              className="w-full justify-start gap-3 data-[state=active]:bg-background data-[state=active]:text-foreground"
+            >
+              <Cpu className="h-4 w-4" />
+              Embeddings
+            </TabsTrigger>
+            <TabsTrigger
+              value="models"
+              className="w-full justify-start gap-3 data-[state=active]:bg-background data-[state=active]:text-foreground"
+            >
+              <Server className="h-4 w-4" />
+              Model Management
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="flex-1 overflow-y-auto bg-muted/10">
+            <TabsContent value="graph" className="mt-0 p-6 space-y-4">
+              <div className="bg-card rounded-lg border border-border/40 p-5 space-y-4">
+                <div className="space-y-3">
                   <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <Database className="h-4 w-4 text-nvidia-green" />
                     Database Type
@@ -632,23 +568,11 @@ export function SettingsModal() {
                     </div>
                   </div>
                 )}
-              
-                <div className="flex justify-end pt-3 border-t border-border/30">
-                  <button 
-                    type="submit" 
-                    className="flex items-center gap-2 px-4 py-2 rounded-md bg-nvidia-green hover:bg-nvidia-green/90 text-white transition-colors text-sm font-medium shadow-sm"
-                  >
-                    <Save className="h-4 w-4" />
-                    Save Settings
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-          
-          {activeTab === "vectordb" && (
-            <div className="bg-muted/30 border border-border/40 rounded-xl p-4">
-              <form onSubmit={saveVectorDbSettings} className="space-y-4">
+              </div>
+            </TabsContent>
+
+            <TabsContent value="vectordb" className="mt-0 p-6">
+              <div className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <SearchIcon className="h-4 w-4 text-nvidia-green" />
@@ -692,23 +616,11 @@ export function SettingsModal() {
                     </div>
                   </div>
                 </div>
-                
-                <div className="flex justify-end pt-3 border-t border-border/30">
-                  <button 
-                    type="submit" 
-                    className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary hover:bg-primary/90 text-primary-foreground transition-colors text-sm font-medium shadow-sm"
-                  >
-                    <Save className="h-4 w-4" />
-                    Save Settings
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-          
-          {activeTab === "s3" && (
-            <div className="bg-muted/30 border border-border/40 rounded-xl p-4">
-              <form onSubmit={saveS3Settings} className="space-y-4">
+              </div>
+            </TabsContent>
+
+            <TabsContent value="s3" className="mt-0 p-6">
+              <div className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <HardDrive className="h-4 w-4 text-nvidia-green" />
@@ -783,38 +695,11 @@ export function SettingsModal() {
                     </div>
                   </div>
                 )}
-                
-                <div className="flex justify-end pt-3 border-t border-border/30">
-                  <Button 
-                    type="submit" 
-                    disabled={isConnecting} 
-                    className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary hover:bg-primary/90 text-primary-foreground transition-colors text-sm font-medium shadow-sm"
-                  >
-                    {isConnecting ? (
-                      <>
-                        <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        Connecting...
-                      </>
-                    ) : isS3Connected ? (
-                      <>
-                        <Save className="h-4 w-4" />
-                        Update Connection
-                      </>
-                    ) : (
-                      <>
-                        <HardDrive className="h-4 w-4" />
-                        Connect to S3
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </div>
-          )}
-          
-          {activeTab === "embeddings" && (
-            <div className="bg-muted/30 border border-border/40 rounded-xl p-4">
-              <form onSubmit={saveEmbeddingsSettings} className="space-y-4">
+              </div>
+            </TabsContent>
+
+            <TabsContent value="embeddings" className="mt-0 p-6">
+              <div className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <Cpu className="h-4 w-4 text-nvidia-green" />
@@ -859,22 +744,11 @@ export function SettingsModal() {
                     </div>
                   )}
                 </div>
-                
-                <div className="flex justify-end pt-3 border-t border-border/30">
-                  <button 
-                    type="submit" 
-                    className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary hover:bg-primary/90 text-primary-foreground transition-colors text-sm font-medium shadow-sm"
-                  >
-                    <Save className="h-4 w-4" />
-                    Save Settings
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-          
-          {activeTab === "models" && (
-            <div className="bg-muted/30 border border-border/40 rounded-xl p-4">
+              </div>
+            </TabsContent>
+
+            <TabsContent value="models" className="mt-0 p-6">
+              <div className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
@@ -921,7 +795,6 @@ export function SettingsModal() {
 
                 {availableOllamaModels.length > 0 && (
                   <div className="bg-background/50 rounded-lg p-3 space-y-3">
-                    <form onSubmit={saveOllamaSettings} className="space-y-3">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <label className="text-xs font-medium text-muted-foreground">Available Models</label>
@@ -948,33 +821,23 @@ export function SettingsModal() {
                         </div>
                       </div>
 
-                      <div className="flex justify-between items-center pt-2 border-t border-border/30">
-                        <div className="flex gap-2 text-xs">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedOllamaModels(availableOllamaModels)}
-                            className="text-primary hover:text-primary/80 transition-colors font-medium"
-                          >
-                            All
-                          </button>
-                          <span className="text-muted-foreground/50">|</span>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedOllamaModels([])}
-                            className="text-primary hover:text-primary/80 transition-colors font-medium"
-                          >
-                            None
-                          </button>
-                        </div>
-                        <button 
-                          type="submit" 
-                          className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary hover:bg-primary/90 text-primary-foreground transition-colors text-xs font-medium shadow-sm"
+                      <div className="flex gap-2 text-xs pt-2 border-t border-border/30">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedOllamaModels(availableOllamaModels)}
+                          className="text-primary hover:text-primary/80 transition-colors font-medium"
                         >
-                          <Save className="h-3 w-3" />
-                          Save Settings
+                          Select All
+                        </button>
+                        <span className="text-muted-foreground/50">|</span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedOllamaModels([])}
+                          className="text-primary hover:text-primary/80 transition-colors font-medium"
+                        >
+                          Select None
                         </button>
                       </div>
-                    </form>
                   </div>
                 )}
 
@@ -987,9 +850,39 @@ export function SettingsModal() {
                   </div>
                 )}
               </div>
-            </div>
-          )}
-        </div>
+              </div>
+            </TabsContent>
+          </div>
+          </Tabs>
+
+          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border/10 bg-muted/20 shrink-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsOpen(false)}
+              className="px-4"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isConnecting}
+              className="flex items-center gap-2 px-6 bg-nvidia-green hover:bg-nvidia-green/90 text-black font-semibold"
+            >
+              {isConnecting ? (
+                <>
+                  <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  Save Settings
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   )
