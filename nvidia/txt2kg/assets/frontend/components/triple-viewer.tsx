@@ -363,11 +363,11 @@ export function TripleViewer() {
 
   return (
     <div className="p-6">
-      {/* Header Section with improved layout */}
-      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
-        <div className="flex items-center gap-4 relative" ref={dropdownRef}>
+      {/* Header Section - Document Selector and Global Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div className="flex items-center gap-4 relative flex-1" ref={dropdownRef}>
           <label className="text-sm font-semibold text-foreground whitespace-nowrap">Select Document</label>
-          <div className="relative w-64">
+          <div className="relative flex-1 max-w-md">
             <button
               className="w-full flex items-center justify-between bg-card border border-border rounded-lg p-3 text-foreground text-sm hover:bg-muted/30 transition-colors"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -390,7 +390,7 @@ export function TripleViewer() {
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </button>
-            
+
             {isDropdownOpen && (
               <div className="absolute z-10 mt-1 w-full bg-card border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
                 <div className="p-2 sticky top-0 bg-card border-b border-border">
@@ -430,176 +430,164 @@ export function TripleViewer() {
             )}
           </div>
         </div>
-        
-        {/* Primary Action - Store All Documents */}
-        <div className="flex justify-end">
-          <button
-            onClick={storeAllTriplesInGraphDb}
-            disabled={isStoringAll || documents.filter(doc => doc.triples && doc.triples.length > 0).length === 0}
-            className={`inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all shadow-sm ${
-              storeAllStatus === 'success'
-                ? 'bg-green-50 border border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400'
-                : storeAllStatus === 'error'
-                  ? 'bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400'
-                  : 'bg-nvidia-green hover:bg-nvidia-green/90 text-white border-nvidia-green hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed'
-            }`}
-          >
-            <Database className="h-4 w-4" />
-            <span>
-              {storeAllStatus === 'loading' ? 'Storing All Documents...' :
-               storeAllStatus === 'success' ? 'All Documents Stored!' :
-               storeAllStatus === 'error' ? 'Failed' :
-               'Store All in Graph DB'}
-            </span>
-          </button>
-        </div>
+
+        {/* Global Action - Store All Documents */}
+        <button
+          onClick={storeAllTriplesInGraphDb}
+          disabled={isStoringAll || documents.filter(doc => doc.triples && doc.triples.length > 0).length === 0}
+          className={`inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg transition-all shadow-sm ${
+            storeAllStatus === 'success'
+              ? 'bg-green-50 border border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400'
+              : storeAllStatus === 'error'
+                ? 'bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400'
+                : 'bg-nvidia-green hover:bg-nvidia-green/90 text-white hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed'
+          }`}
+        >
+          <Database className="h-4 w-4" />
+          <span>
+            {storeAllStatus === 'loading' ? 'Storing All...' :
+             storeAllStatus === 'success' ? 'All Stored!' :
+             storeAllStatus === 'error' ? 'Failed' :
+             'Store All Documents'}
+          </span>
+        </button>
       </div>
-      
+
       {selectedDoc && (
         <>
-          {/* Knowledge Graph Stats */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-semibold text-foreground">Document Statistics</h4>
-              <div className="flex items-center gap-6 text-sm">
+          {/* Tab Navigation with Stats */}
+          <div className="mb-6 border border-border/40 rounded-xl p-4 bg-muted/10">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+              <div className="inline-flex items-center justify-center rounded-xl bg-muted/20 border border-border/15 p-2 shadow-sm backdrop-blur-sm w-fit">
+                <button
+                  onClick={() => setViewMode('triples')}
+                  className={`inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200 hover:bg-background/60 ${
+                    viewMode === 'triples'
+                      ? 'bg-background text-foreground shadow-sm border border-border/20'
+                      : 'text-muted-foreground'
+                  }`}
+                >
+                  <div className={`nvidia-build-tab-icon ${viewMode === 'triples' ? 'scale-105' : ''}`}>
+                    <List className="h-3 w-3 text-nvidia-green" />
+                  </div>
+                  <span>Triples</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('entities')}
+                  className={`inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200 hover:bg-background/60 ${
+                    viewMode === 'entities'
+                      ? 'bg-background text-foreground shadow-sm border border-border/20'
+                      : 'text-muted-foreground'
+                  }`}
+                >
+                  <div className={`nvidia-build-tab-icon ${viewMode === 'entities' ? 'scale-105' : ''}`}>
+                    <Network className="h-3 w-3 text-nvidia-green" />
+                  </div>
+                  <span>Entities</span>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-nvidia-green text-base">{selectedDoc.triples?.length || 0}</span>
+                  <span className="font-bold text-nvidia-green text-lg">{selectedDoc.triples?.length || 0}</span>
                   <span className="text-xs text-muted-foreground font-medium">Triples</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-nvidia-green text-base">{uniqueEntities.length}</span>
+                  <span className="font-bold text-nvidia-green text-lg">{uniqueEntities.length}</span>
                   <span className="text-xs text-muted-foreground font-medium">Entities</span>
                 </div>
+                {selectedDoc.chunkCount && selectedDoc.chunkCount > 1 && (
+                  <span className="text-xs px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium">
+                    {selectedDoc.chunkCount} chunks
+                  </span>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Tab Navigation */}
-          <div className="mb-6">
-            <div className="inline-flex items-center justify-center rounded-xl bg-muted/20 border border-border/15 p-2 shadow-sm backdrop-blur-sm w-fit">
-              <button 
-                onClick={() => setViewMode('triples')}
-                className={`inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200 hover:bg-background/60 ${
-                  viewMode === 'triples' 
-                    ? 'bg-background text-foreground shadow-sm border border-border/20' 
-                    : 'text-muted-foreground'
-                }`}
-              >
-                <div className={`nvidia-build-tab-icon ${viewMode === 'triples' ? 'scale-105' : ''}`}>
-                  <List className="h-3 w-3 text-nvidia-green" />
+
+
+          {/* Action Bar - Document Actions */}
+          <div className="flex flex-wrap items-center justify-end gap-2 mb-4">
+            <button
+              onClick={() => {
+                if (viewMode === 'triples') {
+                  setIsAddingTriple(true)
+                  setEditingIndex(null)
+                } else {
+                  setIsAddingEntity(true)
+                }
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-nvidia-green hover:bg-nvidia-green/90 text-white rounded-md transition-all"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Add {viewMode === 'triples' ? 'Triple' : 'Entity'}</span>
+            </button>
+
+            {viewMode === 'triples' && (
+              <>
+                <button
+                  onClick={storeInGraphDb}
+                  disabled={isStoringSingle || !selectedDoc.triples || selectedDoc.triples.length === 0}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                    storeSingleStatus === 'success'
+                      ? 'bg-green-50 border border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400'
+                      : storeSingleStatus === 'error'
+                        ? 'bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400'
+                        : 'bg-background border border-border hover:bg-muted/50 text-foreground disabled:opacity-50 disabled:cursor-not-allowed'
+                  }`}
+                >
+                  <Database className="h-3.5 w-3.5" />
+                  <span>
+                    {storeSingleStatus === 'loading' ? 'Storing...' :
+                     storeSingleStatus === 'success' ? 'Stored!' :
+                     storeSingleStatus === 'error' ? 'Failed' :
+                     'Store Document'}
+                  </span>
+                </button>
+
+                <div className="relative">
+                  <button
+                    onClick={() => setShowExportMenu(!showExportMenu)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-background border border-border hover:bg-muted/50 text-foreground rounded-md transition-all"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    <span>Export</span>
+                    <ChevronDown className="h-3 w-3" />
+                  </button>
+
+                  {showExportMenu && (
+                    <div className="absolute right-0 mt-2 w-64 bg-card border border-border rounded-lg shadow-lg z-50 overflow-hidden">
+                      <button
+                        onClick={exportTriplesJSON}
+                        className="w-full text-left px-4 py-3 hover:bg-muted/30 flex items-center gap-3 transition-colors"
+                      >
+                        <FileJson className="h-4 w-4 text-primary" />
+                        <div>
+                          <div className="text-sm font-medium">Export as JSON</div>
+                          <div className="text-xs text-muted-foreground">For Graph Viewer</div>
+                        </div>
+                      </button>
+                      <button
+                        onClick={exportTriplesCSV}
+                        className="w-full text-left px-4 py-3 hover:bg-muted/30 flex items-center gap-3 transition-colors"
+                      >
+                        <FileText className="h-4 w-4 text-primary" />
+                        <div>
+                          <div className="text-sm font-medium">Export as CSV</div>
+                          <div className="text-xs text-muted-foreground">For spreadsheets</div>
+                        </div>
+                      </button>
+                    </div>
+                  )}
                 </div>
-                <span>Triples</span>
-              </button>
-              <button 
-                onClick={() => setViewMode('entities')}
-                className={`inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200 hover:bg-background/60 ${
-                  viewMode === 'entities' 
-                    ? 'bg-background text-foreground shadow-sm border border-border/20' 
-                    : 'text-muted-foreground'
-                }`}
-              >
-                <div className={`nvidia-build-tab-icon ${viewMode === 'entities' ? 'scale-105' : ''}`}>
-                  <Network className="h-3 w-3 text-nvidia-green" />
-                </div>
-                <span>Entities</span>
-              </button>
-            </div>
-            
-            {selectedDoc.chunkCount && selectedDoc.chunkCount > 1 && (
-              <div className="flex justify-end items-center mt-4">
-                <span className="text-xs px-3 py-1.5 rounded-full bg-nvidia-green/10 text-nvidia-green border border-nvidia-green/20 font-medium">
-                  Processed in {selectedDoc.chunkCount} chunks
-                </span>
-              </div>
+              </>
             )}
           </div>
-
-
 
           {viewMode === 'triples' ? (
             selectedDoc.triples && selectedDoc.triples.length > 0 ? (
               <div>
-                {/* Action Buttons Section */}
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-                  <div className="flex items-center">
-                    <h3 className="text-lg font-semibold text-foreground">
-                      Knowledge Triples ({selectedDoc.triples?.length || 0})
-                    </h3>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-3">
-                    {/* Primary Action - Add Triple */}
-                    <button
-                      onClick={() => {
-                        setIsAddingTriple(true)
-                        setEditingIndex(null)
-                      }}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-nvidia-green hover:bg-nvidia-green/90 text-white rounded-lg transition-all shadow-sm hover:shadow-md"
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span>Add Triple</span>
-                    </button>
-
-                    {/* Secondary Actions Group */}
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={storeInGraphDb}
-                        disabled={isStoringSingle || !selectedDoc.triples || selectedDoc.triples.length === 0}
-                        className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all shadow-sm ${
-                          storeSingleStatus === 'success'
-                            ? 'bg-green-50 border border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400'
-                            : storeSingleStatus === 'error'
-                              ? 'bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400'
-                              : 'bg-background border border-border hover:bg-muted/50 text-foreground hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed'
-                        }`}
-                      >
-                        <Database className="h-4 w-4" />
-                        <span>
-                          {storeSingleStatus === 'loading' ? 'Storing...' :
-                           storeSingleStatus === 'success' ? 'Stored!' :
-                           storeSingleStatus === 'error' ? 'Failed' :
-                           'Store in Graph DB'}
-                        </span>
-                      </button>
-
-                      <div className="relative">
-                        <button 
-                          onClick={() => setShowExportMenu(!showExportMenu)} 
-                          className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-background border border-border hover:bg-muted/50 text-foreground rounded-lg transition-all shadow-sm hover:shadow-md relative z-40"
-                        >
-                          <Download className="h-4 w-4" />
-                          <span>Export</span>
-                          <ChevronDown className="h-3 w-3 ml-1" />
-                        </button>
-
-                        {showExportMenu && (
-                        <div className="absolute right-0 mt-2 w-64 bg-card border border-border rounded-lg shadow-lg z-50 overflow-hidden">
-                            <button
-                              onClick={exportTriplesJSON}
-                              className="w-full text-left px-4 py-3 hover:bg-muted/30 flex items-center gap-3 transition-colors"
-                            >
-                              <FileJson className="h-4 w-4 text-primary" />
-                              <div>
-                                <div className="text-sm font-medium">Export as JSON</div>
-                                <div className="text-xs text-muted-foreground">For Graph Viewer</div>
-                              </div>
-                            </button>
-                            <button
-                              onClick={exportTriplesCSV}
-                              className="w-full text-left px-4 py-3 hover:bg-muted/30 flex items-center gap-3 transition-colors"
-                            >
-                              <FileText className="h-4 w-4 text-primary" />
-                              <div>
-                                <div className="text-sm font-medium">Export as CSV</div>
-                                <div className="text-xs text-muted-foreground">For spreadsheets</div>
-                              </div>
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
                 <div className="border border-border rounded-xl overflow-hidden">
                   <div className="flex justify-between items-center p-4 bg-muted/30 border-b border-border">
@@ -682,55 +670,6 @@ export function TripleViewer() {
           ) : (
             // Entities View
             <div>
-              {/* Entities Action Buttons Section */}
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-                <div className="flex items-center">
-                  <h3 className="text-lg font-semibold text-foreground">
-                    {uniqueEntities.length > 0
-                      ? `Entities (${uniqueEntities.length})`
-                      : "No Entities Found"}
-                  </h3>
-                </div>
-                
-                <div className="flex flex-wrap items-center gap-3">
-                  {/* Primary Action - Add Entity */}
-                  <button
-                    onClick={() => setIsAddingEntity(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-nvidia-green hover:bg-nvidia-green/90 text-white rounded-lg transition-all shadow-sm hover:shadow-md"
-                  >
-                    <Plus className="h-4 w-4" />
-                    <span>Add Entity</span>
-                  </button>
-
-                  {/* Secondary Action - Export */}
-                  <div className="relative">
-                    <button 
-                      onClick={() => setShowExportMenu(!showExportMenu)} 
-                      className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-background border border-border hover:bg-muted/50 text-foreground rounded-lg transition-all shadow-sm hover:shadow-md relative z-40"
-                    >
-                      <Download className="h-4 w-4" />
-                      <span>Export</span>
-                      <ChevronDown className="h-3 w-3 ml-1" />
-                    </button>
-
-                    {showExportMenu && (
-                      <div className="absolute right-0 mt-2 w-64 bg-card border border-border rounded-lg shadow-lg z-50 overflow-hidden">
-                        <button
-                          onClick={exportEntitiesCSV}
-                          className="w-full text-left px-4 py-3 hover:bg-muted/30 flex items-center gap-3 transition-colors"
-                        >
-                          <FileText className="h-4 w-4 text-primary" />
-                          <div>
-                            <div className="text-sm font-medium">Export Entities as CSV</div>
-                            <div className="text-xs text-muted-foreground">For spreadsheets</div>
-                          </div>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
               {isAddingEntity && (
                 <div className="mb-6 p-4 bg-muted/20 border border-border rounded-lg">
                   <div className="mb-3">
