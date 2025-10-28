@@ -42,7 +42,7 @@ up its IP address.
 
 ## What you'll accomplish
 
-You will establish secure SSH access to your DGX Spark device using either NVIDIA Sync or manual
+You will establish secure SSH access to your DGX Spark device using either NVIDIA Sync or a manual
 SSH configuration. NVIDIA Sync provides a graphical interface for device management with
 integrated app launching, while manual SSH gives you direct command-line control with port
 forwarding capabilities. Both approaches enable you to run terminal commands, access web
@@ -57,18 +57,16 @@ applications, and manage your DGX Spark remotely from your laptop.
 
 ## Prerequisites
 
-- DGX Spark device is set up and you have created a local user account
+- Your DGX Spark [device is set up](https://docs.nvidia.com/dgx/dgx-spark/first-boot.html) and you have created a local user account
 - Your laptop and DGX Spark are on the same network
 - You have your DGX Spark username and password
-- You have your device's mDNS hostname (printed on quick start guide) or IP address
-
-
+- You have your device's mDNS hostname (printed on the Quick Start Guide) or IP address
 
 ## Time & risk
 
 - **Time estimate:** 5-10 minutes
 - **Risk level:** Low - SSH setup involves credential configuration but no system-level changes to the DGX Spark device
-- **Rollback:** SSH key removal can be done by editing `~/.ssh/authorized_keys` on the DGX Spark.
+- **Rollback:** SSH key removal can be done by editing `~/.ssh/authorized_keys` on your DGX Spark.
 
 ## Connect with NVIDIA Sync
 
@@ -101,12 +99,12 @@ Download and install NVIDIA Sync on your computer to get started.
   curl -fsSL  https://workbench.download.nvidia.com/stable/linux/gpgkey  |  sudo tee -a /etc/apt/trusted.gpg.d/ai-workbench-desktop-key.asc
   echo "deb https://workbench.download.nvidia.com/stable/linux/debian default proprietary" | sudo tee -a /etc/apt/sources.list
   ```
-* Update package lists
+* Update package lists:
 
   ```
   sudo apt update
   ```
-* Install NVIDIA Sync
+* Install NVIDIA Sync:
 
   ```
   sudo apt install nvidia-sync
@@ -147,7 +145,7 @@ Finally, connect your DGX Spark by filling out the form:
 > Your password is used only during this initial setup to configure SSH key-based authentication. It is not stored or transmitted after setup completion. NVIDIA Sync will SSH into your device and 
 > configure its locally provisioned SSH key pair.
 
-Click add "Add" and NVIDIA Sync will automatically:
+Click the "Add" button and NVIDIA Sync will automatically:
 
 1. Generate an SSH key pair on your laptop
 2. Connect to your DGX Spark using your provided username and password
@@ -163,15 +161,12 @@ Click add "Add" and NVIDIA Sync will automatically:
 Once connected, NVIDIA Sync appears as a system tray/taskbar application. Click the NVIDIA Sync
 icon to open the device management interface.
 
-Clicking on the large "Connect" and "Disconnect" buttons controls the overall SSH connection to your device.
-
-**Set working directory** (optional): Choose a default directory that Apps will open in
+- **SSH connection**: Clicking on the large "Connect" and "Disconnect" buttons controls the overall SSH connection to your device.
+- **Set working directory** (optional): Choose a default directory that Apps will open in
 when launched through NVIDIA Sync. This defaults to your home directory on the remote device.
-
-**Launch applications**: Click on any configured app to open it with automatic SSH
+- **Launch applications**: Click on any configured app to open it with automatic SSH
 connection to your DGX Spark.
-
-"Custom Ports" are configured on the Settings screen to provide access to custom web apps or APIs running on your device.
+- **Customize ports** (optional): "Custom Ports" are configured on the Settings screen to provide access to custom web apps or APIs running on your device.
 
 ## Step 5. Validate SSH setup
 
@@ -192,14 +187,14 @@ or
 ssh <IP>
 ```
 
-On the DGX Spark, verify you're connected
+On the DGX Spark, verify you're connected:
 
 ```bash
 hostname
 whoami
 ```
 
-Exit the SSH session
+Exit the SSH session:
 
 ```bash
 exit
@@ -210,8 +205,8 @@ exit
 Test your setup by launching a development tool:
 - Click the NVIDIA Sync system tray icon.
 - Select "Terminal" to open a terminal session on your DGX Spark.
-- Select "DGX Dashboard" to use Jupyterlab and manage updates.
-- Try [a custom port example with Open WebUI](/spark/open-webui/sync)
+- Select "DGX Dashboard" to use JupyterLab and manage updates.
+- Try [a custom port example with Open WebUI](/spark/open-webui/sync).
 
 ## Connect with Manual SSH
 
@@ -233,11 +228,11 @@ Collect the required connection details for your DGX Spark:
 
 - **Username**: Your DGX Spark user account name
 - **Password**: Your DGX Spark account password
-- **Hostname**: Your device's mDNS hostname (from quick start guide, e.g., `spark-abcd.local`)
-- **IP Address**: Alternative only needed if mDNS doesn't work on your network as described below
+- **Hostname**: Your device's mDNS hostname (from the Quick Start Guide, e.g., `spark-abcd.local`)
+- **IP Address**: An alternative only needed if mDNS doesn't work on your network as described below
 
 In some network configurations, like complex corporate environments, mDNS won't work as expected 
-and you'll have to use your device's IP address directly to connect. You know you are in this situation when
+and you'll have to use your device's IP address directly to connect. You'll know you are in this situation when
 you try to SSH and the command hangs indefinitely or you get an error like:
 
 ```
@@ -246,7 +241,7 @@ ssh: Could not resolve hostname spark-abcd.local: Name or service not known
 
 **Testing mDNS Resolution**
 
-To test if mDNS is working, use the `ping` utility.
+To test if mDNS is working, use the `ping` utility:
 
 ```bash
 ping spark-abcd.local
@@ -262,7 +257,7 @@ PING spark-abcd.local (10.9.1.9): 56 data bytes
 64 bytes from 10.9.1.9: icmp_seq=2 ttl=64 time=33.301 ms
 ```
 
-If mDNS is **not** working and you will have to use your IP directly, you should see something like this:
+If mDNS is **not** working, indicating you will have to use your IP directly, you will see something like this:
 
 ```
 $ ping -c 3 spark-abcd.local
@@ -282,6 +277,8 @@ Connect to your DGX Spark for the first time to verify basic connectivity:
 ssh <YOUR_USERNAME>@<SPARK_HOSTNAME>.local
 ```
 
+or
+
 ```bash
 ## Alternative: Connect using IP address
 ssh <YOUR_USERNAME>@<DEVICE_IP_ADDRESS>
@@ -289,7 +286,7 @@ ssh <YOUR_USERNAME>@<DEVICE_IP_ADDRESS>
 
 Replace placeholders with your actual values:
 - `<YOUR_USERNAME>`: Your DGX Spark account name
-- `<SPARK_HOSTNAME>`: Device hostname without .local suffix
+- `<SPARK_HOSTNAME>`: Device hostname without `.local` suffix
 - `<DEVICE_IP_ADDRESS>`: Your device's IP address
 
 On first connection, you'll see a host fingerprint warning. Type `yes` and press Enter,
@@ -313,7 +310,8 @@ exit
 To access web applications running on your DGX Spark, use SSH port
 forwarding. In this example we'll access the DGX Dashboard web application.
 
-DGX Dashboard runs on localhost, port 11000.
+> [!NOTE]
+> DGX Dashboard runs on localhost, port 11000.
 
 Open the tunnel:
 
