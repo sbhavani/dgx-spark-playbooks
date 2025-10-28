@@ -1,43 +1,42 @@
 # Basic idea
 
-- **Performance-first**: It claims to speed up training (e.g. 2× faster on single GPU, up to 30× in multi-GPU setups) and reduce memory usage compared to standard methods.   
-- **Kernel-level optimizations**: Core compute is built with custom kernels (e.g. with Triton) and hand-optimized math to boost throughput and efficiency.  
-- **Quantization & model formats**: Supports dynamic quantization (4-bit, 16-bit) and GGUF formats to reduce footprint, while aiming to retain accuracy.    
-- **Broad model support**: Works with many LLMs (LLaMA, Mistral, Qwen, DeepSeek, etc.) and allows training, fine-tuning, exporting to formats like Ollama, vLLM, GGUF, Hugging Face.   
-- **Simplified interface**: Provides easy-to-use notebooks and tools so users can fine-tune models with minimal boilerplate.  
+This playbook demonstrates how to fine-tune Vision-Language Models (VLMs) for both image and video understanding tasks on DGX Spark. 
+With 128GB of unified memory and powerful GPU acceleration, DGX Spark provides an ideal environment for training VRAM-intensive multimodal models that can understand and reason about visual content.
+
+The playbook covers two distinct VLM fine-tuning approaches:
+- **Image VLM Fine-tuning**: Using Qwen2.5-VL-7B for wildfire detection from satellite imagery with GRPO (Generalized Reward Preference Optimization)
+- **Video VLM Fine-tuning**: Using InternVL3 8B for dangerous driving detection and structured metadata generation from driving videos
+
+Both approaches leverage advanced training techniques, including LoRA fine-tuning, preference optimization, and structured reasoning to achieve superior performance on specialized tasks.
 
 # What you'll accomplish
 
-You'll set up Unsloth for optimized fine-tuning of large language models on NVIDIA Spark devices, 
-achieving up to 2x faster training speeds with reduced memory usage through efficient 
-parameter-efficient fine-tuning methods like LoRA and QLoRA.
-
-# What to know before starting
-
-- Python package management with pip and virtual environments
-- Hugging Face Transformers library basics (loading models, tokenizers, datasets)
-- GPU fundamentals (CUDA/GPU vs CPU, VRAM constraints, device availability)
-- Basic understanding of LLM training concepts (loss functions, checkpoints)
-- Familiarity with prompt engineering and base model interaction
-- Optional: LoRA/QLoRA parameter-efficient fine-tuning knowledge
+You will have fine-tuned VLM models capable of understanding and analyzing both images and videos for specialized use cases, accessible through interactive Web UIs.
+The setup includes:
+- **Image VLM**: Qwen2.5-VL fine-tuned for wildfire detection with reasoning capability
+- **Video VLM**: InternVL3 fine-tuned for dangerous driving analysis and structured metadata generation
+- Interactive Streamlit interfaces for both training and inference
+- Side-by-side model comparison (base vs fine-tuned) in the Web UIs
+- Docker containerization for reproducible environments
 
 # Prerequisites
 
-- NVIDIA Spark device with Blackwell GPU architecture
-- `nvidia-smi` shows a summary of GPU information
-- CUDA 13.0 installed: `nvcc --version`
-- Internet access for downloading models and datasets
-
-# Ancillary files
-
-The Python test script can be found [here on GitHub](${GITLAB_ASSET_BASEURL}/${MODEL}/assets/test_unsloth.py)
+-  DGX Spark device is set up and accessible
+-  No other processes running on the DGX Spark GPU
+-  Enough disk space for model downloads and datasets
+-  NVIDIA Docker installed and configured
+-  Weights & Biases account for training monitoring (optional but recommended)
 
 
 # Time & risk
 
-* **Duration**: 30-60 minutes for initial setup and test run
-* **Risks**: 
-* Triton compiler version mismatches may cause compilation errors
-* CUDA toolkit configuration issues may prevent kernel compilation
-* Memory constraints on smaller models require batch size adjustments
-* **Rollback**: Uninstall packages with `pip uninstall unsloth torch torchvision`.
+* **Duration**:
+* 15-20 minutes for initial setup and model downloads
+* 30-60 minutes for image VLM training (depending on dataset size)
+* 1-2 hours for video VLM training (depending on video dataset size)
+* **Risks**:
+* Docker permission issues may require user group changes and a session restart
+* Large model downloads and datasets may require significant disk space and time
+* Training requires sustained GPU usage and memory
+* Dataset preparation may require manual steps (Kaggle downloads, video processing)
+* **Rollback**: Stop and remove Docker containers, delete downloaded models and datasets if needed.

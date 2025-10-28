@@ -12,12 +12,12 @@ tabs:
 - id: overview
   label: Overview
   filename: overview.md
-- id: instructions
-  label: Instructions
-  filename: instructions.md
 - id: sync
-  label: Setup Open WebUI on Remote Spark with NVIDIA Sync
+  label: Set up Open WebUI on Remote Spark with NVIDIA Sync
   filename: sync.md
+- id: instructions
+  label: Set Up Manually
+  filename: instructions.md
 - id: troubleshooting
   label: Troubleshooting
   filename: troubleshooting.md

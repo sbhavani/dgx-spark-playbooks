@@ -17,6 +17,6 @@ You will accelerate popular machine learning algorithms and data analytics opera
 # Time & risk
 * **Duration:** 20-30 minutes setup time and 2-3 minutes to run each notebook. 
 * **Risks:** 
-  * Data download slowness or failure due to network issues
-  * Kaggle API generation failure requiring retries
+* Data download slowness or failure due to network issues
+* Kaggle API generation failure requiring retries
 * **Rollback:** No permanent system changes made during normal usage.

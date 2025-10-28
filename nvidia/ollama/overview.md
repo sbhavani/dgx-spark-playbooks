@@ -26,6 +26,8 @@ the powerful GPU capabilities of your Spark device without complex network confi
 - NVIDIA Sync installed and connected to your Spark
 - Terminal access to your local machine for testing API calls
 
+
+
 # Time & risk
 
 **Duration**: 10-15 minutes for initial setup, 2-3 minutes for model download (varies by model size)
@@ -33,4 +35,4 @@ the powerful GPU capabilities of your Spark device without complex network confi
 **Risk level**: Low - No system-level changes, easily reversible by stopping the custom app
 
 **Rollback**: Stop the custom app in NVIDIA Sync and uninstall Ollama with standard package
-removal if needed.
+removal if needed

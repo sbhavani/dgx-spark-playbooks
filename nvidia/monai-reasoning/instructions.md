@@ -108,8 +108,8 @@ Launch the Open WebUI container with ARM64 architecture support for your NVIDIA 
 # Define custom prompt suggestions for medical X-ray analysis
 PROMPT_SUGGESTIONS='[
 {
-    "title": ["Analyze X-Ray Image", "Find abnormalities and support devices"],
-    "content": "Find abnormalities and support devices in the image."
+  "title": ["Analyze X-Ray Image", "Find abnormalities and support devices"],
+  "content": "Find abnormalities and support devices in the image."
 }
 ]'
 

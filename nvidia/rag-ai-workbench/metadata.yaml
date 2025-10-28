@@ -1,7 +1,7 @@
 catalog_name: nvidia/rag-ai-workbench
 kind: PLAYBOOK
 name: rag-ai-workbench
-displayName: RAG application in AI Workbench
+displayName: RAG Application in AI Workbench
 short_description: Install and use AI Workbench to clone and run a reproducible RAG
   application
 publisher: nvidia

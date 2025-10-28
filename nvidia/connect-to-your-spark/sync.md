@@ -23,20 +23,20 @@ Download and install NVIDIA Sync on your computer to get started.
 
 * Configure the package repository:
 
-  ```
-  curl -fsSL  https://workbench.download.nvidia.com/stable/linux/gpgkey  |  sudo tee -a /etc/apt/trusted.gpg.d/ai-workbench-desktop-key.asc
-  echo "deb https://workbench.download.nvidia.com/stable/linux/debian default proprietary" | sudo tee -a /etc/apt/sources.list
-  ```
-* Update package lists
+```
+curl -fsSL  https://workbench.download.nvidia.com/stable/linux/gpgkey  |  sudo tee -a /etc/apt/trusted.gpg.d/ai-workbench-desktop-key.asc
+echo "deb https://workbench.download.nvidia.com/stable/linux/debian default proprietary" | sudo tee -a /etc/apt/sources.list
+```
+* Update package lists:
 
-  ```
-  sudo apt update
-  ```
-* Install NVIDIA Sync
+```
+sudo apt update
+```
+* Install NVIDIA Sync:
 
-  ```
-  sudo apt install nvidia-sync
-  ```
+```
+sudo apt install nvidia-sync
+```
 
 # Step 2. Configure Apps
 
@@ -73,7 +73,7 @@ Finally, connect your DGX Spark by filling out the form:
 > Your password is used only during this initial setup to configure SSH key-based authentication. It is not stored or transmitted after setup completion. NVIDIA Sync will SSH into your device and 
 > configure its locally provisioned SSH key pair.
 
-Click add "Add" and NVIDIA Sync will automatically:
+Click the "Add" button and NVIDIA Sync will automatically:
 
 1. Generate an SSH key pair on your laptop
 2. Connect to your DGX Spark using your provided username and password
@@ -89,15 +89,12 @@ Click add "Add" and NVIDIA Sync will automatically:
 Once connected, NVIDIA Sync appears as a system tray/taskbar application. Click the NVIDIA Sync
 icon to open the device management interface.
 
-Clicking on the large "Connect" and "Disconnect" buttons controls the overall SSH connection to your device.
-
-**Set working directory** (optional): Choose a default directory that Apps will open in
+- **SSH connection**: Clicking on the large "Connect" and "Disconnect" buttons controls the overall SSH connection to your device.
+- **Set working directory** (optional): Choose a default directory that Apps will open in
 when launched through NVIDIA Sync. This defaults to your home directory on the remote device.
-
-**Launch applications**: Click on any configured app to open it with automatic SSH
+- **Launch applications**: Click on any configured app to open it with automatic SSH
 connection to your DGX Spark.
-
-"Custom Ports" are configured on the Settings screen to provide access to custom web apps or APIs running on your device.
+- **Customize ports** (optional): "Custom Ports" are configured on the Settings screen to provide access to custom web apps or APIs running on your device.
 
 # Step 5. Validate SSH setup
 
@@ -118,14 +115,14 @@ or
 ssh <IP>
 ```
 
-On the DGX Spark, verify you're connected
+On the DGX Spark, verify you're connected:
 
 ```bash
 hostname
 whoami
 ```
 
-Exit the SSH session
+Exit the SSH session:
 
 ```bash
 exit
@@ -136,5 +133,5 @@ exit
 Test your setup by launching a development tool:
 - Click the NVIDIA Sync system tray icon.
 - Select "Terminal" to open a terminal session on your DGX Spark.
-- Select "DGX Dashboard" to use Jupyterlab and manage updates.
-- Try [a custom port example with Open WebUI](/spark/open-webui/sync)
+- Select "DGX Dashboard" to use JupyterLab and manage updates.
+- Try [a custom port example with Open WebUI](/spark/open-webui/sync).

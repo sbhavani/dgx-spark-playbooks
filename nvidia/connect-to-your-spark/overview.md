@@ -27,7 +27,7 @@ up its IP address.
 
 # What you'll accomplish
 
-You will establish secure SSH access to your DGX Spark device using either NVIDIA Sync or manual
+You will establish secure SSH access to your DGX Spark device using either NVIDIA Sync or a manual
 SSH configuration. NVIDIA Sync provides a graphical interface for device management with
 integrated app launching, while manual SSH gives you direct command-line control with port
 forwarding capabilities. Both approaches enable you to run terminal commands, access web
@@ -42,15 +42,13 @@ applications, and manage your DGX Spark remotely from your laptop.
 
 # Prerequisites
 
-- DGX Spark device is set up and you have created a local user account
+- Your DGX Spark [device is set up](https://docs.nvidia.com/dgx/dgx-spark/first-boot.html) and you have created a local user account
 - Your laptop and DGX Spark are on the same network
 - You have your DGX Spark username and password
-- You have your device's mDNS hostname (printed on quick start guide) or IP address
-
-
+- You have your device's mDNS hostname (printed on the Quick Start Guide) or IP address
 
 # Time & risk
 
 - **Time estimate:** 5-10 minutes
 - **Risk level:** Low - SSH setup involves credential configuration but no system-level changes to the DGX Spark device
-- **Rollback:** SSH key removal can be done by editing `~/.ssh/authorized_keys` on the DGX Spark.
+- **Rollback:** SSH key removal can be done by editing `~/.ssh/authorized_keys` on your DGX Spark.

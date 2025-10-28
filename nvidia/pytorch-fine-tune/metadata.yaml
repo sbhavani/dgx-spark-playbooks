@@ -1,7 +1,7 @@
 catalog_name: nvidia/pytorch-fine-tune
 kind: PLAYBOOK
 name: pytorch-fine-tune
-displayName: Fine tune with Pytorch
+displayName: Fine-tune with Pytorch
 short_description: Use Pytorch to fine-tune models locally
 publisher: nvidia
 labels:

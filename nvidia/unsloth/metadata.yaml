@@ -1,12 +1,18 @@
-catalog_name: nvidia/unsloth
+catalog_name: nvidia/vlm-finetuning
 kind: PLAYBOOK
-name: unsloth
-displayName: Unsloth on DGX Spark
-short_description: Optimized fine-tuning with Unsloth
+name: vlm-finetuning
+displayName: Vision-Language Model Fine-tuning
+short_description: Fine-tune Vision-Language Models for image and video understanding
+  tasks using Qwen2.5-VL and InternVL3
 publisher: nvidia
 labels:
 - DGX
 - Spark
+- Vision-Language Models
+- Fine-tuning
+- Image Understanding
+- Video Analysis
+- GRPO
 duration: 1 HR
 tabs:
 - id: overview
@@ -19,8 +25,6 @@ tabs:
   label: Troubleshooting
   filename: troubleshooting.md
 resources:
-- name: Unsloth Documentation
-  url: https://docs.unsloth.ai/
 - name: DGX Spark Documentation
   url: https://docs.nvidia.com/dgx/dgx-spark
 - name: DGX Spark Forum

@@ -2,7 +2,7 @@ catalog_name: nvidia/jax
 kind: PLAYBOOK
 name: jax
 displayName: Optimized JAX
-short_description: Optimize JAX to Run on Spark
+short_description: Optimize JAX to run on Spark
 publisher: nvidia
 labels:
 - DGX

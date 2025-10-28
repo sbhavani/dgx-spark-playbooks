@@ -98,9 +98,9 @@ MODEL_ID = "stabilityai/stable-diffusion-xl-base-1.0"
 dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
 pipe = DiffusionPipeline.from_pretrained(
-    MODEL_ID,
-    torch_dtype=dtype,
-    variant="fp16" if dtype==torch.float16 else None,
+  MODEL_ID,
+  torch_dtype=dtype,
+  variant="fp16" if dtype==torch.float16 else None,
 )
 pipe = pipe.to("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -116,12 +116,12 @@ guidance = 7.0
 
 # --- Generate ---
 result = pipe(
-    prompt=prompt,
-    negative_prompt=negative_prompt,
-    num_inference_steps=steps,
-    guidance_scale=guidance,
-    height=height,
-    width=width,
+  prompt=prompt,
+  negative_prompt=negative_prompt,
+  num_inference_steps=steps,
+  guidance_scale=guidance,
+  height=height,
+  width=width,
 )
 
 # --- Save to file ---

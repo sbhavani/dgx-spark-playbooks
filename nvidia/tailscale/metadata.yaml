@@ -1,7 +1,7 @@
 catalog_name: nvidia/tailscale
 kind: PLAYBOOK
 name: tailscale
-displayName: Set up Tailscale on your Spark
+displayName: Set up Tailscale on Your Spark
 short_description: Use Tailscale to connect to your Spark on your home network no
   matter where you are
 publisher: nvidia

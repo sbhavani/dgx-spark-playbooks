@@ -54,12 +54,12 @@ link-local addressing:
 # Create the netplan configuration file
 sudo tee /etc/netplan/40-cx7.yaml > /dev/null <<EOF
 network:
-  version: 2
-  ethernets:
-    enp1s0f0np0:
-      link-local: [ ipv4 ]
-    enp1s0f1np1:
-      link-local: [ ipv4 ]
+version: 2
+ethernets:
+  enp1s0f0np0:
+    link-local: [ ipv4 ]
+  enp1s0f1np1:
+    link-local: [ ipv4 ]
 EOF
 
 # Set appropriate permissions
@@ -139,20 +139,20 @@ SSH setup complete! Both local and remote nodes can now SSH to each other withou
 
 You will need to find the IP addresses for the CX-7 interfaces that are up. On both nodes, run the following command to find the IP addresses and take note of them for the next step.
 ```bash
-  ip addr show enp1s0f0np0
-  ip addr show enp1s0f1np1
+ip addr show enp1s0f0np0
+ip addr show enp1s0f1np1
 ```
 
 Example output:
 ```
 # In this example, we are using interface enp1s0f1np1.
 nvidia@dgx-spark-1:~$ ip addr show enp1s0f1np1
-    4: enp1s0f1np1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
-        link/ether 3c:6d:66:cc:b3:b7 brd ff:ff:ff:ff:ff:ff
-        inet **169.254.35.62**/16 brd 169.254.255.255 scope link noprefixroute enp1s0f1np1
-          valid_lft forever preferred_lft forever
-        inet6 fe80::3e6d:66ff:fecc:b3b7/64 scope link
-          valid_lft forever preferred_lft forever
+  4: enp1s0f1np1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+      link/ether 3c:6d:66:cc:b3:b7 brd ff:ff:ff:ff:ff:ff
+      inet **169.254.35.62**/16 brd 169.254.255.255 scope link noprefixroute enp1s0f1np1
+        valid_lft forever preferred_lft forever
+      inet6 fe80::3e6d:66ff:fecc:b3b7/64 scope link
+        valid_lft forever preferred_lft forever
 ```
 
 In this example, the IP address for Node 1 is **169.254.35.62**. Repeat the process for Node 2.

@@ -11,7 +11,7 @@ Open the Terminal app from NVIDIA Sync to start an interactive SSH session and t
 docker ps
 ```
 
-If you see a permission denied error (something like permission denied while trying to connect to the Docker daemon socket), add your user to the docker group so that you don't need to run the command with sudo .
+If you see a permission denied error (something like permission denied while trying to connect to the Docker daemon socket), add your user to the docker group so that you don't need to run the command with sudo.
 
 ```bash
 sudo usermod -aG docker $USER
@@ -44,7 +44,7 @@ Once the container image is downloaded, continue to setup NVIDIA Sync.
 
 A Custom port is used to automatically start the Open WebUI container and set up port forwarding.
 
-Click the "Add New" button on the Custom tab.
+- Click the "Add New" button on the Custom tab.
 
 Fill out the form with these values:
 
@@ -96,13 +96,12 @@ echo "Running. Press Ctrl+C to stop ${NAME}."
 while :; do sleep 86400; done
 ```
 
-- Click the "Add" button to save configuration to your DGX Spark.
+- Click the "Add" button to save the configuration to your DGX Spark.
 
 # Step 5. Launch Open WebUI
 
-Click on the NVIDIA Sync icon in your system tray or taskbar to open the main application window.
-
-Under the "Custom" section, click on "Open WebUI".
+- Click on the NVIDIA Sync icon in your system tray or taskbar to open the main application window.
+- Under the "Custom" section, click on "Open WebUI".
 
 Your default web browser should automatically open to the Open WebUI interface at `http://localhost:12000`.
 
@@ -114,43 +113,35 @@ Your default web browser should automatically open to the Open WebUI interface a
 
 To start using Open WebUI you must create an initial administrator account. This is a local account that you will use to access the Open WebUI interface.
 
-In the Open WebUI interface, click the "Get Started" button at the bottom of the screen.
-
-Fill out the administrator account creation form with your preferred credentials.
-
-Click the registration button to create your account and access the main interface.
+- In the Open WebUI interface, click the "Get Started" button at the bottom of the screen.
+- Fill out the administrator account creation form with your preferred credentials.
+- Click the registration button to create your account and access the main interface.
 
 # Step 7. Download and configure a model
 
 Next, download a language model with Ollama and configure it for use in
 Open WebUI. This download happens on your DGX Spark device and may take several minutes.
 
-Click on the "Select a model" dropdown in the top left corner of the Open WebUI interface.
-
-Type `gpt-oss:20b` in the search field.
-
-Click the `Pull "gpt-oss:20b" from Ollama.com` button that appears.
-
-Wait for the model download to complete. You can monitor progress in the interface.
-
-Once complete, select "gpt-oss:20b" from the model dropdown.
+- Click on the "Select a model" dropdown in the top left corner of the Open WebUI interface.
+- Type `gpt-oss:20b` in the search field.
+- Click the `Pull "gpt-oss:20b" from Ollama.com` button that appears.
+- Wait for the model download to complete. You can monitor progress in the interface.
+- Once complete, select "gpt-oss:20b" from the model dropdown.
 
 # Step 8. Test the model
 
-In the chat textarea at the bottom of the Open WebUI interface, enter: **Write me a haiku about GPUs**
+You can verify that the setup is working properly by testing the model.
 
-Press Enter to send the message and wait for the model's response.
+- In the chat text area at the bottom of the Open WebUI interface, enter: **Write me a haiku about GPUs**.
+- Press Enter to send the message and wait for the model's response.
 
 # Step 9. Stop the Open WebUI 
 
 When you are finished with your session and want to stop the Open WebUI server and reclaim resources, close the Open WebUI from NVIDIA Sync.
 
-Click on the NVIDIA Sync icon in your system tray or taskbar to open the main application window.
-
-Under the "Custom" section, click the `x` icon on the right of the "Open WebUI" entry.
-
-This will close the tunnel and stop the Open WebUI docker container.
-
+- Click on the NVIDIA Sync icon in your system tray or taskbar to open the main application window.
+- Under the "Custom" section, click the `x` icon on the right of the "Open WebUI" entry.
+- This will close the tunnel and stop the Open WebUI docker container.
 
 # Step 10. Next steps
 
@@ -158,7 +149,7 @@ Try downloading different models from the Ollama library at https://ollama.com/l
 
 You can monitor GPU and memory usage through the DGX Dashboard available in NVIDIA Sync as you try different models.
 
-If Open WebUI reports an update is available, you can pull the the container image by running this in your terminal:
+If Open WebUI reports an update is available, you can pull the container image by running this in your terminal:
 
 ```bash
 docker stop open-webui
@@ -170,7 +161,7 @@ After the update, launch Open WebUI again from NVIDIA Sync.
 
 # Step 11. Cleanup and rollback
 
-Steps to completely remove the Open WebUI installation and free up resources:
+Steps to completely remove the Open WebUI installation and free up resources.
 
 > [!WARNING]
 > These commands will permanently delete all Open WebUI data and downloaded models.
