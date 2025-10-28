@@ -1,0 +1,28 @@
+catalog_name: nvidia/monai-reasoning
+kind: PLAYBOOK
+name: monai-reasoning
+displayName: MONAI Reasoning Model
+short_description: Work with a MONAI-Reasoning-CXR-3B vision-language model through
+  Open WebUI
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 30 MIN
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: MONAI Documentation
+  url: https://docs.monai.io/en/stable/
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10

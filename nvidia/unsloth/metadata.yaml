@@ -1,0 +1,30 @@
+catalog_name: nvidia/unsloth
+kind: PLAYBOOK
+name: unsloth
+displayName: Unsloth on DGX Spark
+short_description: Optimized fine-tuning with Unsloth
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 1 HR
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: Unsloth Documentation
+  url: https://docs.unsloth.ai/
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
+cta:
+  text: View on GitHub
+  url: ${GITLAB_ASSET_BASEURL}/${MODEL}

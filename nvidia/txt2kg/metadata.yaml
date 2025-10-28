@@ -1,0 +1,39 @@
+catalog_name: nvidia/txt2kg
+kind: PLAYBOOK
+name: txt2kg
+displayName: Text to Knowledge Graph
+short_description: Transform unstructured text into interactive knowledge graphs with
+  LLM inference and graph visualization
+publisher: nvidia
+labels:
+- DGX
+- Spark
+- Knowledge Graphs
+- GraphRAG
+- Ollama
+- Graph Visualization
+- NLP
+- Graph Databases
+duration: 30 MIN
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark/
+- name: Ollama Documentation
+  url: https://ollama.ai/
+- name: ArangoDB Documentation
+  url: https://docs.arangodb.com/
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
+cta:
+  text: View on GitHub
+  url: ${GITLAB_ASSET_BASEURL}/${MODEL}/

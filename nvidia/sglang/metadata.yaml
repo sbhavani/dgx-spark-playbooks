@@ -1,0 +1,29 @@
+catalog_name: nvidia/sglang
+kind: PLAYBOOK
+name: sglang
+displayName: SGLang Inference Server
+short_description: Install and use SGLang on DGX Spark
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 30 MINS
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+resources:
+- name: SGLang Documentation
+  url: https://docs.sglang.ai/
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
+- name: Terms of Service
+  url: https://assets.ngc.nvidia.com/products/api-catalog/legal/NVIDIA%20API%20Trial%20Terms%20of%20Service.pdf
+cta:
+  text: View on GitHub
+  url: ${GITLAB_ASSET_BASEURL}/${MODEL}

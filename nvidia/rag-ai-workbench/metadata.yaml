@@ -1,0 +1,29 @@
+catalog_name: nvidia/rag-ai-workbench
+kind: PLAYBOOK
+name: rag-ai-workbench
+displayName: RAG application in AI Workbench
+short_description: Install and use AI Workbench to clone and run a reproducible RAG
+  application
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 30 MIN
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
+cta:
+  text: View on GitHub
+  url: https://github.com/NVIDIA/workbench-example-agentic-rag

@@ -1,0 +1,30 @@
+catalog_name: nvidia/open-webui
+kind: PLAYBOOK
+name: open-webui
+displayName: Open WebUI with Ollama
+short_description: Install Open WebUI and use Ollama to chat with models on your Spark
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 15 MIN
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: sync
+  label: Setup Open WebUI on Remote Spark with NVIDIA Sync
+  filename: sync.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: Open WebUI Documentation
+  url: https://docs.openwebui.com/
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Developer Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10

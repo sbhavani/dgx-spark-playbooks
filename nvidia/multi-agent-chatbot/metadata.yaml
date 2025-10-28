@@ -1,0 +1,29 @@
+catalog_name: nvidia/multi-agent-chatbot
+kind: PLAYBOOK
+name: multi-agent-chatbot
+displayName: Build and Deploy a Multi-Agent Chatbot
+short_description: Deploy a multi-agent chatbot system and chat with agents on your
+  Spark
+publisher: nvidia
+labels:
+- DGX
+- Spark
+- Agents
+duration: 1 HR
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: Repository
+  url: ${GITLAB_ASSET_BASEURL}/${MODEL}
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10

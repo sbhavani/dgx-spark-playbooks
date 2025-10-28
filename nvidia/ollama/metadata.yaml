@@ -1,0 +1,25 @@
+catalog_name: nvidia/ollama
+kind: PLAYBOOK
+name: ollama
+displayName: Ollama
+short_description: Install and use Ollama
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 15 MINS
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10

@@ -1,0 +1,30 @@
+catalog_name: nvidia/vscode
+kind: PLAYBOOK
+name: vscode
+displayName: VS Code
+short_description: Install and use VS Code locally or remotely
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 5 MIN
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: sync
+  label: Access with NVIDIA Sync
+  filename: sync.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: VS Code Documentation
+  url: https://code.visualstudio.com/docs
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10

@@ -1,0 +1,24 @@
+catalog_name: nvidia/protein-folding
+kind: PLAYBOOK
+name: protein-folding
+displayName: Use Open Fold
+short_description: Use OpenFold with TensorRT optimization
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 4 HRS
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: terminal
+  label: Access through terminal
+  filename: terminal.md
+resources:
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
+- name: Terms of Service
+  url: https://assets.ngc.nvidia.com/products/api-catalog/legal/NVIDIA%20API%20Trial%20Terms%20of%20Service.pdf
