@@ -1,0 +1,37 @@
+catalog_name: nvidia/trt-llm
+kind: PLAYBOOK
+name: trt-llm
+displayName: TRT LLM for Inference
+short_description: Install and configure TRT LLM to run on a single Spark or on two
+  Sparks
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 1 HR
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Single Spark
+  filename: instructions.md
+- id: stacked-sparks
+  label: Run on two Sparks
+  filename: stacked-sparks.md
+- id: open-webui-instructions
+  label: Open WebUI for TensorRT-LLM
+  filename: open-webui-instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: TensorRT Documentation
+  url: https://nvidia.github.io/TensorRT-LLM/
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
+cta:
+  text: View on GitHub
+  url: https://github.com/NVIDIA/TensorRT-LLM

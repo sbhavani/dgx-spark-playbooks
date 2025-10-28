@@ -1,0 +1,30 @@
+catalog_name: nvidia/vllm
+kind: PLAYBOOK
+name: vllm
+displayName: Install and Use vLLM for Inference
+short_description: Use a container or build vLLM from source for Spark
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 30 MIN
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: stacked-sparks
+  label: Run on two Sparks
+  filename: stacked-sparks.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: vLLM Documentation
+  url: https://docs.vllm.ai/en/latest/
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10

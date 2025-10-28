@@ -43,9 +43,9 @@ Run the JAX development environment in a Docker container with GPU support and p
 
 ```bash
 docker run --gpus all --rm -it \
-    --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 \
-    -p 8080:8080 \
-    jax-on-spark
+  --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 \
+  -p 8080:8080 \
+  jax-on-spark
 ```
 
 # Step 5. Access the marimo interface

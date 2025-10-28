@@ -1,0 +1,33 @@
+catalog_name: nvidia/vibe-coding
+kind: PLAYBOOK
+name: vibe-coding
+displayName: Vibe Coding in VS Code
+short_description: Use DGX Spark as a local or remote Vibe Coding assistant with Ollama
+  and Continue
+publisher: nvidia
+labels:
+- DGX
+- Spark
+- VibeCoding
+duration: 30 MIN
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: Ollama Documentation
+  url: https://ollama.com
+- name: VSCode
+  url: https://code.visualstudio.com
+- name: Continue.dev
+  url: https://continue.dev
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10

@@ -1,0 +1,28 @@
+catalog_name: nvidia/tailscale
+kind: PLAYBOOK
+name: tailscale
+displayName: Set up Tailscale on Your Spark
+short_description: Use Tailscale to connect to your Spark on your home network no
+  matter where you are
+publisher: nvidia
+labels:
+- DGX
+- Spark
+duration: 30 MIN
+tabs:
+- id: overview
+  label: Overview
+  filename: overview.md
+- id: instructions
+  label: Instructions
+  filename: instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+resources:
+- name: Tailscale Documentation
+  url: https://tailscale.com/kb
+- name: DGX Spark Documentation
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
