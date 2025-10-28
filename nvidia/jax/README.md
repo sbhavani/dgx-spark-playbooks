@@ -1,6 +1,6 @@
 # Optimized JAX
 
-> Optimize JAX to Run on Spark
+> Optimize JAX to run on Spark
 
 ## Table of Contents
 

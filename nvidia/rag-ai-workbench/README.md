@@ -1,4 +1,4 @@
-# RAG application in AI Workbench
+# RAG Application in AI Workbench
 
 > Install and use AI Workbench to clone and run a reproducible RAG application
 

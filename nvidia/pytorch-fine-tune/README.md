@@ -1,4 +1,4 @@
-# Fine tune with Pytorch
+# Fine-tune with Pytorch
 
 > Use Pytorch to fine-tune models locally
 
