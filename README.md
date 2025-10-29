@@ -94,16 +94,3 @@ Use table format for quick scanning:
 |---------|-------|-----|
 | Specific error message | Root cause | Exact solution steps |
 ```
-
-### **Step 4: Validate Your Work**
-
-```bash
-# Run the linter to check quality and completeness
-./lint_playbooks.sh nvidia/$PLAYBOOK_NAME
-
-# Fix any issues reported:
-# - E### = Errors (must fix)
-# - W### = Warnings (should fix)  
-# - I### = Info (nice to have)
-# - C### = Convention (style)
-```
