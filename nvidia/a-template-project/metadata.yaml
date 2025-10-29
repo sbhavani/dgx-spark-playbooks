@@ -1,0 +1,127 @@
+# ==============================================================================
+# PLAYBOOK METADATA TEMPLATE
+# ==============================================================================
+# This file defines the basic information and structure of your playbook.
+# Replace all placeholder values (marked with {}) with your actual content.
+#
+# REQUIRED: All fields marked as REQUIRED must be filled out
+# OPTIONAL: Fields marked as OPTIONAL can be omitted if not needed
+# ==============================================================================
+
+# REQUIRED: Unique identifier for your playbook in the API catalog
+# Format: nvidia/{your-project-name}
+# Example: nvidia/my-awesome-tool
+catalog_name: nvidia/{project-name}
+
+# REQUIRED: Type of content - should always be PLAYBOOK for tutorials
+kind: PLAYBOOK
+
+# REQUIRED: Short name used internally (no spaces, lowercase, hyphens ok)
+# Should match the directory name
+# Example: my-awesome-tool
+name: {project-name}
+
+# REQUIRED: Human-readable name shown in the UI
+# Example: My Awesome Tool
+displayName: {Display Name}
+
+# REQUIRED: Brief one-line description (< 100 characters)
+# This appears in search results and cards
+# Example: Install and configure My Awesome Tool for AI workflows
+short_description: {Brief description of what this playbook does}
+
+# REQUIRED: Publisher - should always be "nvidia" for DGX Spark playbooks
+publisher: nvidia
+
+# REQUIRED: Tags for categorization and search
+# Common labels: DGX, Spark, Docker, Python, etc.
+labels:
+- DGX
+- Spark
+# Add more relevant labels:
+# - Docker
+# - Python
+# - {category}
+# - {your-technology}
+
+# REQUIRED: Estimated completion time
+# Format examples: "15 MIN", "1 HOUR", "30 MIN", "2 HOURS"
+duration: {XX MIN}
+
+# REQUIRED: Tab structure defining the content sections
+# Each tab corresponds to a markdown file in the same directory
+# You can add more tabs as needed
+tabs:
+# REQUIRED: Overview tab
+- id: overview
+  label: Overview
+  filename: overview.md
+# REQUIRED: Instructions tab although you can rename it as needed
+- id: instructions  
+  label: Instructions
+  filename: instructions.md
+# OPTIONAL: Add more tabs as needed:
+# - id: advanced
+#   label: Advanced Configuration
+#   filename: advanced.md
+# OPTIONAL: Troubleshooting tab
+# Remove this section if you don't want to include a troubleshooting tab
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
+
+# REQUIRED: External resources and documentation links
+# Add helpful links related to your project
+resources:
+- name: {Tool Name} Documentation
+  url: https://docs.example.com/{tool}
+- name: DGX Spark Documentation  
+  url: https://docs.nvidia.com/dgx/dgx-spark
+- name: DGX Spark Forum
+  url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
+# Add more resources:
+# - name: {Tool Name} GitHub Repository
+#   url: https://github.com/example/{tool}
+# - name: {Tool Name} Community
+#   url: https://community.example.com/{tool}
+
+# REQUIRED: Call-to-action button (usually links to source code or documentation)
+# By defult, it will link to the repository on GitHub
+cta:
+  text: View on GitHub
+  url: ${GITLAB_ASSET_BASEURL}/${MODEL}/
+
+# ==============================================================================
+# GUIDELINES FOR FILLING OUT THIS TEMPLATE:
+#
+# 1. NAMING CONVENTIONS:
+#    - catalog_name: nvidia/my-tool-name (lowercase, hyphens)
+#    - name: my-tool-name (matches directory name)
+#    - displayName: My Tool Name (proper case, spaces ok)
+#
+# 2. DESCRIPTION GUIDELINES:
+#    - Keep short_description under 100 characters
+#    - Focus on the main benefit/outcome
+#    - Mention DGX Spark compatibility
+#
+# 3. DURATION ESTIMATION:
+#    - Include time for downloads/installs
+#    - Consider different skill levels
+#    - Test with actual users if possible
+#
+# 4. LABELS/TAGS:
+#    - Always include: DGX, Spark
+#    - Add technology tags: Python, Docker, AI, ML, etc.
+#    - Add use-case tags: Computer-Vision, NLP, Training, etc.
+#
+# 5. RESOURCES:
+#    - Always include DGX Spark docs and forum
+#    - Add official documentation for your tool
+#    - Include community resources if available
+#
+# 6. TAB STRUCTURE:
+#    - Keep the standard three tabs unless you need more
+#    - overview.md: Introduction and prerequisites  
+#    - instructions.md: Step-by-step tutorial
+#    - troubleshooting.md: Common issues and solutions
+# ==============================================================================
