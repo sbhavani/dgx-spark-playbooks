@@ -68,7 +68,7 @@ Expected output should show {what indicates success}.
 
 {Explanation of what each command does.}
 
-# Step 7. Optional - {Next steps/advanced usage}
+# Step 6. Optional - {Next steps/advanced usage}
 
 {How to extend or build upon what they've accomplished.}
 
