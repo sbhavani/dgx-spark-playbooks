@@ -34,15 +34,11 @@ short_description: {Brief description of what this playbook does}
 publisher: nvidia
 
 # REQUIRED: Tags for categorization and search
-# Common labels: DGX, Spark, Docker, Python, etc.
 labels:
-- DGX
-- Spark
+- {category} # e.g. Data Science, Fine-tuning, etc.
+- {your-technology} # e.g. Docker, TRT-LLM, etc.
 # Add more relevant labels:
-# - Docker
-# - Python
-# - {category}
-# - {your-technology}
+# - {more-technology-labels}
 
 # REQUIRED: Estimated completion time
 # Format examples: "15 MIN", "1 HOUR", "30 MIN", "2 HOURS"
