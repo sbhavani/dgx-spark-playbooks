@@ -7,6 +7,7 @@ Remove these comment blocks when you're done.
 
 STRUCTURE GUIDELINES:
 - Use numbered steps (# Step 1, # Step 2, etc.)
+- Add more steps if needed
 - Each step should have ONE clear objective
 - Include verification steps after installations
 - Use consistent formatting for commands and outputs
@@ -55,7 +56,7 @@ Expected output should show {what indicates success}.
 
 {Instructions for accessing the application - e.g., "Open a web browser and navigate to `http://<SPARK_IP>:8080` where `<SPARK_IP>` is your device's IP address."}
 
-# Step 5. Optional - {Cleanup/management step}
+# Step 5. Cleanup
 
 {When and why someone might need this step.}
 

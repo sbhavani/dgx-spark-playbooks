@@ -39,19 +39,13 @@ Order from most to least important.
 - {Optional skill - e.g., Knowledge of machine learning concepts (helpful but not required)}
 
 # Prerequisites
-
-**Hardware Requirements:**
-<!-- List specific hardware needs -->
-- NVIDIA DGX Spark device {with specific architecture if needed - e.g., "with Blackwell architecture"}
+<!-- List specific hardware and software needs -->
 - Minimum {X}GB GPU memory {explain why - e.g., "for model inference"}
 - At least {X}GB available storage space {explain what it's for - e.g., "for model downloads"}
 - {Any other hardware requirements}
 
-**Software Requirements:**
-<!-- List software that must be installed before starting -->
 - {Software 1}: `{command to check if installed}`
 - {Software 2}: `{command to check if installed}`
-- {Software 3}: `{command to check if installed}`
 - {Network access requirement - e.g., "Network access to download models from Hugging Face"}
 - {Port access requirement - e.g., "Web browser access to `<SPARK_IP>:8080` port"}
 
@@ -64,7 +58,6 @@ Link to source code when possible.
 
 All required assets can be found [in the {Tool Name} repository](${GITLAB_ASSET_BASEURL}/${MODEL}/).
 
-- `{filename}` - {Description of what this file does}
 - `{filename}` - {Description of what this file does}
 - `{filename}` - {Description of what this file does}
 
