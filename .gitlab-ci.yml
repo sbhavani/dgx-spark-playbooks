@@ -69,7 +69,7 @@ variables:
 
 # Step 2: Aggregate all models and publish to public repos (single push, complete regeneration)
 custom:publish-all-playbooks:
-  stage: launch_ux_prd
+  stage: deploy
   image: 
     name: gitlab-master.nvidia.com:5005/api-catalog/pipeline:latest
     entrypoint: [""]
