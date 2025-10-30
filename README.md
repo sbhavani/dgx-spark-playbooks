@@ -2,6 +2,8 @@
 
 This repository contains step-by-step tutorials for NVIDIA DGX Spark devices. Each playbook walks users through installing and configuring specific tools or workflows.
 
+If you are looking to publish playbooks for an external partner, please read [this doc](https://docs.google.com/document/d/1DijoD19mLZzRCC5mD9rNzzAuqqh_k7TbVYbg4g2MZaA/edit?tab=t.0) first.
+
 ## Quick Start
 
 Want to create a new playbook? Here's the simple process:
