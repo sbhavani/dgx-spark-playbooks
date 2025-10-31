@@ -1,5 +1,3 @@
-# Step 1. {First major step - usually verification/prerequisites/environment setup}
-
 <!-- 
 INSTRUCTIONS TEMPLATE: This file provides step-by-step tutorial instructions.
 Replace all placeholder text in {} with your actual content.
@@ -12,6 +10,15 @@ STRUCTURE GUIDELINES:
 - Include verification steps after installations
 - Use consistent formatting for commands and outputs
 -->
+
+<!--
+Optional: At the top of the instructions you can call out any playbooks that should be completed before they begin following these steps.
+-->
+
+> [!TIP] 
+> {If you haven't already installed NVIDIA Sync, [learn how here](link).}
+
+# Step 1. {First major step - usually verification/prerequisites/environment setup}
 
 {Brief description of what this step accomplishes and why it's important.}
 
@@ -69,7 +76,7 @@ Expected output should show {what indicates success}.
 
 {Explanation of what each command does.}
 
-# Step 6. Optional - {Next steps/advanced usage}
+# Step 6. {Optional - Next steps/advanced usage}
 
 {How to extend or build upon what they've accomplished.}
 
@@ -81,4 +88,4 @@ Expected output should show {what indicates success}.
 4. {Performance optimization tips}
 5. {How to monitor usage with `nvidia-smi` or other tools}
 
-{Final success criteria - e.g., "The application should complete within 30-60 seconds depending on your hardware configuration."}
+{Final success criteria if they follow these next steps/advanced usage - e.g., "The application should complete within 30-60 seconds depending on your hardware configuration."}
