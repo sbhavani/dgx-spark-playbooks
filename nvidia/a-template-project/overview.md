@@ -8,7 +8,7 @@ Remove these comment blocks when you're done.
 PURPOSE: Help users understand what they'll accomplish and if this playbook is right for them.
 -->
 
-{Brief description of what your tool/technology does and why it's useful.}
+{Brief description of what your tool/technology does and why it's useful. Be specific about the types of jobs-to-be-done it solves for them.}
 
 {Explain how it works at a high level - 2-3 sentences maximum.}
 
@@ -28,8 +28,8 @@ You'll {main objective - what the user will have working at the end}.
 # What to know before starting
 
 <!-- 
-PREREQUISITES: List required knowledge/experience.
-Be honest about skill level needed - helps users self-select.
+PREREQUISITE KNOWLEDGE: List required knowledge/experience.
+Be honest about skill level needed to help users self-select.
 Order from most to least important.
 -->
 
@@ -39,11 +39,14 @@ Order from most to least important.
 - {Optional skill - e.g., Knowledge of machine learning concepts (helpful but not required)}
 
 # Prerequisites
-<!-- List specific hardware and software needs -->
+
+<!-- 
+HARDWARE/SOFTWARE/SETUP PREREQUISITES: List specific hardware and software needs. If there is a setup required that is already covered in documentation or another playbook (e.g., set up your device) list and link to that resource.
+-->
+
 - Minimum {X}GB GPU memory {explain why - e.g., "for model inference"}
 - At least {X}GB available storage space {explain what it's for - e.g., "for model downloads"}
 - {Any other hardware requirements}
-
 - {Software 1}: `{command to check if installed}`
 - {Software 2}: `{command to check if installed}`
 - {Network access requirement - e.g., "Network access to download models from Hugging Face"}
@@ -65,7 +68,7 @@ All required assets can be found [in the {Tool Name} repository](${GITLAB_ASSET_
 
 <!-- 
 EXPECTATIONS: Help users plan their time and understand potential issues.
-Be realistic about time estimates.
+Be realistic about time estimates and include wait time.
 -->
 
 * **Estimated time:** {XX} minutes or {XX} hours {include what takes the most time - e.g., "(including model download)"}
