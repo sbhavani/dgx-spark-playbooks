@@ -22,11 +22,10 @@ df -h /
 Download the latest SGLang container from NVIDIA NGC. This step runs on the host and may take
 several minutes depending on your network connection.
 
-> TODO: Verify the exact container tag/version for SGLang NGC container
 
 ```bash
 # Pull the SGLang container
-docker pull nvcr.io/nvidia/sglang:<VERSION>-py3
+docker pull nvcr.io/nvidia/sglang:25.10-py3
 
 # Verify the image was downloaded
 docker images | grep sglang
@@ -42,7 +41,7 @@ server inside the container, exposing it on port 30000 for client connections.
 docker run --gpus all -it --rm \
   -p 30000:30000 \
   -v /tmp:/tmp \
-  nvcr.io/nvidia/sglang:<VERSION>-py3 \
+  nvcr.io/nvidia/sglang:25.10-py3 \
   bash
 ```
 
