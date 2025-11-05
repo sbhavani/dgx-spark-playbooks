@@ -725,7 +725,7 @@ class PlaybookConverter:
         ux_conf_lines['publisher'] = metadata.get('publisher', 'nvidia')
         ux_conf_lines['labels'] = metadata.get('labels', [])
         ux_conf_lines['duration'] = metadata.get('duration', 'UNKNOWN')
-
+            
         self._attach_build_site_metadata(ux_conf_lines)
 
         # Add tabs
@@ -742,12 +742,10 @@ class PlaybookConverter:
             if content is None:
                 continue
             
-            # Add indentation to each line of content
+            # Keep content as-is for clean literal block scalar formatting
             if content:
-                lines = content.split('\n')
-                # Add 2-space indent to each non-empty line
-                indented_lines = ['  ' + line if line.strip() else line for line in lines]
-                content = '\n'.join(indented_lines)
+                # Remove any trailing whitespace but preserve internal formatting
+                content = content.rstrip()
             
             # Ensure content ends with newline for consistent YAML formatting
             if content and not content.endswith('\n'):
@@ -759,12 +757,13 @@ class PlaybookConverter:
                 'content': content
             })
         
-        ux_conf_lines['resources'] = metadata.get('resources', [])
-        
-        # Add cta (Call To Action) if present in metadata
-        cta = metadata.get('cta')
-        if cta:
-            ux_conf_lines['cta'] = cta
+                # Add resources section if present
+        if 'resources' in metadata:
+            ux_conf_lines['resources'] = metadata['resources']
+            
+        # Add cta section if present
+        if 'cta' in metadata:
+            ux_conf_lines['cta'] = metadata['cta']
 
         return ux_conf_lines
 
@@ -1360,11 +1359,10 @@ class PlaybookConverter:
                         return {k: convert_multiline_strings(v) for k, v in data.items()}
                     elif isinstance(data, list):
                         return [convert_multiline_strings(item) for item in data]
-                    elif isinstance(data, str) and '\n' in data:
-                        # Strip trailing whitespace/newlines, then add exactly one newline
-                        # This gives us clean | without +/- indicators
-                        cleaned = data.rstrip() + '\n'
-                        return LiteralScalarString(cleaned)
+                    elif isinstance(data, str) and ('\n' in data or len(data) > 80):
+                        # Use literal block scalar for multiline or long strings
+                        # Ensure content ends with exactly one newline for clean | format
+                        return LiteralScalarString(data.rstrip() + '\n')
                     else:
                         return data
                 
@@ -1373,33 +1371,86 @@ class PlaybookConverter:
                 yaml_writer = YAML()
                 yaml_writer.default_flow_style = False
                 yaml_writer.width = 4096
+                yaml_writer.preserve_quotes = False
+                # Ensure literal scalars are used for multiline content
+                yaml_writer.explicit_start = False
                 
-                with open(ux_conf_path, 'w') as f:
+                with open(ux_conf_path, 'w', encoding='utf-8') as f:
                     yaml_writer.dump(converted_yaml, f)
                     
             except ImportError:
-                # Fallback to PyYAML with custom dumper
-                with open(ux_conf_path, 'w') as f:
-                    class LiteralDumper(yaml.Dumper):
-                        pass
+                # Fallback to manual YAML writing with proper block scalars
+                print("   ⚠️  ruamel.yaml not available, using manual YAML formatting")
+                
+                def format_yaml_value(value, indent=0):
+                    """Format a value for YAML output with proper indentation"""
+                    indent_str = '  ' * indent
                     
-                    def str_representer(dumper, data):
-                        if isinstance(data, str) and '\n' in data:
-                            # Use literal block scalar (|) for multiline strings
-                            return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
-                        return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+                    if isinstance(value, dict):
+                        lines = []
+                        for k, v in value.items():
+                            if isinstance(v, (dict, list)):
+                                lines.append(f"{indent_str}{k}:")
+                                lines.append(format_yaml_value(v, indent + 1))
+                            elif isinstance(v, str) and ('\n' in v or len(v) > 80):
+                                # Use literal block scalar for multiline/long strings
+                                content = v if v.endswith('\n') else v + '\n'
+                                lines.append(f"{indent_str}{k}: |")
+                                for line in content.rstrip('\n').split('\n'):
+                                    lines.append(f"{indent_str}  {line}")
+                            elif isinstance(v, bool):
+                                lines.append(f"{indent_str}{k}: {'true' if v else 'false'}")
+                            elif v is None:
+                                lines.append(f"{indent_str}{k}:")
+                            elif isinstance(v, (int, float)):
+                                lines.append(f"{indent_str}{k}: {v}")
+                            else:
+                                # Escape string if needed
+                                v_str = str(v).replace("'", "''")
+                                if ':' in v_str or '#' in v_str or v_str.startswith(('!', '&', '*', '[', '{', '>', '|')):
+                                    lines.append(f"{indent_str}{k}: '{v_str}'")
+                                else:
+                                    lines.append(f"{indent_str}{k}: {v_str}")
+                        return '\n'.join(lines)
                     
-                    LiteralDumper.add_representer(str, str_representer)
+                    elif isinstance(value, list):
+                        lines = []
+                        for item in value:
+                            if isinstance(item, dict):
+                                lines.append(f"{indent_str}-")
+                                for k, v in item.items():
+                                    if isinstance(v, str) and ('\n' in v or len(v) > 80):
+                                        # Use literal block scalar for multiline/long strings
+                                        content = v if v.endswith('\n') else v + '\n'
+                                        lines.append(f"{indent_str}  {k}: |")
+                                        for line in content.rstrip('\n').split('\n'):
+                                            lines.append(f"{indent_str}    {line}")
+                                    elif isinstance(v, dict):
+                                        lines.append(f"{indent_str}  {k}:")
+                                        lines.append(format_yaml_value(v, indent + 2))
+                                    elif isinstance(v, list):
+                                        lines.append(f"{indent_str}  {k}:")
+                                        lines.append(format_yaml_value(v, indent + 2))
+                                    elif isinstance(v, bool):
+                                        lines.append(f"{indent_str}  {k}: {'true' if v else 'false'}")
+                                    elif v is None:
+                                        lines.append(f"{indent_str}  {k}:")
+                                    elif isinstance(v, (int, float)):
+                                        lines.append(f"{indent_str}  {k}: {v}")
+                                    else:
+                                        v_str = str(v).replace("'", "''")
+                                        if ':' in v_str or '#' in v_str:
+                                            lines.append(f"{indent_str}  {k}: '{v_str}'")
+                                        else:
+                                            lines.append(f"{indent_str}  {k}: {v_str}")
+                            else:
+                                lines.append(f"{indent_str}- {item}")
+                        return '\n'.join(lines)
                     
-                    yaml.dump(
-                        ux_conf_yaml, 
-                        f, 
-                        Dumper=LiteralDumper, 
-                        default_flow_style=False, 
-                        sort_keys=False, 
-                        allow_unicode=True,
-                        width=4096
-                    )
+                    return str(value)
+                
+                with open(ux_conf_path, 'w', encoding='utf-8') as f:
+                    f.write(format_yaml_value(ux_conf_yaml))
             
             print(f"   ✅ Wrote: {ux_conf_path}", flush=True)
 
