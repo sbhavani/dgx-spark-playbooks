@@ -48,7 +48,7 @@ huggingface-cli login
 
 ```bash
 git clone ${GITLAB_REPO_BASEURL}
-cd ${MODEL}/assets
+cd dgx-spark-playbooks/${MODEL}/assets
 ```
 
 # Step7: Run the fine-tuning recipes
