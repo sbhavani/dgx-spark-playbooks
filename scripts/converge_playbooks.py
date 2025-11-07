@@ -1226,28 +1226,28 @@ class PlaybookConverter:
                 print(f"   ❌ Error writing README.md to {alias}: {e}")
                 sys.exit(1)
                 
-    # def write_markdown(self, markdown_content: str, dest_paths: Dict[str, Path]) -> None:
-    #     """
-    #     Write generated markdown to all destination repos
+    def write_markdown(self, markdown_content: str, dest_paths: Dict[str, Path]) -> None:
+        """
+        Write generated markdown to all destination repos
         
-    #     Args:
-    #         markdown_content: Generated markdown content
-    #         dest_paths: Dictionary of destination repo paths
-    #     """
-    #     for alias, dest_base_path in dest_paths.items():
-    #         # Write to {dest_repo}/{model_name}/README.md
-    #         dest_model_dir = dest_base_path / self.model_name
-    #         readme_path = dest_model_dir / 'README.md'
+        Args:
+            markdown_content: Generated markdown content
+            dest_paths: Dictionary of destination repo paths
+        """
+        for alias, dest_base_path in dest_paths.items():
+            # Write to {dest_repo}/{model_name}/README.md
+            dest_model_dir = dest_base_path / self.model_name
+            readme_path = dest_model_dir / 'README.md'
             
-    #         print(f"📝 Writing README.md to {alias}/{self.model_name}/")
+            print(f"📝 Writing README.md to {alias}/{self.model_name}/")
             
-    #         try:
-    #             with open(readme_path, 'w') as f:
-    #                 f.write(markdown_content)
-    #             print(f"   ✅ README.md written successfully")
-    #         except Exception as e:
-    #             print(f"   ❌ Error writing README.md: {e}")
-    #             sys.exit(1)
+            try:
+                with open(readme_path, 'w') as f:
+                    f.write(markdown_content)
+                print(f"   ✅ README.md written successfully")
+            except Exception as e:
+                print(f"   ❌ Error writing README.md: {e}")
+                sys.exit(1)
     
     def run(self) -> int:
         """
@@ -1406,7 +1406,6 @@ class PlaybookConverter:
             print("\n⏸️  Skipping git operations (prepare-only mode)", flush=True)
             return 0
         
-        # FULL MODE: Clone, copy, push (original behavior)
         # Step 3: Clone destination repositories
         print("\n📥 Step 3: Cloning destination repositories", flush=True)
         sys.stdout.flush()
