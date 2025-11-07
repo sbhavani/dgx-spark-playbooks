@@ -22,34 +22,34 @@ Execute the following command to set up and run traditional speculative decoding
 
 ```bash
 docker run \
--v $HOME/.cache/huggingface/:/root/.cache/huggingface/ \
---rm -it --ulimit memlock=-1 --ulimit stack=67108864 \
---gpus=all --ipc=host --network host nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
-bash -c "
-  # Download models
-  hf download nvidia/Llama-3.3-70B-Instruct-FP4 && \
-  hf download nvidia/Llama-3.1-8B-Instruct-FP4 \
-  --local-dir /opt/Llama-3.1-8B-Instruct-FP4/ && \
+  -v $HOME/.cache/huggingface/:/root/.cache/huggingface/ \
+  --rm -it --ulimit memlock=-1 --ulimit stack=67108864 \
+  --gpus=all --ipc=host --network host nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
+  bash -c "
+    # Download models
+    hf download nvidia/Llama-3.3-70B-Instruct-FP4 && \
+    hf download nvidia/Llama-3.1-8B-Instruct-FP4 \
+    --local-dir /opt/Llama-3.1-8B-Instruct-FP4/ && \
 
-  # Create configuration file
-  cat <<EOF > extra-llm-api-config.yml
+    # Create configuration file
+    cat <<EOF > extra-llm-api-config.yml
 print_iter_log: false
 disable_overlap_scheduler: true
 speculative_config:
-decoding_type: DraftTarget
-max_draft_len: 4
-speculative_model_dir: /opt/Llama-3.1-8B-Instruct-FP4/
+  decoding_type: DraftTarget
+  max_draft_len: 4
+  speculative_model_dir: /opt/Llama-3.1-8B-Instruct-FP4/
 kv_cache_config:
-enable_block_reuse: false
+  enable_block_reuse: false
 EOF
 
-  # Start TensorRT-LLM server
-  trtllm-serve nvidia/Llama-3.3-70B-Instruct-FP4 \
-    --backend pytorch --tp_size 1 \
-    --max_batch_size 1 \
-    --kv_cache_free_gpu_memory_fraction 0.9 \
-    --extra_llm_api_options ./extra-llm-api-config.yml
-"
+    # Start TensorRT-LLM server
+    trtllm-serve nvidia/Llama-3.3-70B-Instruct-FP4 \
+      --backend pytorch --tp_size 1 \
+      --max_batch_size 1 \
+      --kv_cache_free_gpu_memory_fraction 0.9 \
+      --extra_llm_api_options ./extra-llm-api-config.yml
+  "
 ```
 
 ## Step 3. Test the draft-target setup
@@ -59,13 +59,13 @@ Once the server is running, test it by making an API call from another terminal:
 ```bash
 # Test completion endpoint
 curl -X POST http://localhost:8000/v1/completions \
--H "Content-Type: application/json" \
--d '{
-  "model": "nvidia/Llama-3.3-70B-Instruct-FP4",
-  "prompt": "Explain the benefits of speculative decoding:",
-  "max_tokens": 150,
-  "temperature": 0.7
-}'
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "nvidia/Llama-3.3-70B-Instruct-FP4",
+    "prompt": "Explain the benefits of speculative decoding:",
+    "max_tokens": 150,
+    "temperature": 0.7
+  }'
 ```
 
 **Key features of draft-target:**

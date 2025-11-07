@@ -21,5 +21,5 @@ You will have a fully functional Open WebUI installation running on your DGX Spa
 
 * **Duration**: 15-20 minutes for initial setup, plus model download time (varies by model size)
 * **Risks**:
-* Docker permission issues may require user group changes and session restart
-* Large model downloads may take significant time depending on network speed
+  * Docker permission issues may require user group changes and session restart
+  * Large model downloads may take significant time depending on network speed

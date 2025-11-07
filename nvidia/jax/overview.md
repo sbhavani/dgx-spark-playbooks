@@ -4,10 +4,10 @@ JAX lets you write **NumPy-style Python code** and run it fast on GPUs without w
 
 - **NumPy on accelerators**: Use `jax.numpy` just like NumPy, but arrays live on the GPU.  
 - **Function transformations**:  
-- `jit` → Compiles your function into fast GPU code  
-- `grad` → Gives you automatic differentiation 
-- `vmap` → Vectorizes your function across batches  
-- `pmap` → Runs across multiple GPUs in parallel 
+  - `jit` → Compiles your function into fast GPU code  
+  - `grad` → Gives you automatic differentiation 
+  - `vmap` → Vectorizes your function across batches  
+  - `pmap` → Runs across multiple GPUs in parallel 
 - **XLA backend**: JAX hands your code to XLA (Accelerated Linear Algebra compiler), which fuses operations and generates optimized GPU kernels.
 
 # What you'll accomplish
@@ -48,6 +48,6 @@ All required assets can be found [here on GitHub](${GITLAB_ASSET_BASEURL})
 
 * **Duration:** 2-3 hours including setup, tutorial completion, and validation
 * **Risks:** 
-* Package dependency conflicts in Python environment
-* Performance validation may require architecture-specific optimizations
+  * Package dependency conflicts in Python environment
+  * Performance validation may require architecture-specific optimizations
 **Rollback:** Container environments provide isolation; remove containers and restart to reset state.

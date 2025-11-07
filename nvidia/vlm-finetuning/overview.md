@@ -31,12 +31,12 @@ The setup includes:
 # Time & risk
 
 * **Duration**:
-* 15-20 minutes for initial setup and model downloads
-* 30-60 minutes for image VLM training (depending on dataset size)
-* 1-2 hours for video VLM training (depending on video dataset size)
+  * 15-20 minutes for initial setup and model downloads
+  * 30-60 minutes for image VLM training (depending on dataset size)
+  * 1-2 hours for video VLM training (depending on video dataset size)
 * **Risks**:
-* Docker permission issues may require user group changes and a session restart
-* Large model downloads and datasets may require significant disk space and time
-* Training requires sustained GPU usage and memory
-* Dataset preparation may require manual steps (Kaggle downloads, video processing)
+  * Docker permission issues may require user group changes and a session restart
+  * Large model downloads and datasets may require significant disk space and time
+  * Training requires sustained GPU usage and memory
+  * Dataset preparation may require manual steps (Kaggle downloads, video processing)
 * **Rollback**: Stop and remove Docker containers, delete downloaded models and datasets if needed.

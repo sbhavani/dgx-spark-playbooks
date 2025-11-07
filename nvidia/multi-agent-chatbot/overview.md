@@ -32,6 +32,6 @@ The setup includes:
 
 * **Estimated time**: 30 minutes to an hour
 * **Risks**:
-* Docker permission issues may require user group changes and session restart
-* Setup includes downloading model files for gpt-oss-120B (~63GB), Deepseek-Coder:6.7B-Instruct (~7GB) and Qwen3-Embedding-4B (~4GB), which may take between 30 minutes to 2 hours depending on network speed
+  * Docker permission issues may require user group changes and session restart
+  * Setup includes downloading model files for gpt-oss-120B (~63GB), Deepseek-Coder:6.7B-Instruct (~7GB) and Qwen3-Embedding-4B (~4GB), which may take between 30 minutes to 2 hours depending on network speed
 * **Rollback**: Stop and remove Docker containers using provided cleanup commands.

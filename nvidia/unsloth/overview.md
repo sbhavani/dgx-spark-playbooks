@@ -37,7 +37,7 @@ The Python test script can be found [here on GitHub](${GITLAB_ASSET_BASEURL}/${M
 
 * **Duration**: 30-60 minutes for initial setup and test run
 * **Risks**: 
-* Triton compiler version mismatches may cause compilation errors
-* CUDA toolkit configuration issues may prevent kernel compilation
-* Memory constraints on smaller models require batch size adjustments
+  * Triton compiler version mismatches may cause compilation errors
+  * CUDA toolkit configuration issues may prevent kernel compilation
+  * Memory constraints on smaller models require batch size adjustments
 * **Rollback**: Uninstall packages with `pip uninstall unsloth torch torchvision`.

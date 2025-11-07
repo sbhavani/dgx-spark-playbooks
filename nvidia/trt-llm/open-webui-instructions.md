@@ -18,14 +18,14 @@ For multi-node setup, this would be the primary node.
 
 ```bash
 docker run \
--d \
--e OPENAI_API_BASE_URL="http://localhost:8355/v1" \
--v open-webui:/app/backend/data \
---network host \
---add-host=host.docker.internal:host-gateway \
---name open-webui \
---restart always \
-ghcr.io/open-webui/open-webui:main
+  -d \
+  -e OPENAI_API_BASE_URL="http://localhost:8355/v1" \
+  -v open-webui:/app/backend/data \
+  --network host \
+  --add-host=host.docker.internal:host-gateway \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:main
 ```
 
 This command:

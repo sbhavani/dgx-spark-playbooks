@@ -27,9 +27,9 @@ The setup includes:
 # Time & risk
 
 * **Duration**:
-* 30-45 minutes for initial setup model download time
-* 1-2 hours for dreambooth LoRA training
+  * 30-45 minutes for initial setup model download time
+  * 1-2 hours for dreambooth LoRA training
 * **Risks**:
-* Docker permission issues may require user group changes and session restart
-* The recipe would require hyperparameter tuning and a high-quality dataset for the best results
+  * Docker permission issues may require user group changes and session restart
+  * The recipe would require hyperparameter tuning and a high-quality dataset for the best results
 **Rollback**: Stop and remove Docker containers, delete downloaded models if needed.
