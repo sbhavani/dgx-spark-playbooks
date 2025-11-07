@@ -27,6 +27,7 @@ docker run --gpus all --ulimit memlock=-1 -it --ulimit stack=67108864 --entrypoi
 ```bash
 pip install transformers peft datasets "trl==0.19.1"
 pip install --no-deps unsloth unsloth_zoo
+pip install hf_transfer
 ```
 
 # Step 5. Build and install bitsandbytes inside Docker
