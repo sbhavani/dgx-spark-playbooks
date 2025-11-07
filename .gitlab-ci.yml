@@ -1,6 +1,6 @@
 default:
   tags:
-    - gnr8
+    - perflab
 
 stages:
   - generate
