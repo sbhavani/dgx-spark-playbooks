@@ -47,7 +47,7 @@ df -h .
 
 * **Estimated duration**: 45-90 minutes depending on network speed and model size
 * **Risks**:
-* Model download may fail due to network issues or Hugging Face authentication problems
-* Quantization process is memory-intensive and may fail on systems with insufficient GPU memory
-* Output files are large (several GB) and require adequate storage space
+  * Model download may fail due to network issues or Hugging Face authentication problems
+  * Quantization process is memory-intensive and may fail on systems with insufficient GPU memory
+  * Output files are large (several GB) and require adequate storage space
 * **Rollback**: Remove the output directory and any pulled Docker images to restore original state.

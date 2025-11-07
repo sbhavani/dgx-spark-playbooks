@@ -37,7 +37,7 @@ all traffic automatically encrypted and NAT traversal handled transparently.
 
 * **Duration**: 15-30 minutes for initial setup, 5 minutes per additional device
 * **Risks**:
-* Potential SSH service configuration conflicts
-* Network connectivity issues during initial setup
-* Authentication provider service dependencies
+  * Potential SSH service configuration conflicts
+  * Network connectivity issues during initial setup
+  * Authentication provider service dependencies
 * **Rollback**: Tailscale can be completely removed with `sudo apt remove tailscale` and all network routing automatically reverts to default settings.

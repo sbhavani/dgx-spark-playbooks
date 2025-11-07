@@ -48,6 +48,6 @@ All required assets can be found [here on GitHub](${GITLAB_ASSET_BASEURL})
 
 * **Duration:** 2-3 hours including setup, tutorial completion, and validation
 * **Risks:** 
-* Package dependency conflicts in Python environment
-* Performance validation may require architecture-specific optimizations
-**Rollback:** Container environments provide isolation; remove containers and restart to reset state.
+  * Package dependency conflicts in Python environment
+  * Performance validation may require architecture-specific optimizations
+* **Rollback:** Container environments provide isolation; remove containers and restart to reset state.

@@ -37,7 +37,7 @@ df -h ~
 
 * **Estimated time:** 15-30 minutes for setup and validation
 * **Risks:**
-* Large model downloads may take significant time depending on network speed
-* GPU memory requirements vary by model size
-* Container startup time depends on model loading
+  * Large model downloads may take significant time depending on network speed
+  * GPU memory requirements vary by model size
+  * Container startup time depends on model loading
 * **Rollback:** Stop and remove containers with `docker stop <CONTAINER_NAME> && docker rm <CONTAINER_NAME>`. Remove cached models from `~/.cache/nim` if disk space recovery is needed.
