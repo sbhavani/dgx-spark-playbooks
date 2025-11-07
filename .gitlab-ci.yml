@@ -52,6 +52,7 @@ generate-convergence-output:
     - git config --global user.name "GitLab CI"
   script:
     - echo "📦 Converging all playbooks and creating MR to API Catalog..."
+    - python3 -m pip install --upgrade pyyaml
     - python3 -u scripts/converge_and_mr.py
         --output-dir convergence-output
         --api-catalog-repo "https://gitlab-master.nvidia.com/api-catalog/dgx-spark-playbooks"
