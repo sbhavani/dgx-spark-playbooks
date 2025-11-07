@@ -2,6 +2,7 @@
 
 > Use Tailscale to connect to your Spark on your home network no matter where you are
 
+
 ## Table of Contents
 
 - [Overview](#overview)

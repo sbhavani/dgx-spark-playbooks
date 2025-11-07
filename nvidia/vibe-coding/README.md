@@ -2,6 +2,7 @@
 
 > Use DGX Spark as a local or remote Vibe Coding assistant with Ollama and Continue
 
+
 ## Table of Contents
 
 - [Overview](#overview)

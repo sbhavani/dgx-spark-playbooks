@@ -2,6 +2,7 @@
 
 > Transform unstructured text into interactive knowledge graphs with LLM inference and graph visualization
 
+
 ## Table of Contents
 
 - [Overview](#overview)
