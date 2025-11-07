@@ -1,42 +1,23 @@
-# Global variables - these are additive with included pipeline vars
-.models:
-  - MODEL:
-    - nvidia/comfy-ui
-    - nvidia/connect-to-your-spark
-    - nvidia/cuda-x-data-science
-    - nvidia/dgx-dashboard
-    - nvidia/flux-finetuning
-    - nvidia/jax
-    - nvidia/llama-factory
-    - nvidia/multi-agent-chatbot
-    - nvidia/multi-modal-inference
-    - nvidia/nccl
-    - nvidia/nemo-fine-tune
-    - nvidia/nim-llm
-    - nvidia/nvfp4-quantization
-    - nvidia/open-webui
-    - nvidia/pytorch-fine-tune
-    - nvidia/rag-ai-workbench
-    - nvidia/speculative-decoding
-    - nvidia/connect-two-sparks
-    - nvidia/tailscale
-    - nvidia/trt-llm
-    - nvidia/txt2kg
-    - nvidia/unsloth
-    - nvidia/vibe-coding
-    - nvidia/vllm
-    - nvidia/vlm-finetuning
-    - nvidia/vscode
-    - nvidia/vss
+default:
+  tags:
+    - gnr8
 
+stages:
+  - generate
+  - create-mr
+
+# Global variables - these are additive with included pipeline vars
 variables:
   # Base URLs used for substitution in ux-conf.yaml
   GITLAB_ASSET_BASEURL: "https://github.com/NVIDIA/dgx-spark-playbooks/blob/main"
   GITLAB_REPO_BASEURL: "https://github.com/NVIDIA/dgx-spark-playbooks"
+  GITLAB_RAW_CONTENT_BASEURL: "https://raw.githubusercontent.com/NVIDIA/dgx-spark-playbooks/refs/heads/main"
 
-  # Source repository for assets (internal GitLab)
-  SRC_ASSETS_URL: "https://gitlab-master.nvidia.com/spark-playbooks/dgx-spark-playbook-assets.git"
-  
+  # API Catalog repository configuration
+  # Note: GITLAB_MASTER_TOKEN_API_CATALOG must be set in GitLab CI/CD Settings > Variables
+  # This token needs: api, read_repository, write_repository permissions
+  SRC_ASSETS_URL: "https://gitlab-master.nvidia.com/dgx/dgx-spark-playbooks-assets"
+
   # Destination repositories (JSON array format for parsing in script)
   # Cutover to Github.com supported via the public_github alias
   # Format: [{"alias": "name", "url": "git-url", "token_var": "ENV_VAR_NAME"}, ...]
@@ -55,56 +36,37 @@ variables:
   # Override in GitLab UI if needed: Settings > CI/CD > Variables
   FORBIDDEN_PATTERNS_JSON: '["sw-docs-dgx-station","gitlab-master\\.nvidia\\.com","urm\\.nvidia\\.com"]'
   
-  # Root files to copy from source assets repo (glob patterns)
-  # These files are copied from source assets repo root to each destination repo root
-  ROOT_FILE_GLOBS_JSON: '["LICENSE*","CONTRIBUTING.md","CODE_OF_CONDUCT.md"]'
-  
   # Root directories to copy from project root (directory names)
   # These directories are copied from CI project root to each destination repo root
   # Used for images and assets referenced in README-Public.md
   ROOT_DIRS_JSON: '["src"]'
 
-  # Models to skip from publication to Github/Gitlab (this does not affect build.nvidia.com publication)
-  SKIP_MODELS_JSON: '["nvidia/monai-reasoning", "nvidia/protein-folding", "nvidia/sglang"]'
-
-# Step 2: Aggregate all models and publish to public repos (single push, complete regeneration)
-custom:publish-all-playbooks:
-  stage: deploy
-  image: 
-    name: gitlab-master.nvidia.com:5005/api-catalog/pipeline:latest
-    entrypoint: [""]
+# Converge all playbooks and create MR to API Catalog
+generate-convergence-output:
+  stage: generate
+  image: python:3.9-slim
   before_script:
-    #- apt-get update && apt-get install -y openssh-client
+    - apt-get update && apt-get install -y git
+    - pip install requests
     - git config --global user.email "automaton@nvidia.com"
     - git config --global user.name "GitLab CI"
-    # Setup SSH for GitHub deploy key
-    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
-    - cat "$GITHUB_TOKEN_DGX_SPARK_PLAYBOOKS" > ~/.ssh/github_deploy_key
-    - chmod 600 ~/.ssh/github_deploy_key
-    # Ensure key ends with newline and check format
-    - echo "" >> ~/.ssh/github_deploy_key
-    - head -1 ~/.ssh/github_deploy_key
-    - ssh-keygen -y -f ~/.ssh/github_deploy_key > /dev/null || (echo "❌ Invalid key format" && exit 1)
-    - |
-      cat > ~/.ssh/config <<EOF
-      Host github.com
-        HostName github.com
-        User git
-        IdentityFile ~/.ssh/github_deploy_key
-        StrictHostKeyChecking no
-        UserKnownHostsFile=/dev/null
-      EOF
-    - chmod 600 ~/.ssh/config
-    - ssh -T git@github.com || echo "SSH configured (exit code $? is expected)"
   script:
-    - echo "📦 Publishing all playbooks to public repositories..."
-    # This is test without pushing to remote repositories
-    - python -u scripts/publish_all_playbooks.py --artifacts-dir convergence-output --allow-forbidden-refs --censor-forbidden-refs
-    # This is the production command
-    # - python -u scripts/publish_all_playbooks.py --artifacts-dir convergence-output --push --allow-forbidden-refs --censor-forbidden-refs
+    - echo "📦 Converging all playbooks and creating MR to API Catalog..."
+    - python3 -u scripts/converge_and_mr.py
+        --output-dir convergence-output
+        --api-catalog-repo "https://gitlab-master.nvidia.com/api-catalog/dgx-spark-playbooks"
+        --api-catalog-token "$GITLAB_MASTER_TOKEN_API_CATALOG"
+        --gitlab-url "https://gitlab-master.nvidia.com"
+        --project-id "api-catalog%2Fdgx-spark-playbooks"
+        --target-branch "main"
+        --allow-forbidden-refs
+  artifacts:
+    paths:
+      - convergence-output/
+    expire_in: 7 days
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    # - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       when: manual
   allow_failure: false
-

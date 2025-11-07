@@ -1281,20 +1281,8 @@ class PlaybookConverter:
             print("⚠️  Skipping convergence (no markdown content)")
             return 0
 
-        # Step 2: Generate README.md file
-        print("\n📝 Step 2: Generating README.md file from markdown content", flush=True)
-        sys.stdout.flush()
-        readme_content = self.generate_readme_from_markdown(metadata, markdown_content)
-        
-        if not readme_content:
-            print("⚠️  No content generated, skipping", flush=True)
-            return 0
-            
-        print(f"   ✅ Generated {len(readme_content)} characters of README", flush=True)
-        sys.stdout.flush()
-
-        # Step 2.1: Generate conf.yaml and ux-conf.yaml files from markdown and metadata.yaml
-        print("\n📝 Step 2.1: Generating conf.yaml and ux-conf.yaml from metadata and markdown content", flush=True)
+        # Step 2: Generate conf.yaml and ux-conf.yaml files from markdown and metadata.yaml
+        print("\n📝 Step 2: Generating conf.yaml and ux-conf.yaml from metadata and markdown content", flush=True)
         sys.stdout.flush()
 
         conf_yaml = self.generate_conf_yaml(metadata)
@@ -1321,24 +1309,13 @@ class PlaybookConverter:
             # Validation failed and not allowed to proceed
             return 1
         
-        # Step 2.6: Censor forbidden references if enabled
-        if self.censor_forbidden_refs:
-            print("\n🔒 Step 2.6: Censoring forbidden references", flush=True)
-            readme_content = self.censor_forbidden_references(readme_content)
-        
-        # PREPARE-ONLY MODE: Just write markdown to filesystem, skip git operations
+        # PREPARE-ONLY MODE: Just write YAML files to filesystem, skip git operations
         if self.prepare_only:
-            print("\n📝 Step 3: Writing README content to filesystem (prepare-only mode)", flush=True)
-            # Write to simple directory structure: output_dir/model_path/README.md
+            print("\n📝 Step 3: Writing YAML files to filesystem (prepare-only mode)", flush=True)
+            # Write to simple directory structure: output_dir/model_path/
             model_output_dir = self.output_dir / self.model_name
             model_output_dir.mkdir(parents=True, exist_ok=True)
             
-            # Write README.md
-            readme_path = model_output_dir / 'README.md'
-            with open(readme_path, 'w') as f:
-                f.write(readme_content)
-            print(f"   ✅ Wrote: {readme_path}", flush=True)
-
             # Write conf.yaml
             conf_path = model_output_dir / 'conf.yaml'
             with open(conf_path, 'w') as f:
@@ -1478,23 +1455,18 @@ class PlaybookConverter:
         print(f"   ✅ Directories cleaned and ready for fresh content", flush=True)
         sys.stdout.flush()
         
-        # Step 6: Write markdown to destinations
-        print("\n📝 Step 6: Writing markdown files", flush=True)
-        sys.stdout.flush()
-        self.write_markdown(markdown_content, dest_paths)
-        
-        # Step 7: Copy assets to destinations
-        print("\n📋 Step 7: Copying assets", flush=True)
+        # Step 6: Copy assets to destinations
+        print("\n📋 Step 6: Copying assets", flush=True)
         sys.stdout.flush()
         self.copy_assets(src_assets_path, dest_paths)
         
-        # Step 8: Copy root files (LICENSE, etc.) from source assets repo to destinations
-        print("\n📋 Step 8: Copying root files from source assets repo", flush=True)
+        # Step 7: Copy root files (LICENSE, etc.) from source assets repo to destinations
+        print("\n📋 Step 7: Copying root files from source assets repo", flush=True)
         sys.stdout.flush()
         self.copy_root_files(src_assets_path, dest_paths)
         
-        # Step 8.5: Copy root directories (src, etc.) from project root to destinations
-        print("\n📂 Step 8.5: Copying root directories from project root", flush=True)
+        # Step 8: Copy root directories (src, etc.) from project root to destinations
+        print("\n📂 Step 8: Copying root directories from project root", flush=True)
         sys.stdout.flush()
         self.copy_root_directories(dest_paths)
         
