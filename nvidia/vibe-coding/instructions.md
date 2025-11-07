@@ -42,17 +42,17 @@ sudo ufw allow 11434/tcp
 
 Verify that the workstation can connect to your DGX Spark's Ollama server:
 
-  ```bash
-  curl -v http://YOUR_SPARK_IP:11434/api/version
-  ```
+```bash
+curl -v http://YOUR_SPARK_IP:11434/api/version
+```
  Replace **YOUR_SPARK_IP** with your DGX Spark's IP address.
  If the connection fails please see the Troubleshooting tab.
 
 # Step 3. Install VSCode
 
 For DGX Spark (ARM-based), download and install VSCode:
-  Navigate to https://code.visualstudio.com/download and download the Linux ARM64 version of VSCode. After
-  the download completes note the downloaded package name. Use it in the next command in place of DOWNLOADED_PACKAGE_NAME.
+Navigate to https://code.visualstudio.com/download and download the Linux ARM64 version of VSCode. After
+the download completes note the downloaded package name. Use it in the next command in place of DOWNLOADED_PACKAGE_NAME.
 ```bash
 sudo dpkg -i DOWNLOADED_PACKAGE_NAME
 ```
@@ -78,19 +78,19 @@ Your downloaded model will now be the default (e.g., `gpt-oss:120b`) for inferen
 # Step 6. Setting up a Workstation to Connect to the DGX Spark' Ollama Server
 
 To connect a workstation running VSCode to a remote DGX Spark instance the following must be completed on that workstation:
-  - Install Continue as instructed in Step 4
-  - Click on the `Continue` icon on the left pane
-  - Click `Or, configure your own models`
-  - Click `Click here to view more providers`
-  - Select `Ollama` as the Provider
-  - Select `Autodetect` as the Model.
+- Install Continue as instructed in Step 4
+- Click on the `Continue` icon on the left pane
+- Click `Or, configure your own models`
+- Click `Click here to view more providers`
+- Select `Ollama` as the Provider
+- Select `Autodetect` as the Model.
 
 Continue **will** fail to detect the model as it is attempting to connect to a locally hosted Ollama server.
-  - Find the `gear` icon in the upper right corner of the Continue window and click on it.
-  - On the left pane, click **Models**
-  - Next to the first dropdown menu under **Chat** click the gear icon.
-  - Continue's `config.yaml` will open. Take note of your DGX Spark's IP address.
-  - Replace the configuration with the following. **YOUR_SPARK_IP** should be replaced with your DGX Spark's IP.
+- Find the `gear` icon in the upper right corner of the Continue window and click on it.
+- On the left pane, click **Models**
+- Next to the first dropdown menu under **Chat** click the gear icon.
+- Continue's `config.yaml` will open. Take note of your DGX Spark's IP address.
+- Replace the configuration with the following. **YOUR_SPARK_IP** should be replaced with your DGX Spark's IP.
 
 
 ```yaml
@@ -99,19 +99,19 @@ version: 1.0.0
 schema: v1
 
 assistants:
-  - name: default
-    model: OllamaSpark
+- name: default
+  model: OllamaSpark
 
 models:
-  - name: OllamaSpark
-    provider: ollama
-    model: gpt-oss:120b
-    apiBase: http://YOUR_SPARK_IP:11434
-    title: gpt-oss:120b
-    roles:
-      - chat
-      - edit
-      - autocomplete
+- name: OllamaSpark
+  provider: ollama
+  model: gpt-oss:120b
+  apiBase: http://YOUR_SPARK_IP:11434
+  title: gpt-oss:120b
+  roles:
+    - chat
+    - edit
+    - autocomplete
 ```
 
 Replace `YOUR_SPARK_IP` with the IP address of your DGX Spark.  

@@ -118,7 +118,7 @@ export OF_JOB="demo"
 For quick testing without local setup, use NVIDIA's online demo interface.
 
 1. Navigate to the OpenFold2 page on NVIDIA Build Portal
-   > TODO: Add specific URL for NVIDIA Build Portal OpenFold2 demo
+ > TODO: Add specific URL for NVIDIA Build Portal OpenFold2 demo
 
 2. Paste your protein sequence in FASTA format
 
@@ -157,50 +157,50 @@ SEQ = """>demo
 MGSDKIHHHHHHENLYFQGAMASMTGGQQMGRGSMAAAAKKVVAGAAAAGGQAGD"""
 
 def ensure_py3dmol():
-    try:
-        import py3Dmol
-    except ImportError:
-        sp.check_call([sys.executable, "-m", "pip", "install", "py3Dmol"])
+  try:
+      import py3Dmol
+  except ImportError:
+      sp.check_call([sys.executable, "-m", "pip", "install", "py3Dmol"])
 
 def run_openfold(fasta_path):
-    cmd = [
-        sys.executable, "openfold/run_pretrained_openfold.py",
-        "--fasta_path", fasta_path,
-        "--job_name", JOB,
-        "--output_dir", OUTDIR,
-        "--model_device", DEVICE,
-        "--param_path", PARAM,
-        "--pdb70_database_path", PDB70,
-        "--uniref90_database_path", UNIREF90,
-        "--mgnify_database_path", MGNIFY,
-        "--uniclust30_database_path", UNICLUST30,
-        "--bfd_database_path", BFD,
-        "--template_mmcif_dir", MMCIF,
-        "--obsolete_pdbs_path", OBSOLETE,
-        "--skip_relaxation"
-    ]
-    sp.check_call(cmd)
+  cmd = [
+      sys.executable, "openfold/run_pretrained_openfold.py",
+      "--fasta_path", fasta_path,
+      "--job_name", JOB,
+      "--output_dir", OUTDIR,
+      "--model_device", DEVICE,
+      "--param_path", PARAM,
+      "--pdb70_database_path", PDB70,
+      "--uniref90_database_path", UNIREF90,
+      "--mgnify_database_path", MGNIFY,
+      "--uniclust30_database_path", UNICLUST30,
+      "--bfd_database_path", BFD,
+      "--template_mmcif_dir", MMCIF,
+      "--obsolete_pdbs_path", OBSOLETE,
+      "--skip_relaxation"
+  ]
+  sp.check_call(cmd)
 
 def visualize():
-    import py3Dmol
-    pdb = open(f"{OUTDIR}/{JOB}/ranked_0.pdb").read()
-    view = py3Dmol.view(width=800, height=520)
-    view.addModel(pdb, "pdb")
-    view.setStyle({"cartoon": {"arrows": True}})
-    view.zoomTo()
-    open(f"{OUTDIR}/{JOB}_view.html", "w").write(view._make_html())
-    print(f"Viewer written to {OUTDIR}/{JOB}_view.html")
+  import py3Dmol
+  pdb = open(f"{OUTDIR}/{JOB}/ranked_0.pdb").read()
+  view = py3Dmol.view(width=800, height=520)
+  view.addModel(pdb, "pdb")
+  view.setStyle({"cartoon": {"arrows": True}})
+  view.zoomTo()
+  open(f"{OUTDIR}/{JOB}_view.html", "w").write(view._make_html())
+  print(f"Viewer written to {OUTDIR}/{JOB}_view.html")
 
 def main():
-    ensure_py3dmol()
-    with tempfile.TemporaryDirectory() as td:
-        fasta_path = os.path.join(td, f"{JOB}.fasta")
-        open(fasta_path, "w").write(textwrap.dedent(SEQ).strip() + "\n")
-        run_openfold(fasta_path)
-        visualize()
+  ensure_py3dmol()
+  with tempfile.TemporaryDirectory() as td:
+      fasta_path = os.path.join(td, f"{JOB}.fasta")
+      open(fasta_path, "w").write(textwrap.dedent(SEQ).strip() + "\n")
+      run_openfold(fasta_path)
+      visualize()
 
 if __name__ == "__main__":
-    main()
+  main()
 EOF
 ```
 
@@ -252,19 +252,19 @@ EOF
 
 # Run OpenFold directly
 python openfold/run_pretrained_openfold.py \
-    --fasta_path my_protein.fasta \
-    --job_name my_protein \
-    --output_dir openfold_out \
-    --model_device cuda:0 \
-    --param_path $OF_PARAM_PATH \
-    --pdb70_database_path $OF_DB_PDB70 \
-    --uniref90_database_path $OF_DB_UNIREF90 \
-    --mgnify_database_path $OF_DB_MGNIFY \
-    --uniclust30_database_path $OF_DB_UNICLUST30 \
-    --bfd_database_path $OF_DB_BFD \
-    --template_mmcif_dir $OF_DB_MMCIF \
-    --obsolete_pdbs_path $OF_DB_OBSOLETE \
-    --skip_relaxation
+  --fasta_path my_protein.fasta \
+  --job_name my_protein \
+  --output_dir openfold_out \
+  --model_device cuda:0 \
+  --param_path $OF_PARAM_PATH \
+  --pdb70_database_path $OF_DB_PDB70 \
+  --uniref90_database_path $OF_DB_UNIREF90 \
+  --mgnify_database_path $OF_DB_MGNIFY \
+  --uniclust30_database_path $OF_DB_UNICLUST30 \
+  --bfd_database_path $OF_DB_BFD \
+  --template_mmcif_dir $OF_DB_MMCIF \
+  --obsolete_pdbs_path $OF_DB_OBSOLETE \
+  --skip_relaxation
 ```
 
 # Step 10. Troubleshooting common issues
@@ -314,19 +314,19 @@ MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGG
 EOF
 
 python openfold/run_pretrained_openfold.py \
-    --fasta_path test_ubiquitin.fasta \
-    --job_name ubiquitin_test \
-    --output_dir openfold_out \
-    --model_device cuda:0 \
-    --param_path $OF_PARAM_PATH \
-    --pdb70_database_path $OF_DB_PDB70 \
-    --uniref90_database_path $OF_DB_UNIREF90 \
-    --mgnify_database_path $OF_DB_MGNIFY \
-    --uniclust30_database_path $OF_DB_UNICLUST30 \
-    --bfd_database_path $OF_DB_BFD \
-    --template_mmcif_dir $OF_DB_MMCIF \
-    --obsolete_pdbs_path $OF_DB_OBSOLETE \
-    --skip_relaxation
+  --fasta_path test_ubiquitin.fasta \
+  --job_name ubiquitin_test \
+  --output_dir openfold_out \
+  --model_device cuda:0 \
+  --param_path $OF_PARAM_PATH \
+  --pdb70_database_path $OF_DB_PDB70 \
+  --uniref90_database_path $OF_DB_UNIREF90 \
+  --mgnify_database_path $OF_DB_MGNIFY \
+  --uniclust30_database_path $OF_DB_UNICLUST30 \
+  --bfd_database_path $OF_DB_BFD \
+  --template_mmcif_dir $OF_DB_MMCIF \
+  --obsolete_pdbs_path $OF_DB_OBSOLETE \
+  --skip_relaxation
 ```
 
 For production use, consider:

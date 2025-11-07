@@ -42,21 +42,21 @@ Test multi-modal inference using the Flux.1 Dev model with different precision f
 
 ```bash
 python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
-  --hf-token=$HF_TOKEN --download-onnx-models --bf16
+--hf-token=$HF_TOKEN --download-onnx-models --bf16
 ```
 
 **Substep B. FP8 quantized precision**
 
 ```bash
 python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
-  --hf-token=$HF_TOKEN --quantization-level 4 --fp8 --download-onnx-models
+--hf-token=$HF_TOKEN --quantization-level 4 --fp8 --download-onnx-models
 ```
 
 **Substep C. FP4 quantized precision**
 
 ```bash
 python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
-  --hf-token=$HF_TOKEN --fp4 --download-onnx-models
+--hf-token=$HF_TOKEN --fp4 --download-onnx-models
 ```
 
 # Step 5. Run Flux.1 Schnell model inference
@@ -70,23 +70,23 @@ Test the faster Flux.1 Schnell variant with different precision formats.
 
 ```bash
 python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
-  --hf-token=$HF_TOKEN --version="flux.1-schnell"
+--hf-token=$HF_TOKEN --version="flux.1-schnell"
 ```
 
 **Substep B. FP8 quantized precision**
 
 ```bash
 python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
-  --hf-token=$HF_TOKEN --version="flux.1-schnell" \
-  --quantization-level 4 --fp8 --download-onnx-models
+--hf-token=$HF_TOKEN --version="flux.1-schnell" \
+--quantization-level 4 --fp8 --download-onnx-models
 ```
 
 **Substep C. FP4 quantized precision**
 
 ```bash
 python3 demo_txt2img_flux.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
-  --hf-token=$HF_TOKEN --version="flux.1-schnell" \
-  --fp4 --download-onnx-models
+--hf-token=$HF_TOKEN --version="flux.1-schnell" \
+--fp4 --download-onnx-models
 ```
 
 # Step 6. Run SDXL model inference
@@ -97,14 +97,14 @@ Test the SDXL model for comparison with different precision formats.
 
 ```bash
 python3 demo_txt2img_xl.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
-  --hf-token=$HF_TOKEN --version xl-1.0 --download-onnx-models
+--hf-token=$HF_TOKEN --version xl-1.0 --download-onnx-models
 ```
 
 **Substep B. FP8 quantized precision**
 
 ```bash
 python3 demo_txt2img_xl.py "a beautiful photograph of Mt. Fuji during cherry blossom" \
-  --hf-token=$HF_TOKEN --version xl-1.0 --download-onnx-models --fp8
+--hf-token=$HF_TOKEN --version xl-1.0 --download-onnx-models --fp8
 ```
 
 # Step 7. Validate inference outputs

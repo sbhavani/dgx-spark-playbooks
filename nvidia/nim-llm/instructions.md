@@ -35,14 +35,14 @@ Start the containerized LLM service with GPU acceleration and proper resource al
 
 ```bash
 docker run -it --rm --name=$CONTAINER_NAME \
-  --runtime=nvidia \
-  --gpus all \
-  --shm-size=16GB \
-  -e NGC_API_KEY=$NGC_API_KEY \
-  -v "$LOCAL_NIM_CACHE:/opt/nim/.cache" \
-  -u $(id -u) \
-  -p 8000:8000 \
-  $IMG_NAME
+--runtime=nvidia \
+--gpus all \
+--shm-size=16GB \
+-e NGC_API_KEY=$NGC_API_KEY \
+-v "$LOCAL_NIM_CACHE:/opt/nim/.cache" \
+-u $(id -u) \
+-p 8000:8000 \
+$IMG_NAME
 ```
 
 The container will download the model on first run and may take several minutes to start. Look for
@@ -55,29 +55,29 @@ Test the deployed service with a basic completion request to verify functionalit
 
 ```bash
 curl -X 'POST' \
-    'http://0.0.0.0:8000/v1/chat/completions' \
-    -H 'accept: application/json' \
-    -H 'Content-Type: application/json' \
-    -d '{
-      "model": "meta/llama-3.1-8b-instruct",
-      "messages": [
-        {
-          "role":"system",
-          "content":"detailed thinking on"
-        },
-        {
-          "role":"user",
-          "content":"Can you write me a song?"
-        }
-      ],
-      "top_p": 1,
-      "n": 1,
-      "max_tokens": 15,
-      "frequency_penalty": 1.0,
-      "stop": ["hello"]
+  'http://0.0.0.0:8000/v1/chat/completions' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "model": "meta/llama-3.1-8b-instruct",
+    "messages": [
+      {
+        "role":"system",
+        "content":"detailed thinking on"
+      },
+      {
+        "role":"user",
+        "content":"Can you write me a song?"
+      }
+    ],
+    "top_p": 1,
+    "n": 1,
+    "max_tokens": 15,
+    "frequency_penalty": 1.0,
+    "stop": ["hello"]
 
-    }'
-    
+  }'
+  
 ```
 
 Expected output should be a JSON response containing a completion field with generated text.

@@ -19,15 +19,15 @@ You will have Visual Studio Code running natively on your DGX Spark device with 
 • Active internet connection for downloading the VS Code installer
 
 • Verify ARM64 architecture:
-  ```bash
-  uname -m
-  # Expected output: aarch64
-  ```
+```bash
+uname -m
+# Expected output: aarch64
+```
 • Verify GUI desktop environment available:
-  ```bash
-  echo $DISPLAY
-  # Should return display information like :0 or :10.0
-  ```
+```bash
+echo $DISPLAY
+# Should return display information like :0 or :10.0
+```
 
 
 # Time & risk

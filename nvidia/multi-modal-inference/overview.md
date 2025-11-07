@@ -43,11 +43,11 @@ All necessary files can be found in the TensorRT repository [here on GitHub](htt
 - **Duration**: 45-90 minutes depending on model downloads and optimization steps
 
 - **Risks**: 
-  - Large model downloads may timeout
-  - High VRAM requirements may cause OOM errors
-  - Quantized models may show quality degradation
+- Large model downloads may timeout
+- High VRAM requirements may cause OOM errors
+- Quantized models may show quality degradation
 
 - **Rollback**: 
-  - Remove downloaded models from HuggingFace cache
-  - Then exit the container environment
-  
+- Remove downloaded models from HuggingFace cache
+- Then exit the container environment
+

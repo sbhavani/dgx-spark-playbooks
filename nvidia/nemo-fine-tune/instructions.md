@@ -26,11 +26,11 @@ docker pull nvcr.io/nvidia/pytorch:25.08-py3
 
 ```bash
 docker run \
-  --gpus all \
-  --ulimit memlock=-1 \
-  -it --ulimit stack=67108864 \
-  --entrypoint /usr/bin/bash \
-  --rm nvcr.io/nvidia/pytorch:25.08-py3
+--gpus all \
+--ulimit memlock=-1 \
+-it --ulimit stack=67108864 \
+--entrypoint /usr/bin/bash \
+--rm nvcr.io/nvidia/pytorch:25.08-py3
 ```
 
 # Step 4. Install package management tools
@@ -79,27 +79,27 @@ uv venv --system-site-packages
 
 # Install packages with uv
 uv sync --inexact --frozen --all-extras \
-  --no-install-package torch \
-  --no-install-package torchvision \
-  --no-install-package triton \
-  --no-install-package nvidia-cublas-cu12 \
-  --no-install-package nvidia-cuda-cupti-cu12 \
-  --no-install-package nvidia-cuda-nvrtc-cu12 \
-  --no-install-package nvidia-cuda-runtime-cu12 \
-  --no-install-package nvidia-cudnn-cu12 \
-  --no-install-package nvidia-cufft-cu12 \
-  --no-install-package nvidia-cufile-cu12 \
-  --no-install-package nvidia-curand-cu12 \
-  --no-install-package nvidia-cusolver-cu12 \
-  --no-install-package nvidia-cusparse-cu12 \
-  --no-install-package nvidia-cusparselt-cu12 \
-  --no-install-package nvidia-nccl-cu12 \
-  --no-install-package transformer-engine \
-  --no-install-package nvidia-modelopt \
-  --no-install-package nvidia-modelopt-core \
-  --no-install-package flash-attn \
-  --no-install-package transformer-engine-cu12 \
-  --no-install-package transformer-engine-torch
+--no-install-package torch \
+--no-install-package torchvision \
+--no-install-package triton \
+--no-install-package nvidia-cublas-cu12 \
+--no-install-package nvidia-cuda-cupti-cu12 \
+--no-install-package nvidia-cuda-nvrtc-cu12 \
+--no-install-package nvidia-cuda-runtime-cu12 \
+--no-install-package nvidia-cudnn-cu12 \
+--no-install-package nvidia-cufft-cu12 \
+--no-install-package nvidia-cufile-cu12 \
+--no-install-package nvidia-curand-cu12 \
+--no-install-package nvidia-cusolver-cu12 \
+--no-install-package nvidia-cusparse-cu12 \
+--no-install-package nvidia-cusparselt-cu12 \
+--no-install-package nvidia-nccl-cu12 \
+--no-install-package transformer-engine \
+--no-install-package nvidia-modelopt \
+--no-install-package nvidia-modelopt-core \
+--no-install-package flash-attn \
+--no-install-package transformer-engine-cu12 \
+--no-install-package transformer-engine-torch
 
 # Install bitsandbytes
 CMAKE_ARGS="-DCOMPUTE_BACKEND=cuda -DCOMPUTE_CAPABILITY=80;86;87;89;90" \

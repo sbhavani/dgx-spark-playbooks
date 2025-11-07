@@ -47,7 +47,7 @@ All required assets can be found [in the ComfyUI repository on GitHub](https://g
 
 * **Estimated time:** 30-45 minutes (including model download)
 * **Risk level:** Medium
-  * Model downloads are large (~2GB) and may fail due to network issues
-  * Port 8188 must be accessible for web interface functionality
+* Model downloads are large (~2GB) and may fail due to network issues
+* Port 8188 must be accessible for web interface functionality
 * **Rollback:** Virtual environment can be deleted to remove all installed packages. Downloaded models can be removed manually from the checkpoints directory.
  

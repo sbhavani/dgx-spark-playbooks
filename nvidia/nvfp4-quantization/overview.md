@@ -6,9 +6,9 @@ NVIDIA Blackwell Tensor Cores natively support mixed-precision execution across 
 This design minimizes quantization error during matrix multiplications and supports efficient conversion pipelines in TensorRT-LLM for fine-tuned layer-wise quantization.
 
 Immediate benefits are:
-  - Cut memory use ~3.5x vs FP16 and ~1.8x vs FP8
-  - Maintain accuracy close to FP8 (usually <1% loss)
-  - Improve speed and energy efficiency for inference
+- Cut memory use ~3.5x vs FP16 and ~1.8x vs FP8
+- Maintain accuracy close to FP8 (usually <1% loss)
+- Improve speed and energy efficiency for inference
 
 
 # What you'll accomplish
@@ -47,7 +47,7 @@ df -h .
 
 * **Estimated duration**: 45-90 minutes depending on network speed and model size
 * **Risks**:
-  * Model download may fail due to network issues or Hugging Face authentication problems
-  * Quantization process is memory-intensive and may fail on systems with insufficient GPU memory
-  * Output files are large (several GB) and require adequate storage space
+* Model download may fail due to network issues or Hugging Face authentication problems
+* Quantization process is memory-intensive and may fail on systems with insufficient GPU memory
+* Output files are large (several GB) and require adequate storage space
 * **Rollback**: Remove the output directory and any pulled Docker images to restore original state.

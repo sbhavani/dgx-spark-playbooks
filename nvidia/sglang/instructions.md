@@ -39,17 +39,10 @@ server inside the container, exposing it on port 30000 for client connections.
 ```bash
 # Launch container with GPU support and port mapping
 docker run --gpus all -it --rm \
-<<<<<<< HEAD
   -p 30000:30000 \
   -v /tmp:/tmp \
   nvcr.io/nvidia/sglang:25.10-py3 \
   bash
-=======
-    -p 30000:30000 \
-    -v /tmp:/tmp \
-    nvcr.io/nvidia/sglang:<VERSION>-py3 \
-    bash
->>>>>>> d2716ee (Consolidate playbook content and assets to a single repo)
 ```
 
 # Step 4. Start the SGLang inference server
@@ -60,11 +53,11 @@ inside the Docker container and starts the SGLang server daemon.
 ```bash
 # Start the inference server with DeepSeek-V2-Lite model
 python3 -m sglang.launch_server \
-    --model-path deepseek-ai/DeepSeek-V2-Lite \
-    --host 0.0.0.0 \
-    --port 30000 \
-    --trust-remote-code \
-    --tp 1 &
+  --model-path deepseek-ai/DeepSeek-V2-Lite \
+  --host 0.0.0.0 \
+  --port 30000 \
+  --trust-remote-code \
+  --tp 1 &
 
 # Wait for server to initialize
 sleep 30
@@ -81,14 +74,14 @@ correctly. This validates that the server is accepting requests and generating r
 ```bash
 # Test with curl
 curl -X POST http://localhost:30000/generate \
-    -H "Content-Type: application/json" \
-    -d '{
-        "text": "What does NVIDIA love?",
-        "sampling_params": {
-            "temperature": 0.7,
-            "max_new_tokens": 100
-        }
-    }'
+  -H "Content-Type: application/json" \
+  -d '{
+      "text": "What does NVIDIA love?",
+      "sampling_params": {
+          "temperature": 0.7,
+          "max_new_tokens": 100
+      }
+  }'
 ```
 
 # Step 6. Test Python client API
@@ -101,11 +94,11 @@ import requests
 
 # Send prompt to server
 response = requests.post('http://localhost:30000/generate', json={
-    'text': 'What does NVIDIA love?',
-    'sampling_params': {
-        'temperature': 0.7,
-        'max_new_tokens': 100,
-    },
+  'text': 'What does NVIDIA love?',
+  'sampling_params': {
+      'temperature': 0.7,
+      'max_new_tokens': 100,
+  },
 })
 
 print(f"Response: {response.json()['text']}")
@@ -127,7 +120,7 @@ complete SGLang setup and ensures reliable operation.
 # Check server mode (from host)
 curl http://localhost:30000/health
 curl -X POST http://localhost:30000/generate -H "Content-Type: application/json" \
-    -d '{"text": "Hello", "sampling_params": {"max_new_tokens": 10}}'
+  -d '{"text": "Hello", "sampling_params": {"max_new_tokens": 10}}'
 
 # Check container logs
 docker ps

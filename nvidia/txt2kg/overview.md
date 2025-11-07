@@ -30,12 +30,12 @@ The setup includes:
 # Time & risk
 
 - **Duration**:
-  - 2-3 minutes for initial setup and container deployment
-  - 5-10 minutes for Ollama model download (depending on model size)
-  - Immediate document processing and knowledge graph generation
+- 2-3 minutes for initial setup and container deployment
+- 5-10 minutes for Ollama model download (depending on model size)
+- Immediate document processing and knowledge graph generation
 
 - **Risks**:
-  - GPU memory requirements depend on chosen Ollama model size
-  - Document processing time scales with document size and complexity
+- GPU memory requirements depend on chosen Ollama model size
+- Document processing time scales with document size and complexity
 
 - **Rollback**: Stop and remove Docker containers, delete downloaded models if needed

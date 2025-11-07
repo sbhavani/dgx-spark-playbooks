@@ -37,7 +37,7 @@ This may take between 30 minutes to 2 hours depending on network speed.
 # Step 4. Start the docker containers for the application
 
 ```bash
-  docker compose -f docker-compose.yml -f docker-compose-models.yml up -d --build
+docker compose -f docker-compose.yml -f docker-compose-models.yml up -d --build
 ```
 This step builds the base llama.cpp server image and starts all the required docker services to serve models, the backend API server as well as the frontend UI. 
 This step can take 10 to 20 minutes depending on network speed.

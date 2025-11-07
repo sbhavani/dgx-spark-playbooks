@@ -20,14 +20,14 @@ These examples demonstrate how to accelerate large language model inference whil
 - NVIDIA Spark device with sufficient GPU memory available
 - Docker with GPU support enabled
 
-  ```bash
-  docker run --gpus all nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev nvidia-smi
-  ```
+```bash
+docker run --gpus all nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev nvidia-smi
+```
 - HuggingFace authentication configured (if needed for model downloads)
 
-  ```bash
-  huggingface-cli login
-  ```
+```bash
+huggingface-cli login
+```
 - Network connectivity for model downloads
 
 

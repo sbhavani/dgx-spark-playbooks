@@ -55,11 +55,11 @@ sudo apt install -y curl gnupg
 
 # Add Tailscale signing key
 curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg | \
-  sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
+sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
 
 # Add Tailscale repository
 curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.tailscale-keyring.list | \
-  sudo tee /etc/apt/sources.list.d/tailscale.list
+sudo tee /etc/apt/sources.list.d/tailscale.list
 
 # Update package list with new repository
 sudo apt update
@@ -124,11 +124,11 @@ sudo apt install -y curl gnupg
 
 # Add Tailscale signing key
 curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg | \
-  sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
+sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
 
 # Add Tailscale repository
 curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.tailscale-keyring.list | \
-  sudo tee /etc/apt/sources.list.d/tailscale.list
+sudo tee /etc/apt/sources.list.d/tailscale.list
 
 # Update package list with new repository
 sudo apt update
@@ -268,4 +268,4 @@ Your Tailscale setup is complete. You can now:
 - Access your Spark device from any network with: `ssh <USERNAME>@<SPARK_HOSTNAME>`
 - Transfer files securely: `scp file.txt <USERNAME>@<SPARK_HOSTNAME>:~/`
 - Open the DGX Dashboard and start JupyterLab, then connect with:
-  `ssh -L 8888:localhost:1102 <USERNAME>@<SPARK_HOSTNAME>`
+`ssh -L 8888:localhost:1102 <USERNAME>@<SPARK_HOSTNAME>`

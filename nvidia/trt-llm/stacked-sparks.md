@@ -45,16 +45,16 @@ Add or modify the file to include the nvidia runtime and GPU UUID (replace **GPU
 
 ```json
 {
-  "runtimes": {
-    "nvidia": {
-      "path": "nvidia-container-runtime",
-      "runtimeArgs": []
-    }
-  },
-  "default-runtime": "nvidia",
-  "node-generic-resources": [
-    "NVIDIA_GPU=GPU-45cbf7b3-f919-7228-7a26-b06628ebefa1"
-    ]
+"runtimes": {
+  "nvidia": {
+    "path": "nvidia-container-runtime",
+    "runtimeArgs": []
+  }
+},
+"default-runtime": "nvidia",
+"node-generic-resources": [
+  "NVIDIA_GPU=GPU-45cbf7b3-f919-7228-7a26-b06628ebefa1"
+  ]
 }
 ```
 
@@ -83,7 +83,7 @@ Swarm initialized: current node (node-id) is now a manager.
 
 To add a worker to this swarm, run the following command:
 
-    docker swarm join --token <worker-token> <advertise-addr>:<port>
+  docker swarm join --token <worker-token> <advertise-addr>:<port>
 
 To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
 ```
@@ -155,10 +155,10 @@ export TRTLLM_MN_CONTAINER=$(docker ps -q -f name=trtllm-multinode)
 docker exec $TRTLLM_MN_CONTAINER bash -c 'cat <<EOF > /tmp/extra-llm-api-config.yml
 print_iter_log: false
 kv_cache_config:
-  dtype: "auto"
-  free_gpu_memory_fraction: 0.9
+dtype: "auto"
+free_gpu_memory_fraction: 0.9
 cuda_graph_config:
-  enable_padding: true
+enable_padding: true
 EOF'
 ```
 
@@ -170,25 +170,25 @@ We can download a model using the following command. You can replace `nvidia/Qwe
 export HF_TOKEN=<your-huggingface-token>
 
 docker exec \
-  -e MODEL="nvidia/Qwen3-235B-A22B-FP4" \
-  -e HF_TOKEN=$HF_TOKEN \
-  -it $TRTLLM_MN_CONTAINER bash -c 'mpirun -x HF_TOKEN bash -c "huggingface-cli download $MODEL"'
+-e MODEL="nvidia/Qwen3-235B-A22B-FP4" \
+-e HF_TOKEN=$HF_TOKEN \
+-it $TRTLLM_MN_CONTAINER bash -c 'mpirun -x HF_TOKEN bash -c "huggingface-cli download $MODEL"'
 ```
 
 ## Step 11. Serve the model
 
 ```bash
 docker exec \
-  -e MODEL="nvidia/Qwen3-235B-A22B-FP4" \
-  -e HF_TOKEN=$HF_TOKEN \
-  -it $TRTLLM_MN_CONTAINER bash -c '
-    mpirun -x HF_TOKEN trtllm-llmapi-launch trtllm-serve $MODEL \
-      --tp_size 2 \
-      --backend pytorch \
-      --max_num_tokens 32768 \
-      --max_batch_size 4 \
-      --extra_llm_api_options /tmp/extra-llm-api-config.yml \
-      --port 8355'
+-e MODEL="nvidia/Qwen3-235B-A22B-FP4" \
+-e HF_TOKEN=$HF_TOKEN \
+-it $TRTLLM_MN_CONTAINER bash -c '
+  mpirun -x HF_TOKEN trtllm-llmapi-launch trtllm-serve $MODEL \
+    --tp_size 2 \
+    --backend pytorch \
+    --max_num_tokens 32768 \
+    --max_batch_size 4 \
+    --extra_llm_api_options /tmp/extra-llm-api-config.yml \
+    --port 8355'
 ```
 
 This will start the TensorRT-LLM server on port 8355. You can then make inference requests to `http://localhost:8355` using the OpenAI-compatible API format.
@@ -203,12 +203,12 @@ Once the server is running, you can test it with a CURL request. Please ensure t
 
 ```bash
 curl -s http://localhost:8355/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "nvidia/Qwen3-235B-A22B-FP4",
-    "messages": [{"role": "user", "content": "Paris is great because"}],
-    "max_tokens": 64
-  }'
+-H "Content-Type: application/json" \
+-d '{
+  "model": "nvidia/Qwen3-235B-A22B-FP4",
+  "messages": [{"role": "user", "content": "Paris is great because"}],
+  "max_tokens": 64
+}'
 ```
 
 **Expected output:** JSON response with generated text completion.

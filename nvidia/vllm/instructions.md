@@ -26,9 +26,9 @@ In another terminal, test the server:
 curl http://localhost:8000/v1/chat/completions \
 -H "Content-Type: application/json" \
 -d '{
-    "model": "Qwen/Qwen2.5-Math-1.5B-Instruct",
-    "messages": [{"role": "user", "content": "12*17"}],
-    "max_tokens": 500
+  "model": "Qwen/Qwen2.5-Math-1.5B-Instruct",
+  "messages": [{"role": "user", "content": "12*17"}],
+  "max_tokens": 500
 }'
 ```
 
