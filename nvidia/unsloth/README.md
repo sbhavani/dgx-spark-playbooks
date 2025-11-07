@@ -87,6 +87,7 @@ docker run --gpus all --ulimit memlock=-1 -it --ulimit stack=67108864 --entrypoi
 ```bash
 pip install transformers peft datasets "trl==0.19.1"
 pip install --no-deps unsloth unsloth_zoo
+pip install hf_transfer
 ```
 
 ## Step 5. Build and install bitsandbytes inside Docker
@@ -99,7 +100,7 @@ pip install --no-deps bitsandbytes
 Curl the test script [here](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main/nvidia/unsloth/assets/test_unsloth.py) into the container.
 
 ```bash
-curl -O https://github.com/NVIDIA/dgx-spark-playbooks/blob/main/nvidia/unsloth/assets/test_unsloth.py
+curl -O https://raw.githubusercontent.com/NVIDIA/dgx-spark-playbooks/refs/heads/main/nvidia/unsloth/assets/test_unsloth.py
 ```
 
 We will use this test script to validate the installation with a simple fine-tuning task.

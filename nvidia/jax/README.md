@@ -103,7 +103,7 @@ git clone https://github.com/NVIDIA/dgx-spark-playbooks
 > This command will download a base image and build a container locally to support this environment.
 
 ```bash
-cd jax/assets
+cd dgx-spark-playbooks/nvidia/jax/assets
 docker build -t jax-on-spark .
 ```
 

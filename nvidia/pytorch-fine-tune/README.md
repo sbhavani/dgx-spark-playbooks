@@ -93,7 +93,7 @@ huggingface-cli login
 
 ```bash
 git clone https://github.com/NVIDIA/dgx-spark-playbooks
-cd nvidia/pytorch-fine-tune/assets
+cd dgx-spark-playbooks/nvidia/pytorch-fine-tune/assets
 ```
 
 ## Step7: Run the fine-tuning recipes
