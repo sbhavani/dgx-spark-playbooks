@@ -33,7 +33,7 @@ git clone ${GITLAB_REPO_BASEURL}
 > This command will download a base image and build a container locally to support this environment.
 
 ```bash
-cd dgx-spark-playbooks/${MODEL}
+cd dgx-spark-playbooks/${MODEL}/assets
 docker build -t jax-on-spark .
 ```
 
