@@ -49,7 +49,7 @@ EOF
       --max_batch_size 1 \
       --kv_cache_free_gpu_memory_fraction 0.9 \
       --extra_llm_api_options ./extra-llm-api-config.yml
-"
+  "
 ```
 
 ## Step 3. Test the draft-target setup

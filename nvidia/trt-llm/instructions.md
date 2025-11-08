@@ -202,7 +202,7 @@ Serve with OpenAI-compatible API via trtllm-serve:
 ```bash
 export MODEL_HANDLE="nvidia/Llama-3.1-8B-Instruct-FP4"
 
-  docker run --name trtllm_llm_server --rm -it --gpus all --ipc host --network host \
+docker run --name trtllm_llm_server --rm -it --gpus all --ipc host --network host \
   -e HF_TOKEN=$HF_TOKEN \
   -e MODEL_HANDLE="$MODEL_HANDLE" \
   -v $HOME/.cache/huggingface/:/root/.cache/huggingface/ \
@@ -230,7 +230,7 @@ EOF
 ```bash
 export MODEL_HANDLE="openai/gpt-oss-20b"
 
-  docker run --name trtllm_llm_server --rm -it --gpus all --ipc host --network host \
+docker run --name trtllm_llm_server --rm -it --gpus all --ipc host --network host \
   -e HF_TOKEN=$HF_TOKEN \
   -e MODEL_HANDLE="$MODEL_HANDLE" \
   -v $HOME/.cache/huggingface/:/root/.cache/huggingface/ \
