@@ -74,7 +74,7 @@ The other goes over an example of machine learning algorithms including UMAP and
   ```
 If you are remotely accessing your DGX-Spark then make sure to forward the necesary port to access the notebook in your local browser. Use the below   instruction for port fowarding
 ```bash
-   ssh -N -L YYYY:localhost:XXXX username@remote_host 
+  ssh -N -L YYYY:localhost:XXXX username@remote_host 
 ```
 - `YYYY`: The local port you want to use (e.g. 8888)
 - `XXXX`: The port you specified when starting Jupyter Notebook on the remote machine (e.g. 8888)

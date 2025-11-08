@@ -113,10 +113,10 @@ Ollama server running on port 11434. This configuration runs on your local machi
 
 1. Click the "Add New" button
 2. Fill out the form with these values:
-   - **Name**: `Ollama Server`
-   - **Port**: `11434`
-   - **Auto open in browser**: Leave unchecked (this is an API, not a web interface)
-   - **Start Script**: Leave empty
+  - **Name**: `Ollama Server`
+  - **Port**: `11434`
+  - **Auto open in browser**: Leave unchecked (this is an API, not a web interface)
+  - **Start Script**: Leave empty
 3. Click "Add"
 
 The new Ollama Server entry should now appear in your NVIDIA Sync custom apps list.
