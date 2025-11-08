@@ -293,6 +293,34 @@ def push_branch(repo_path: Path, branch_name: str, token: str) -> bool:
         return False
 
 
+def get_user_id_by_username(gitlab_url: str, token: str, username: str) -> Optional[int]:
+    """
+    Get GitLab user ID by username
+    
+    Returns:
+        User ID if found, None otherwise
+    """
+    api_url = f"{gitlab_url}/api/v4/users"
+    headers = {'PRIVATE-TOKEN': token}
+    params = {'username': username}
+    
+    try:
+        response = requests.get(api_url, headers=headers, params=params)
+        response.raise_for_status()
+        users = response.json()
+        
+        if users and len(users) > 0:
+            user_id = users[0]['id']
+            print(f"   Found user '{username}' with ID: {user_id}")
+            return user_id
+        else:
+            print(f"   ⚠️  User '{username}' not found")
+            return None
+    except requests.exceptions.RequestException as e:
+        print(f"   ⚠️  Error looking up user '{username}': {e}")
+        return None
+
+
 def create_merge_request(
     gitlab_url: str,
     project_id: str,
@@ -300,10 +328,14 @@ def create_merge_request(
     target_branch: str,
     token: str,
     title: Optional[str] = None,
-    description: Optional[str] = None
+    description: Optional[str] = None,
+    reviewer_ids: Optional[List[int]] = None
 ) -> Optional[str]:
     """
     Create a merge request using GitLab API
+    
+    Args:
+        reviewer_ids: List of GitLab user IDs to assign as reviewers
     
     Returns:
         MR URL if successful, None otherwise
@@ -332,6 +364,11 @@ def create_merge_request(
         'description': description,
         'remove_source_branch': True
     }
+    
+    # Add reviewers if specified
+    if reviewer_ids:
+        data['reviewer_ids'] = reviewer_ids
+        print(f"   Adding {len(reviewer_ids)} reviewer(s): {reviewer_ids}")
     
     try:
         print(f"Creating MR from {source_branch} to {target_branch}...")
@@ -409,6 +446,12 @@ def main():
         default='.gitlab-ci.yml',
         help='Path to .gitlab-ci.yml file when using --use-gitlab-ci (default: .gitlab-ci.yml)'
     )
+    parser.add_argument(
+        '--reviewer',
+        action='append',
+        default=None,
+        help='GitLab username to add as reviewer (can be used multiple times)'
+    )
     
     args = parser.parse_args()
     
@@ -467,14 +510,29 @@ def main():
     if not push_branch(api_catalog_dir, branch_name, args.api_catalog_token):
         sys.exit(1)
     
-    # Step 7: Create merge request
+    # Step 7: Look up reviewer IDs
+    reviewer_ids = []
+    if args.reviewer and not args.skip_mr:
+        print("\n🔍 Looking up reviewer user IDs...")
+        for username in args.reviewer:
+            user_id = get_user_id_by_username(args.gitlab_url, args.api_catalog_token, username)
+            if user_id:
+                reviewer_ids.append(user_id)
+        
+        if reviewer_ids:
+            print(f"✅ Found {len(reviewer_ids)} reviewer(s)")
+        else:
+            print("⚠️  No valid reviewers found")
+    
+    # Step 8: Create merge request
     if not args.skip_mr:
         mr_url = create_merge_request(
             args.gitlab_url,
             args.project_id,
             branch_name,
             args.target_branch,
-            args.api_catalog_token
+            args.api_catalog_token,
+            reviewer_ids=reviewer_ids if reviewer_ids else None
         )
         
         if mr_url:

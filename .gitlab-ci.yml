@@ -12,6 +12,10 @@ variables:
   GITLAB_ASSET_BASEURL: "https://github.com/NVIDIA/dgx-spark-playbooks/blob/main"
   GITLAB_REPO_BASEURL: "https://github.com/NVIDIA/dgx-spark-playbooks"
   GITLAB_RAW_CONTENT_BASEURL: "https://raw.githubusercontent.com/NVIDIA/dgx-spark-playbooks/refs/heads/main"
+  
+  # MR Reviewer - Set this in GitLab CI/CD settings: Settings > CI/CD > Variables
+  # Add MR_REVIEWER_USERNAME with your GitLab username
+  MR_REVIEWER_USERNAME: "${MR_REVIEWER_USERNAME}"  # Override this in GitLab project settings
 
   # API Catalog repository configuration
   # Note: GITLAB_MASTER_TOKEN_API_CATALOG must be set in GitLab CI/CD Settings > Variables
@@ -60,6 +64,7 @@ generate-convergence-output:
         --gitlab-url "https://gitlab-master.nvidia.com"
         --project-id "api-catalog%2Fdgx-spark-playbooks"
         --target-branch "main"
+        --reviewer "$MR_REVIEWER_USERNAME"
         --allow-forbidden-refs
   artifacts:
     paths:
@@ -69,5 +74,5 @@ generate-convergence-output:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: manual
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-      when: manual
+      when: on_success  # Auto-run when MR is merged to default branch
   allow_failure: false

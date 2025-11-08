@@ -28,6 +28,12 @@ The following environment variables must be set in GitLab CI/CD Settings > Varia
   - `read_repository` - Clone the repository
   - `write_repository` - Push changes
 
+#### Optional
+- `MR_REVIEWER_USERNAME` - GitLab username to add as reviewer on created MRs
+  - Example: `margaretz`
+  - The script will look up the user ID and add them as a reviewer
+  - Can add multiple reviewers using `--reviewer` flag multiple times
+
 #### Used by converge_playbooks.py
 - `GITLAB_ASSET_BASEURL` - Base URL for GitHub assets
 - `GITLAB_REPO_BASEURL` - Base URL for GitHub repository
@@ -127,6 +133,7 @@ python3 scripts/converge_and_mr.py \
 --gitlab-url TEXT           GitLab instance URL (default: https://gitlab-master.nvidia.com)
 --project-id TEXT           GitLab project ID for API Catalog (required)
 --target-branch TEXT        Target branch for merge request (default: main)
+--reviewer USERNAME         GitLab username to add as reviewer (can be used multiple times)
 --exclude MODEL             Exclude specific models (can be used multiple times, default: nvidia/a-template-project)
 --use-gitlab-ci             Use MODEL list from .gitlab-ci.yml instead of auto-discovering
 --gitlab-ci-file TEXT       Path to .gitlab-ci.yml file when using --use-gitlab-ci (default: .gitlab-ci.yml)
@@ -154,6 +161,26 @@ python3 scripts/converge_and_mr.py \
 - Use `--use-gitlab-ci` flag to read from `.gitlab-ci.yml` file's `.models` section
 - Only processes playbooks explicitly listed in the MODEL array
 - Useful if you need strict control over which playbooks are processed
+
+### Adding Reviewers to MRs
+
+**Add single reviewer:**
+```bash
+python3 scripts/converge_and_mr.py \
+  --reviewer margaretz \
+  ...
+```
+
+**Add multiple reviewers:**
+```bash
+python3 scripts/converge_and_mr.py \
+  --reviewer margaretz \
+  --reviewer johndoe \
+  --reviewer janedoe \
+  ...
+```
+
+The script will automatically look up each username and add them as reviewers to the created MR.
 
 ## Project ID Format
 
