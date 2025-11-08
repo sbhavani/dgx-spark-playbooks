@@ -20,5 +20,3 @@ resources:
   url: https://docs.nvidia.com/dgx/dgx-spark
 - name: DGX Spark Forum
   url: https://forums.developer.nvidia.com/c/accelerated-computing/dgx-spark-gb10
-- name: Terms of Service
-  url: https://assets.ngc.nvidia.com/products/api-catalog/legal/NVIDIA%20API%20Trial%20Terms%20of%20Service.pdf

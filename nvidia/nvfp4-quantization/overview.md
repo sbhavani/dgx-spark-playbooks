@@ -6,9 +6,9 @@ NVIDIA Blackwell Tensor Cores natively support mixed-precision execution across 
 This design minimizes quantization error during matrix multiplications and supports efficient conversion pipelines in TensorRT-LLM for fine-tuned layer-wise quantization.
 
 Immediate benefits are:
-- Cut memory use ~3.5x vs FP16 and ~1.8x vs FP8
-- Maintain accuracy close to FP8 (usually <1% loss)
-- Improve speed and energy efficiency for inference
+  - Cut memory use ~3.5x vs FP16 and ~1.8x vs FP8
+  - Maintain accuracy close to FP8 (usually <1% loss)
+  - Improve speed and energy efficiency for inference
 
 
 # What you'll accomplish

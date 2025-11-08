@@ -16,21 +16,21 @@ You'll launch a NIM container on your DGX Spark device to expose a GPU-accelerat
 ## Prerequisites
 
 - DGX Spark device with NVIDIA drivers installed
-```bash
-nvidia-smi
-```
+  ```bash
+  nvidia-smi
+  ```
 - Docker with NVIDIA Container Toolkit configured, instructions [here](https://docs.nvidia.com/dgx/dgx-spark/nvidia-container-runtime-for-docker.html)
-```bash
-docker run -it --gpus=all nvcr.io/nvidia/cuda:13.0.1-devel-ubuntu24.04 nvidia-smi
-```
+  ```bash
+  docker run -it --gpus=all nvcr.io/nvidia/cuda:13.0.1-devel-ubuntu24.04 nvidia-smi
+  ```
 - NGC account with API key from [here](https://ngc.nvidia.com/setup/api-key)
-```bash
-echo $NGC_API_KEY | grep -E '^[a-zA-Z0-9]{86}=='
-```
+  ```bash
+  echo $NGC_API_KEY | grep -E '^[a-zA-Z0-9]{86}=='
+  ```
 - Sufficient disk space for model caching (varies by model, typically 10-50GB)
-```bash
-df -h ~
-```
+  ```bash
+  df -h ~
+  ```
 
 
 ## Time & risk

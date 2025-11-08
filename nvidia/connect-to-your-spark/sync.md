@@ -23,20 +23,20 @@ Download and install NVIDIA Sync on your computer to get started.
 
 * Configure the package repository:
 
-```
-curl -fsSL  https://workbench.download.nvidia.com/stable/linux/gpgkey  |  sudo tee -a /etc/apt/trusted.gpg.d/ai-workbench-desktop-key.asc
-echo "deb https://workbench.download.nvidia.com/stable/linux/debian default proprietary" | sudo tee -a /etc/apt/sources.list
-```
+  ```
+  curl -fsSL  https://workbench.download.nvidia.com/stable/linux/gpgkey  |  sudo tee -a /etc/apt/trusted.gpg.d/ai-workbench-desktop-key.asc
+  echo "deb https://workbench.download.nvidia.com/stable/linux/debian default proprietary" | sudo tee -a /etc/apt/sources.list
+  ```
 * Update package lists:
 
-```
-sudo apt update
-```
+  ```
+  sudo apt update
+  ```
 * Install NVIDIA Sync:
 
-```
-sudo apt install nvidia-sync
-```
+  ```
+  sudo apt install nvidia-sync
+  ```
 
 # Step 2. Configure Apps
 
