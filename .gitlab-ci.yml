@@ -71,8 +71,6 @@ generate-convergence-output:
       - convergence-output/
     expire_in: 7 days
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: manual
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       when: on_success  # Auto-run when MR is merged to default branch
   allow_failure: false
