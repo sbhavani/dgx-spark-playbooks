@@ -25,7 +25,7 @@ docker run --gpus all --ulimit memlock=-1 -it --ulimit stack=67108864 --entrypoi
 # Step 4. Install dependencies inside Docker
 
 ```bash
-pip install transformers peft datasets "trl==0.19.1"
+pip install transformers peft "datasets==4.3.0" "trl==0.19.1"
 pip install --no-deps unsloth unsloth_zoo
 pip install hf_transfer
 ```
