@@ -42,20 +42,20 @@ Launch the TensorRT-LLM container with GPU access, IPC settings optimized for mu
 
 ```bash
 docker run --rm -it --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
--v "./output_models:/workspace/output_models" \
--v "$HOME/.cache/huggingface:/root/.cache/huggingface" \
--e HF_TOKEN=$HF_TOKEN \
-nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
-bash -c "
-  git clone -b 0.35.0 --single-branch https://github.com/NVIDIA/TensorRT-Model-Optimizer.git /app/TensorRT-Model-Optimizer && \
-  cd /app/TensorRT-Model-Optimizer && pip install -e '.[dev]' && \
-  export ROOT_SAVE_PATH='/workspace/output_models' && \
-  /app/TensorRT-Model-Optimizer/examples/llm_ptq/scripts/huggingface_example.sh \
-  --model 'deepseek-ai/DeepSeek-R1-Distill-Llama-8B' \
-  --quant nvfp4 \
-  --tp 1 \
-  --export_fmt hf
-"
+  -v "./output_models:/workspace/output_models" \
+  -v "$HOME/.cache/huggingface:/root/.cache/huggingface" \
+  -e HF_TOKEN=$HF_TOKEN \
+  nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
+  bash -c "
+    git clone -b 0.35.0 --single-branch https://github.com/NVIDIA/TensorRT-Model-Optimizer.git /app/TensorRT-Model-Optimizer && \
+    cd /app/TensorRT-Model-Optimizer && pip install -e '.[dev]' && \
+    export ROOT_SAVE_PATH='/workspace/output_models' && \
+    /app/TensorRT-Model-Optimizer/examples/llm_ptq/scripts/huggingface_example.sh \
+    --model 'deepseek-ai/DeepSeek-R1-Distill-Llama-8B' \
+    --quant nvfp4 \
+    --tp 1 \
+    --export_fmt hf
+  "
 ```
 
 Note: You may encounter this `pynvml.NVMLError_NotSupported: Not Supported`. This is expected in some environments, does not affect results, and will be fixed in an upcoming release.
@@ -102,18 +102,18 @@ Now verify the quantized model can be loaded properly using a simple test:
 
 ```bash
 docker run \
--e HF_TOKEN=$HF_TOKEN \
--v $HOME/.cache/huggingface/:/root/.cache/huggingface/ \
--v "$MODEL_PATH:/workspace/model" \
---rm -it --ulimit memlock=-1 --ulimit stack=67108864 \
---gpus=all --ipc=host --network host \
-nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
-bash -c '
-  python examples/llm-api/quickstart_advanced.py \
-    --model_dir /workspace/model/ \
-    --prompt "Paris is great because" \
-    --max_tokens 64
-  '
+  -e HF_TOKEN=$HF_TOKEN \
+  -v $HOME/.cache/huggingface/:/root/.cache/huggingface/ \
+  -v "$MODEL_PATH:/workspace/model" \
+  --rm -it --ulimit memlock=-1 --ulimit stack=67108864 \
+  --gpus=all --ipc=host --network host \
+  nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
+  bash -c '
+    python examples/llm-api/quickstart_advanced.py \
+      --model_dir /workspace/model/ \
+      --prompt "Paris is great because" \
+      --max_tokens 64
+    '
 ```
 
 # Step 8. Serve the model with OpenAI-compatible API
@@ -125,29 +125,29 @@ First, set the path to your quantized model:
 export MODEL_PATH="./output_models/saved_models_DeepSeek-R1-Distill-Llama-8B_nvfp4_hf/"
 
 docker run \
--e HF_TOKEN=$HF_TOKEN \
--v "$MODEL_PATH:/workspace/model" \
---rm -it --ulimit memlock=-1 --ulimit stack=67108864 \
---gpus=all --ipc=host --network host \
-nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
-trtllm-serve /workspace/model \
-  --backend pytorch \
-  --max_batch_size 4 \
-  --port 8000
+  -e HF_TOKEN=$HF_TOKEN \
+  -v "$MODEL_PATH:/workspace/model" \
+  --rm -it --ulimit memlock=-1 --ulimit stack=67108864 \
+  --gpus=all --ipc=host --network host \
+  nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
+  trtllm-serve /workspace/model \
+    --backend pytorch \
+    --max_batch_size 4 \
+    --port 8000
 ```
 
 Run the following to test the server with a client CURL request:
 
 ```bash
 curl -X POST http://localhost:8000/v1/chat/completions \
--H "Content-Type: application/json" \
--d '{
-  "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
-  "prompt": "What is artificial intelligence?",
-  "max_tokens": 100,
-  "temperature": 0.7,
-  "stream": false
-}'
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+    "prompt": "What is artificial intelligence?",
+    "max_tokens": 100,
+    "temperature": 0.7,
+    "stream": false
+  }'
 ```
 
 # Step 10. Cleanup and rollback

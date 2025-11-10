@@ -58,10 +58,10 @@ Ollama server running on port 11434. This configuration runs on your local machi
 
 1. Click the "Add New" button
 2. Fill out the form with these values:
- - **Name**: `Ollama Server`
- - **Port**: `11434`
- - **Auto open in browser**: Leave unchecked (this is an API, not a web interface)
- - **Start Script**: Leave empty
+  - **Name**: `Ollama Server`
+  - **Port**: `11434`
+  - **Auto open in browser**: Leave unchecked (this is an API, not a web interface)
+  - **Start Script**: Leave empty
 3. Click "Add"
 
 The new Ollama Server entry should now appear in your NVIDIA Sync custom apps list.
@@ -83,25 +83,25 @@ working correctly. This runs on your local laptop terminal.
 
 ```bash
 curl http://localhost:11434/api/chat -d '{
-"model": "qwen2.5:32b",
-"messages": [{
-  "role": "user",
-  "content": "Write me a haiku about GPUs and AI."
-}],
-"stream": false
+  "model": "qwen2.5:32b",
+  "messages": [{
+    "role": "user",
+    "content": "Write me a haiku about GPUs and AI."
+  }],
+  "stream": false
 }'
 ```
 
 Expected response format:
 ```json
 {
-"model": "qwen2.5:32b",
-"created_at": "2024-01-15T12:30:45.123Z",
-"message": {
-  "role": "assistant",
-  "content": "Silicon power flows\nThrough circuits, dreams become real\nAI awakens"
-},
-"done": true
+  "model": "qwen2.5:32b",
+  "created_at": "2024-01-15T12:30:45.123Z",
+  "message": {
+    "role": "assistant",
+    "content": "Silicon power flows\nThrough circuits, dreams become real\nAI awakens"
+  },
+  "done": true
 }
 ```
 
@@ -118,9 +118,9 @@ curl http://localhost:11434/api/tags
 Test streaming responses:
 ```bash
 curl -N http://localhost:11434/api/chat -d '{
-"model": "qwen2.5:32b",
-"messages": [{"role": "user", "content": "Count to 5 slowly"}],
-"stream": true
+  "model": "qwen2.5:32b",
+  "messages": [{"role": "user", "content": "Count to 5 slowly"}],
+  "stream": true
 }'
 ```
 

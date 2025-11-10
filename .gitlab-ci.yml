@@ -1,0 +1,76 @@
+default:
+  tags:
+    - perflab
+
+stages:
+  - generate
+  - create-mr
+
+# Global variables - these are additive with included pipeline vars
+variables:
+  # Base URLs used for substitution in ux-conf.yaml
+  GITLAB_ASSET_BASEURL: "https://github.com/NVIDIA/dgx-spark-playbooks/blob/main"
+  GITLAB_REPO_BASEURL: "https://github.com/NVIDIA/dgx-spark-playbooks"
+  GITLAB_RAW_CONTENT_BASEURL: "https://raw.githubusercontent.com/NVIDIA/dgx-spark-playbooks/refs/heads/main"
+  
+  # MR Reviewer - Set this in GitLab CI/CD settings: Settings > CI/CD > Variables
+  # Add MR_REVIEWER_USERNAME with your GitLab username
+  MR_REVIEWER_USERNAME: "${MR_REVIEWER_USERNAME}"  # Override this in GitLab project settings
+
+  # API Catalog repository configuration
+  # Note: GITLAB_MASTER_TOKEN_API_CATALOG must be set in GitLab CI/CD Settings > Variables
+  # This token needs: api, read_repository, write_repository permissions
+  SRC_ASSETS_URL: "https://gitlab-master.nvidia.com/dgx/dgx-spark-playbooks-assets"
+
+  # Destination repositories (JSON array format for parsing in script)
+  # Cutover to Github.com supported via the public_github alias
+  # Format: [{"alias": "name", "url": "git-url", "token_var": "ENV_VAR_NAME"}, ...]
+
+
+  #### This is a test
+  #### Gitlab Only Publishing: 
+  DST_REPOS_JSON: '[{"alias":"public_gitlab","url":"https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets","token_var":"GITLAB_TOKEN_DGX_SPARK_PLAYBOOKS"}]'
+
+  #### This is production
+  #### DST_REPOS_JSON: '[{"alias":"public_gitlab","url":"https://gitlab.com/nvidia/dgx-spark/temp-external-playbook-assets/dgx-spark-playbook-assets","token_var":"GITLAB_TOKEN_DGX_SPARK_PLAYBOOKS"}, {"alias":"public_github","url":"git@github.com:NVIDIA/dgx-spark-playbooks.git","token_var":"GITHUB_TOKEN_DGX_SPARK_PLAYBOOKS"}]'
+
+  
+  # Forbidden reference patterns (regex) - blocks internal references in public docs
+  # Job will FAIL if these patterns are detected in generated markdown
+  # Override in GitLab UI if needed: Settings > CI/CD > Variables
+  FORBIDDEN_PATTERNS_JSON: '["sw-docs-dgx-station","gitlab-master\\.nvidia\\.com","urm\\.nvidia\\.com"]'
+  
+  # Root directories to copy from project root (directory names)
+  # These directories are copied from CI project root to each destination repo root
+  # Used for images and assets referenced in README-Public.md
+  ROOT_DIRS_JSON: '["src"]'
+
+# Converge all playbooks and create MR to API Catalog
+generate-convergence-output:
+  stage: generate
+  image: python:3.9-slim
+  before_script:
+    - apt-get update && apt-get install -y git
+    - pip install requests
+    - git config --global user.email "automaton@nvidia.com"
+    - git config --global user.name "GitLab CI"
+  script:
+    - echo "📦 Converging all playbooks and creating MR to API Catalog..."
+    - python3 -m pip install --upgrade pyyaml
+    - python3 -u scripts/converge_and_mr.py
+        --output-dir convergence-output
+        --api-catalog-repo "https://gitlab-master.nvidia.com/api-catalog/dgx-spark-playbooks"
+        --api-catalog-token "$GITLAB_MASTER_TOKEN_API_CATALOG"
+        --gitlab-url "https://gitlab-master.nvidia.com"
+        --project-id "api-catalog%2Fdgx-spark-playbooks"
+        --target-branch "main"
+        --reviewer "$MR_REVIEWER_USERNAME"
+        --allow-forbidden-refs
+  artifacts:
+    paths:
+      - convergence-output/
+    expire_in: 7 days
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: on_success  # Auto-run when MR is merged to default branch
+  allow_failure: false

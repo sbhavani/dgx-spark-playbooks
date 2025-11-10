@@ -29,9 +29,9 @@ Start the Open WebUI container by running:
 
 ```bash
 docker run -d -p 8080:8080 --gpus=all \
--v open-webui:/app/backend/data \
--v open-webui-ollama:/root/.ollama \
---name open-webui ghcr.io/open-webui/open-webui:ollama
+  -v open-webui:/app/backend/data \
+  -v open-webui-ollama:/root/.ollama \
+  --name open-webui ghcr.io/open-webui/open-webui:ollama
 ```
 
 This will start the Open WebUI container and make it accessible at `http://localhost:8080`. You can access the Open WebUI interface from your local web browser.

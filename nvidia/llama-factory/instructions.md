@@ -70,12 +70,12 @@ llamafactory-cli train examples/train_lora/llama3_lora_sft.yaml
 Example output:
 ```bash
 ***** train metrics *****
-epoch                    =        3.0
-total_flos               = 22851591GF
-train_loss               =     0.9113
-train_runtime            = 0:22:21.99
-train_samples_per_second =      2.437
-train_steps_per_second   =      0.306
+  epoch                    =        3.0
+  total_flos               = 22851591GF
+  train_loss               =     0.9113
+  train_runtime            = 0:22:21.99
+  train_samples_per_second =      2.437
+  train_steps_per_second   =      0.306
 Figure saved at: saves/llama3-8b/lora/sft/training_loss.png
 ```
 
