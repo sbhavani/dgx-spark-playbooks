@@ -27,7 +27,7 @@ Verify the virtual environment is active by checking the command prompt shows `(
 Install PyTorch with CUDA 12.9 support.
 
 ```bash
-pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu129
+pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu130
 ```
 
 This installation targets CUDA 12.9 compatibility with Blackwell architecture GPUs.
