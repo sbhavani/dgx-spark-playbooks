@@ -27,3 +27,4 @@ resources:
 cta:
   text: View on GitHub
   url: ${GITLAB_ASSET_BASEURL}/${MODEL}
+
