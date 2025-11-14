@@ -22,6 +22,7 @@ from trl import SFTConfig, SFTTrainer
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
+
 # Define prompt templates
 ALPACA_PROMPT_TEMPLATE = """Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
 ### Instruction: {}
@@ -77,7 +78,7 @@ def main(args):
         "seed": 42,
         "dataset_text_field": "text",
         "packing": False,
-        "max_seq_length": args.seq_length,
+        "max_length": args.seq_length,
         "torch_compile": False,
         "report_to": "none",
         "logging_dir": args.log_dir,
