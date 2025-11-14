@@ -15,6 +15,9 @@ tabs:
 - id: instructions
   label: Instructions
   filename: instructions.md
+- id: troubleshooting
+  label: Troubleshooting
+  filename: troubleshooting.md
 resources:
 - name: SGLang Documentation
   url: https://docs.sglang.ai/
