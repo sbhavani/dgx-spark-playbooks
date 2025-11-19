@@ -55,6 +55,8 @@ The setup includes:
 
 - **Rollback**: Stop and remove Docker containers, delete downloaded models if needed
 
+Last Updated: 11/19/2025
+
 ## Instructions
 
 ## Step 1. Clone the repository
