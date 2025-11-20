@@ -46,7 +46,6 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [Unsloth on DGX Spark](nvidia/unsloth/)
 - [Vibe Coding in VS Code](nvidia/vibe-coding/)
 - [Install and Use vLLM for Inference](nvidia/vllm/)
-- [Vision-Language Model Fine-tuning](nvidia/vlm-finetuning/)
 - [VS Code](nvidia/vscode/)
 - [Build a Video Search and Summarization (VSS) Agent](nvidia/vss/)
 
