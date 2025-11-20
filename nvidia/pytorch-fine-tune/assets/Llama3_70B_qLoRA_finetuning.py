@@ -59,7 +59,8 @@ def main(args):
         load_in_4bit=True,
         bnb_4bit_use_double_quant=True,
         bnb_4bit_quant_type='nf4',
-        bnb_4bit_compute_dtype=getattr(torch, args.dtype),
+        bnb_4bit_compute_dtype=args.dtype,
+        bnb_4bit_quant_storage=args.dtype
     )
     
     model = AutoModelForCausalLM.from_pretrained(
@@ -74,15 +75,15 @@ def main(args):
 
     # Prepare model for QLoRA training
     print(f"Preparing model for QLoRA (4-bit) with rank {args.lora_rank}...")
-    model = prepare_model_for_kbit_training(model)
+    # model = prepare_model_for_kbit_training(model)
     
-    model = get_peft_model(model, LoraConfig(
+    peft_config = LoraConfig(
         r=args.lora_rank,
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        target_modules="all-linear",
         lora_alpha=16,
         lora_dropout=0,
         task_type=TaskType.CAUSAL_LM
-    ))
+    )
     
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total_params = sum(p.numel() for p in model.parameters())
@@ -104,7 +105,7 @@ def main(args):
         "seed": 42,
         "dataset_text_field": "text",
         "packing": False,
-        "max_seq_length": args.seq_length,
+        "max_length": args.seq_length,
         "torch_compile": False,
         "report_to": "none",
         "logging_dir": args.log_dir,
@@ -136,6 +137,7 @@ def main(args):
         processing_class=tokenizer,
         train_dataset=dataset,
         args=SFTConfig(**config),
+        peft_config=peft_config,
     )
     
     trainer_stats = trainer.train()
