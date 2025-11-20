@@ -112,7 +112,11 @@ export default function RagPage() {
           
           if (ragResponse.ok) {
             const data = await ragResponse.json();
-            console.log('📥 RAG Response data:', { hasAnswer: !!data.answer, answerLength: data.answer?.length });
+            console.log('📥 RAG Response data:', { 
+              hasAnswer: !!data.answer, 
+              answerLength: data.answer?.length,
+              documentCount: data.documentCount 
+            });
             // Handle the answer - we might need to display differently than triples
             if (data.answer) {
               console.log('✅ Setting answer in results:', data.answer.substring(0, 100) + '...');
@@ -123,7 +127,7 @@ export default function RagPage() {
               // Set empty results array since Pure RAG doesn't return triples
               setResults([]);
 
-              resultCount = 1;
+              resultCount = data.documentCount || 0;
               relevanceScore = data.relevanceScore || 0;
               
               // Log the query with performance metrics
@@ -133,7 +137,7 @@ export default function RagPage() {
                 resultCount
               });
               
-              console.log('Pure RAG query completed successfully');
+              console.log(`✅ Pure RAG query completed. Retrieved ${resultCount} document chunks`);
               setIsLoading(false);
               return;
             }
@@ -530,7 +534,7 @@ export default function RagPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                               </svg>
                               <span className="text-muted-foreground">
-                                Hop: <span className="font-medium text-foreground">{triple.depth}</span>
+                                Hop: <span className="font-medium text-foreground">{triple.depth + 1}</span>
                               </span>
                             </div>
                           )}

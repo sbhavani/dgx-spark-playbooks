@@ -6,6 +6,13 @@ import type { Triple } from '@/types/graph';
 
 /**
  * Backend service that combines graph database for storage and Qdrant for embeddings
+ * 
+ * Two distinct modes:
+ * 1. Knowledge Graph Mode: Stores triples in graph DB + entity names in 'entity-embeddings' collection
+ * 2. Pure RAG Mode: Stores document chunks in 'document-embeddings' collection (via RAGService)
+ * 
+ * Use processTriples() for knowledge graph ingestion
+ * Use storeDocumentChunks() for Pure RAG document ingestion
  */
 export class BackendService {
   private graphDBService: GraphDBService;
@@ -608,6 +615,27 @@ Answer:`;
         count: topTriples.length
       };
     }
+  }
+
+  /**
+   * Store document chunks for Pure RAG (separate from entity embeddings)
+   * This stores full text chunks rather than just entity names
+   * @param documents Array of document text chunks
+   * @param metadata Optional metadata for each document
+   */
+  public async storeDocumentChunks(
+    documents: string[],
+    metadata?: Record<string, any>[]
+  ): Promise<void> {
+    console.log(`Storing ${documents.length} document chunks for Pure RAG`);
+
+    // Generate embeddings for document chunks
+    const embeddings = await this.generateEmbeddings(documents);
+    
+    // Store in Qdrant document-embeddings collection
+    await this.pineconeService.storeDocumentChunks(documents, embeddings, metadata);
+    
+    console.log(`✅ Stored ${documents.length} document chunks in document-embeddings collection`);
   }
 
   /**

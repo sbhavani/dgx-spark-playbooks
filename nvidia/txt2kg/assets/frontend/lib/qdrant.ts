@@ -257,8 +257,12 @@ export class QdrantService {
 
   /**
    * Upsert vectors to Qdrant
+   * @param points Array of points to upsert
+   * @param collectionName Optional collection name (defaults to entity-embeddings)
    */
-  public async upsertVectors(points: QdrantPoint[]): Promise<boolean> {
+  public async upsertVectors(points: QdrantPoint[], collectionName?: string): Promise<boolean> {
+    const targetCollection = collectionName || this.collectionName;
+    
     if (!this.initialized) {
       await this.initialize();
     }
@@ -269,9 +273,9 @@ export class QdrantService {
     }
 
     try {
-      console.log(`Upserting ${points.length} vectors to Qdrant`);
+      console.log(`Upserting ${points.length} vectors to Qdrant collection: ${targetCollection}`);
 
-      const response = await this.makeRequest(`/collections/${this.collectionName}/points`, 'PUT', {
+      const response = await this.makeRequest(`/collections/${targetCollection}/points`, 'PUT', {
         points: points
       });
 
@@ -615,6 +619,70 @@ export class QdrantService {
     } catch (error) {
       console.log('Error finding similar documents - returning empty results');
       return [];
+    }
+  }
+
+  /**
+   * Store document chunks for Pure RAG
+   * @param documents Array of document text chunks
+   * @param embeddings Array of embeddings corresponding to the documents
+   * @param metadata Optional metadata for each document
+   */
+  public async storeDocumentChunks(
+    documents: string[],
+    embeddings: number[][],
+    metadata?: Record<string, any>[]
+  ): Promise<void> {
+    const documentCollection = 'document-embeddings';
+    
+    try {
+      console.log(`Storing ${documents.length} document chunks in collection: ${documentCollection}`);
+
+      // Ensure the document collection exists
+      const collectionInfo = await this.makeRequest(`/collections/${documentCollection}`, 'GET');
+      if (!collectionInfo || collectionInfo.status === 'error') {
+        console.log(`Creating Qdrant collection: ${documentCollection}`);
+        await this.makeRequest(`/collections/${documentCollection}`, 'PUT', {
+          vectors: {
+            size: this.dimension,
+            distance: 'Cosine'
+          }
+        });
+      }
+
+      const points: QdrantPoint[] = [];
+
+      // Convert to Qdrant point format
+      for (let i = 0; i < documents.length; i++) {
+        const docId = metadata?.[i]?.id || `doc_${randomUUID()}`;
+        const point: QdrantPoint = {
+          id: stringToUUID(docId),
+          vector: embeddings[i],
+          payload: {
+            originalId: docId,
+            text: documents[i],
+            type: 'document',
+            ...(metadata?.[i] || {})
+          }
+        };
+        points.push(point);
+      }
+
+      // Use batching for efficient upserts
+      const batchSize = 100;
+      for (let i = 0; i < points.length; i += batchSize) {
+        const batch = points.slice(i, i + batchSize);
+        const success = await this.upsertVectors(batch, documentCollection);
+        if (success) {
+          console.log(`Upserted document batch ${Math.floor(i/batchSize) + 1} of ${Math.ceil(points.length/batchSize)}`);
+        } else {
+          console.log(`Failed to upsert document batch ${Math.floor(i/batchSize) + 1} - continuing`);
+        }
+      }
+
+      console.log(`✅ Completed storing ${points.length} document chunks`);
+    } catch (error) {
+      console.log('Error storing document chunks - continuing without storage');
     }
   }
 }

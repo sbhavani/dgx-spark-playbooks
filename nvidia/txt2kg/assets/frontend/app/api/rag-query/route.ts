@@ -20,17 +20,20 @@ export async function POST(req: NextRequest) {
     const ragService = RAGService;
     await ragService.initialize();
     
-    console.log(`Processing RAG query: "${query}" with topK=${topK}`);
+    console.log(`Processing Pure RAG query: "${query}" with topK=${topK}`);
 
     // Retrieve documents and generate answer
-    const answer = await ragService.retrievalQA(query, topK);
+    const result = await ragService.retrievalQA(query, topK);
     
     // Check if this is a fallback response
-    const isGeneralKnowledgeFallback = answer.startsWith('[Note: No specific information was found');
+    const isGeneralKnowledgeFallback = result.answer.startsWith('[Note: No specific information was found');
+
+    console.log(`✅ Pure RAG query completed. Retrieved ${result.documentCount} document chunks`);
 
     // Return the results
     return NextResponse.json({
-      answer,
+      answer: result.answer,
+      documentCount: result.documentCount,
       usedFallback: isGeneralKnowledgeFallback,
       success: true
     });

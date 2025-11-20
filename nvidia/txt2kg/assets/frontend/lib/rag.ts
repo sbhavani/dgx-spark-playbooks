@@ -2,6 +2,11 @@
  * Retrieval Augmented Generation (RAG) implementation using Qdrant and LangChain
  * This module provides a RetrievalQA chain using Qdrant as the vector store
  * Uses NVIDIA API for LLM inference
+ * 
+ * Architecture:
+ * - Uses 'document-embeddings' collection for Pure RAG (stores full text chunks)
+ * - Separate from 'entity-embeddings' collection used for knowledge graph entities
+ * - Documents are retrieved via semantic similarity and fed to LLM for answer generation
  */
 
 import { ChatOpenAI } from "@langchain/openai";
@@ -41,7 +46,7 @@ export class RAGService {
   private llm: ChatOpenAI | null = null;
   private initialized: boolean = false;
   private isInitializing: boolean = false;
-  private collectionName: string = 'entity-embeddings';
+  private collectionName: string = 'document-embeddings';
 
   private constructor() {
     this.embeddingsService = new CustomEmbeddings();
@@ -164,9 +169,9 @@ export class RAGService {
    * Perform question answering with document retrieval using proper RAG implementation
    * @param query User query
    * @param topK Number of most similar documents to retrieve
-   * @returns Answer generated from relevant context
+   * @returns Object containing the answer and document count
    */
-  public async retrievalQA(query: string, topK: number = 5): Promise<string> {
+  public async retrievalQA(query: string, topK: number = 5): Promise<{ answer: string; documentCount: number }> {
     if (!this.initialized) {
       await this.initialize();
     }
@@ -209,14 +214,17 @@ Answer:
 
       // Execute fallback chain
       const answer = await fallbackChain.invoke({});
-      return `[Note: No specific information was found in the knowledge base. This answer is based on general knowledge.]\n\n${answer}`;
+      return {
+        answer: `[Note: No specific information was found in the knowledge base. This answer is based on general knowledge.]\n\n${answer}`,
+        documentCount: 0
+      };
     }
 
-    console.log(`✅ Found ${similarDocs.length} relevant documents`);
+    console.log(`✅ Found ${similarDocs.length} relevant document chunks`);
 
     // Log first document structure for debugging
     if (similarDocs.length > 0) {
-      console.log('📄 First document structure:', {
+      console.log('📄 First document chunk structure:', {
         hasPageContent: !!similarDocs[0].pageContent,
         pageContentLength: similarDocs[0].pageContent?.length || 0,
         hasMetadata: !!similarDocs[0].metadata,
@@ -263,7 +271,10 @@ Answer:
       ]);
 
       const answer = await fallbackChain.invoke({});
-      return `[Note: No specific information was found in the knowledge base. This answer is based on general knowledge.]\n\n${answer}`;
+      return {
+        answer: `[Note: No specific information was found in the knowledge base. This answer is based on general knowledge.]\n\n${answer}`,
+        documentCount: similarDocs.length
+      };
     }
 
     // Define prompt template for RAG
@@ -297,7 +308,11 @@ Answer:
       const answer = await retrievalChain.invoke({});
       console.log('✅ RAG query completed successfully');
       console.log(`📝 Answer length: ${answer.length} characters`);
-      return answer;
+      console.log(`📄 Retrieved ${similarDocs.length} document chunks`);
+      return {
+        answer,
+        documentCount: similarDocs.length
+      };
     } catch (error) {
       console.error('❌ Error generating answer with NVIDIA LLM:', error);
       throw error;
