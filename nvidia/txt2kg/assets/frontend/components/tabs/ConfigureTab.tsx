@@ -176,9 +176,6 @@ export function ConfigureTab() {
             </div>
             <h2 className="text-lg font-semibold text-foreground">Process Documents</h2>
           </div>
-          <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-            Extract structured knowledge triples from documents for knowledge graph construction
-          </p>
           <EmbeddingsGenerator showTripleExtraction={true} />
         </div>
       </div>

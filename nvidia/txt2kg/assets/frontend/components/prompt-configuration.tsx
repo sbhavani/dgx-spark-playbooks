@@ -219,10 +219,6 @@ export function PromptConfiguration({
         )}
         
         <TabsContent value="system" className="space-y-2 pt-2">
-          <div className="text-xs text-muted-foreground mb-2">
-            This system prompt is used for the default triple extraction mode (without LangChain).
-          </div>
-          
           <div className="mb-4">
             <Label htmlFor="system-prompt-template" className="text-xs font-medium mb-1 block">Prompt Template</Label>
             <select

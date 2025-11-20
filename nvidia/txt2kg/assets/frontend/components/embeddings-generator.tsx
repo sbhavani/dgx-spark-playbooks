@@ -953,7 +953,7 @@ function TriplesContent({
                   </Label>
                 </div>
                 <p className="text-xs text-muted-foreground ml-6 mb-3">
-                  PyG's txt2kg.py chunking algorithm with configurable chunk size and overlap. Set overlap to 0 for original PyG behavior.
+                  PyG's txt2kg.py chunking algorithm with configurable chunk size and overlap.
                 </p>
               </div>
             </div>
