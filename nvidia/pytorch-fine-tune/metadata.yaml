@@ -15,6 +15,9 @@ tabs:
 - id: instructions
   label: Instructions
   filename: instructions.md
+- id: run-two-sparks
+  label: Run on two Sparks
+  filename: run-two-sparks.md
 - id: troubleshooting
   label: Troubleshooting
   filename: troubleshooting.md
