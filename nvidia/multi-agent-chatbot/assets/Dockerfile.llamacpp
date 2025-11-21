@@ -30,7 +30,8 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-RUN git clone https://github.com/ggml-org/llama.cpp.git .
+RUN git clone https://github.com/ggml-org/llama.cpp.git . \
+    && git checkout 5d8bb90
 
 RUN if [ "${CUDA_DOCKER_ARCH}" != "default" ]; then \
     export CMAKE_ARGS="-DCMAKE_CUDA_ARCHITECTURES=121"; \
