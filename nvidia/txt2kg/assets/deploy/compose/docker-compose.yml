@@ -131,17 +131,29 @@ services:
       - |
         echo 'Waiting for Qdrant to start...'
         sleep 5
-        echo 'Checking if collection exists...'
+        echo 'Checking if entity-embeddings collection exists...'
         RESPONSE=$(curl -s http://qdrant:6333/collections/entity-embeddings)
         if echo "$RESPONSE" | grep -q '"status":"ok"'; then
-          echo 'Collection already exists'
+          echo 'entity-embeddings collection already exists'
         else
           echo 'Creating collection entity-embeddings...'
           curl -X PUT http://qdrant:6333/collections/entity-embeddings \
             -H 'Content-Type: application/json' \
             -d '{"vectors":{"size":384,"distance":"Cosine"}}'
           echo ''
-          echo 'Collection created successfully'
+          echo 'entity-embeddings collection created successfully'
+        fi
+        echo 'Checking if document-embeddings collection exists...'
+        RESPONSE=$(curl -s http://qdrant:6333/collections/document-embeddings)
+        if echo "$RESPONSE" | grep -q '"status":"ok"'; then
+          echo 'document-embeddings collection already exists'
+        else
+          echo 'Creating collection document-embeddings...'
+          curl -X PUT http://qdrant:6333/collections/document-embeddings \
+            -H 'Content-Type: application/json' \
+            -d '{"vectors":{"size":384,"distance":"Cosine"}}'
+          echo ''
+          echo 'document-embeddings collection created successfully'
         fi
     networks:
       - pinecone-net

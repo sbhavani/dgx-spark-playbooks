@@ -122,9 +122,6 @@ export function InfoModal() {
           {/* Powered by NVIDIA Section */}
           <div className="bg-nvidia-green/5 border border-nvidia-green/20 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="text-xs px-3 py-1.5 rounded-full bg-nvidia-green/15 text-nvidia-green border border-nvidia-green/20 font-medium">
-                POWERED BY NVIDIA AI
-              </div>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Built with NVIDIA's advanced AI infrastructure and optimized for enterprise-grade knowledge extraction workflows.

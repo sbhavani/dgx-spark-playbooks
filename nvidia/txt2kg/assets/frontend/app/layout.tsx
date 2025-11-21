@@ -43,9 +43,6 @@ export default function RootLayout({
                   <NvidiaIcon className="h-8 w-8" />
                   <div>
                     <span className="text-xl font-bold gradient-text">txt2kg</span>
-                    <span className="ml-2 text-xs bg-primary/20 text-[#76b900] px-2 py-0.5 rounded-full">
-                      Powered by NVIDIA AI
-                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
