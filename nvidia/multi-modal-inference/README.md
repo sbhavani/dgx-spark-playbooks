@@ -76,7 +76,7 @@ the TensorRT development environment with all required dependencies pre-installe
 docker run --gpus all --ipc=host --ulimit memlock=-1 \
 --ulimit stack=67108864 -it --rm --ipc=host \
 -v $HOME/.cache/huggingface:/root/.cache/huggingface \
-nvcr.io/nvidia/pytorch:25.09-py3
+nvcr.io/nvidia/pytorch:25.10-py3
 ```
 
 ## Step 2. Clone and set up TensorRT repository
@@ -101,6 +101,7 @@ apt install -y libgl1 libglu1-mesa libglib2.0-0t64 libxrender1 libxext6 libx11-6
 pip install nvidia-modelopt[torch,onnx]
 sed -i '/^nvidia-modelopt\[.*\]=.*/d' requirements.txt
 pip3 install -r requirements.txt
+pip install onnxconverter_common
 ```
 
 ## Step 4. Run Flux.1 Dev model inference

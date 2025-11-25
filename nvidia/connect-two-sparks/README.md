@@ -101,7 +101,12 @@ rocep1s0f1 port 1 ==> enp1s0f1np1 (Up)
 
 Choose one option to setup the network interfaces. Option 1 and 2 are mutually exclusive.
 
-**Option 1: Automatic IP Assignment (Recommended)**
+> [!NOTE] 
+> Full bandwidth can be achieved with just one QSFP cable.
+> When two QSFP cables are connected, all four interfaces must be assigned IP addresses to obtain full bandwidth.
+> Option 1 below can only be used when 1 QSFP cable is connected.
+
+**Option 1: Automatic IP Assignment (Can only be used when 1 QSFP cable is connected)**
 
 Configure network interfaces using netplan on both DGX Spark nodes for automatic
 link-local addressing:
@@ -125,10 +130,77 @@ sudo chmod 600 /etc/netplan/40-cx7.yaml
 sudo netplan apply
 ```
 
+**Option 2: Manual IP Assignment with the netplan configure file**
+
+On node 1:
+```bash
+## Create the netplan configuration file
+sudo tee /etc/netplan/40-cx7.yaml > /dev/null <<EOF
+network:
+  version: 2
+  ethernets:
+    enp1s0f0np0:
+      addresses:
+        - 192.168.100.10/24
+      dhcp4: no
+    enp1s0f1np1:
+      addresses:
+        - 192.168.200.12/24
+      dhcp4: no
+    enP2p1s0f0np0:
+      addresses:
+        - 192.168.100.14/24
+      dhcp4: no
+    enP2p1s0f1np1:
+      addresses:
+        - 192.168.200.16/24
+      dhcp4: no
+EOF
+
+## Set appropriate permissions
+sudo chmod 600 /etc/netplan/40-cx7.yaml
+
+## Apply the configuration
+sudo netplan apply
+```
+
+On node 2:
+```bash
+## Create the netplan configuration file
+sudo tee /etc/netplan/40-cx7.yaml > /dev/null <<EOF
+network:
+  version: 2
+  ethernets:
+    enp1s0f0np0:
+      addresses:
+        - 192.168.100.11/24
+      dhcp4: no
+    enp1s0f1np1:
+      addresses:
+        - 192.168.200.13/24
+      dhcp4: no
+    enP2p1s0f0np0:
+      addresses:
+        - 192.168.100.15/24
+      dhcp4: no
+    enP2p1s0f1np1:
+      addresses:
+        - 192.168.200.17/24
+      dhcp4: no
+EOF
+
+## Set appropriate permissions
+sudo chmod 600 /etc/netplan/40-cx7.yaml
+
+## Apply the configuration
+sudo netplan apply
+```
+
+
+**Option 3: Manual IP Assignment with command line**
+
 > [!NOTE]
 > Using this option, the IPs assigned to the interfaces will change if you reboot the system.
-
-**Option 2: Manual IP Assignment (Advanced)**
 
 First, identify which network ports are available and up:
 
@@ -167,7 +239,7 @@ You can verify the IP assignment on both nodes by running the following command 
 ip addr show enp1s0f1np1
 ```
 
-## Step 3. Set up passwordless SSH authentication
+## Step 4. Set up passwordless SSH authentication
 
 #### Option 1: Automatically configure SSH
 
@@ -220,7 +292,7 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub <username>@<IP for Node 1>
 ssh-copy-id -i ~/.ssh/id_rsa.pub <username>@<IP for Node 2>
 ```
 
-## Step 4. Verify Multi-Node Communication
+## Step 5. Verify Multi-Node Communication
 
 Test basic multi-node functionality:
 

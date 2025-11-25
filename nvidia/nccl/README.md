@@ -128,6 +128,10 @@ In this example, the IP address for Node 1 is **169.254.35.62**. Repeat the proc
 
 ## Step 5. Run NCCL communication test
 
+> [!NOTE] 
+> Full bandwidth can be achieved with just one QSFP cable.
+> When two QSFP cables are connected, all four interfaces must be assigned IP addresses to obtain full bandwidth.
+
 Execute the following commands on both nodes to run the NCCL communication test. Replace the IP addresses and interface names with the ones you found in the previous step.
 
 ```bash
