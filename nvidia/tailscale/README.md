@@ -9,9 +9,9 @@
 - [Instructions](#instructions)
   - [Step 1. Verify system requirements](#step-1-verify-system-requirements)
   - [Step 2. Install SSH server (if needed)](#step-2-install-ssh-server-if-needed)
-  - [Step 3. Install Tailscale on NVIDIA Spark](#step-3-install-tailscale-on-nvidia-spark)
+  - [Step 3. Install Tailscale on NVIDIA DGX Spark](#step-3-install-tailscale-on-nvidia-dgx-spark)
   - [Step 4. Verify Tailscale installation](#step-4-verify-tailscale-installation)
-  - [Step 5. Connect Spark device to Tailscale network](#step-5-connect-spark-device-to-tailscale-network)
+  - [Step 5. Connect your DGX Spark to Tailscale network](#step-5-connect-your-dgx-spark-to-tailscale-network)
   - [Step 6. Install Tailscale on client devices](#step-6-install-tailscale-on-client-devices)
   - [Step 7. Connect client devices to tailnet](#step-7-connect-client-devices-to-tailnet)
   - [Step 8. Verify network connectivity](#step-8-verify-network-connectivity)
@@ -29,17 +29,17 @@
 ## Basic idea
 
 Tailscale creates an encrypted peer-to-peer mesh network that allows secure access
-to your NVIDIA Spark device from anywhere without complex firewall configurations
-or port forwarding. By installing Tailscale on both your Spark and client devices,
+to your NVIDIA DGX Spark device from anywhere without complex firewall configurations
+or port forwarding. By installing Tailscale on both your DGX Spark and client devices,
 you establish a private "tailnet" where each device gets a stable private IP
 address and hostname, enabling seamless SSH access whether you're at home, work,
 or a coffee shop.
 
 ## What you'll accomplish
 
-You will set up Tailscale on your NVIDIA Spark device and client machines to
+You will set up Tailscale on your DGX Spark device and client machines to
 create secure remote access. After completion, you'll be able to SSH into your
-Spark from anywhere using simple commands like `ssh user@spark-hostname`, with
+DGX Spark from anywhere using simple commands like `ssh user@spark-hostname`, with
 all traffic automatically encrypted and NAT traversal handled transparently.
 
 ## What to know before starting
@@ -52,30 +52,36 @@ all traffic automatically encrypted and NAT traversal handled transparently.
 
 ## Prerequisites
 
-- NVIDIA Spark device running DGX OS (ARM64/AArch64)
+**Hardware Requirements:**
+-  NVIDIA Grace Blackwell GB10 Superchip System
+
+**Software Requirements:**
+- NVIDIA DGX OS
 - Client device (Mac, Windows, or Linux) for remote access
 - Client device and DGX Spark not on the same network when testing connectivity
 - Internet connectivity on both devices
 - Valid email account for Tailscale authentication (Google, GitHub, Microsoft)
 - SSH server availability check: `systemctl status ssh`
 - Package manager working: `sudo apt update`
-- User account with sudo privileges on Spark device
+- User account with sudo privileges on your DGX Spark device
 
 ## Time & risk
 
 * **Duration**: 15-30 minutes for initial setup, 5 minutes per additional device
-* **Risks**:
+* **Risks**: Medium
   * Potential SSH service configuration conflicts
   * Network connectivity issues during initial setup
   * Authentication provider service dependencies
 * **Rollback**: Tailscale can be completely removed with `sudo apt remove tailscale` and all network routing automatically reverts to default settings.
+* **Last Updated:** 11/21/2025
+  * Minor copyedits
 
 ## Instructions
 
 ### Step 1. Verify system requirements
 
-Check that your NVIDIA Spark device is running a supported Ubuntu version and
-has internet connectivity. This step runs on the Spark device to confirm
+Check that your NVIDIA DGX Spark device is running a supported Ubuntu version and
+has internet connectivity. This step runs on the DGX Spark device to confirm
 prerequisites.
 
 ```bash
@@ -91,9 +97,9 @@ sudo whoami
 
 ### Step 2. Install SSH server (if needed)
 
-Ensure SSH server is running on your Spark device since Tailscale provides
+Ensure SSH server is running on your DGX Spark device since Tailscale provides
 network connectivity but requires SSH for remote access. This step runs on
-the Spark device.
+the DGX Spark device.
 
 ```bash
 ## Check if SSH is running
@@ -114,9 +120,9 @@ sudo systemctl enable ssh --now --no-pager
 systemctl status ssh --no-pager
 ```
 
-### Step 3. Install Tailscale on NVIDIA Spark
+### Step 3. Install Tailscale on NVIDIA DGX Spark
 
-Install Tailscale on your ARM64 Spark device using the official Ubuntu
+Install Tailscale on your DGX Spark using the official Ubuntu
 repository. This step adds the Tailscale package repository and installs
 the client.
 
@@ -144,7 +150,7 @@ sudo apt install -y tailscale
 
 ### Step 4. Verify Tailscale installation
 
-Confirm Tailscale installed correctly on your Spark device before proceeding
+Confirm Tailscale installed correctly on your DGX Spark device before proceeding
 with authentication.
 
 ```bash
@@ -155,24 +161,24 @@ tailscale version
 sudo systemctl status tailscaled --no-pager
 ```
 
-### Step 5. Connect Spark device to Tailscale network
+### Step 5. Connect your DGX Spark to Tailscale network
 
-Authenticate your Spark device with Tailscale using your chosen identity
+Authenticate your DGX Spark device with Tailscale using your chosen identity
 provider. This creates your private tailnet and assigns a stable IP address.
 
 ```bash
 ## Start Tailscale and begin authentication
 sudo tailscale up
 
-## Follow the URL displayed to complete login in browser
+## Follow the URL displayed to complete login in your browser
 ## Choose from: Google, GitHub, Microsoft, or other supported providers
 ```
 
 ### Step 6. Install Tailscale on client devices
 
-Install Tailscale on the devices you'll use to connect to your Spark remotely.
+Install Tailscale on the devices you'll use to connect to your DGX Spark remotely.
 
-Choose the appropriate method for your client operating system.
+Choose the appropriate method for your client operating system:
 
 **On macOS:**
 - Option 1: Install from Mac App Store by searching for "Tailscale" and then clicking Get → Install
@@ -187,7 +193,7 @@ Choose the appropriate method for your client operating system.
 
 **On Linux:**
 
-Use the same instructions as were done for installing on your DGX Spark.
+Follow the same instructions used for the DGX Spark installation.
 
 ```bash
 ## Update package list
@@ -214,12 +220,12 @@ sudo apt install -y tailscale
 ### Step 7. Connect client devices to tailnet
 
 Log in to Tailscale on each client device using the same identity provider
-account you used for the Spark device.
+account you used for your DGX Spark.
 
 **On macOS/Windows (GUI):**
 - Launch Tailscale app
 - Click "Log in" button
-- Sign in with same account used on Spark
+- Sign in with same account used on DGX Spark
 
 **On Linux (CLI):**
 
@@ -247,8 +253,8 @@ tailscale ping <SPARK_HOSTNAME>
 
 ### Step 9. Configure SSH authentication
 
-Set up SSH key authentication for secure access to your Spark device. This
-step runs on your client device and Spark device.
+Set up SSH key authentication for secure access to your DGX Spark. This
+step runs on your client device and DGX Spark device.
 
 **Generate SSH key on client (if not already done):**
 
@@ -260,7 +266,7 @@ ssh-keygen -t ed25519 -f ~/.ssh/tailscale_spark
 cat ~/.ssh/tailscale_spark.pub
 ```
 
-**Add public key to Spark device:**
+**Add public key to DGX Spark:**
 
 ```bash
 ## On Spark device, add client's public key
@@ -273,7 +279,7 @@ chmod 700 ~/.ssh
 
 ### Step 10. Test SSH connection
 
-Connect to your Spark device using SSH over the Tailscale network to verify
+Connect to your DGX Spark using SSH over the Tailscale network to verify
 the complete setup works.
 
 ```bash
@@ -316,7 +322,7 @@ Remove Tailscale completely if needed. This will disconnect devices from the
 tailnet and remove all network configurations.
 
 > [!WARNING]
-> his will permanently remove the device from your Tailscale network and require re-authentication to rejoin.
+> This will permanently remove the device from your Tailscale network and require re-authentication to rejoin.
 
 ```bash
 ## Stop Tailscale service
@@ -339,7 +345,7 @@ To restore: Re-run installation steps 3-5.
 
 Your Tailscale setup is complete. You can now:
 
-- Access your Spark device from any network with: `ssh <USERNAME>@<SPARK_HOSTNAME>`
+- Access your DGX Spark device from any network with: `ssh <USERNAME>@<SPARK_HOSTNAME>`
 - Transfer files securely: `scp file.txt <USERNAME>@<SPARK_HOSTNAME>:~/`
 - Open the DGX Dashboard and start JupyterLab, then connect with:
   `ssh -L 8888:localhost:1102 <USERNAME>@<SPARK_HOSTNAME>`
@@ -353,3 +359,6 @@ Your Tailscale setup is complete. You can now:
 | SSH auth failure | Wrong SSH keys | Check public key in `~/.ssh/authorized_keys` |
 | Cannot ping hostname | DNS issues | Use IP from `tailscale status` instead |
 | Devices missing | Different accounts | Use same identity provider for all devices |
+
+
+For latest known issues, please review the [DGX Spark User Guide](https://docs.nvidia.com/dgx/dgx-spark/known-issues.html).

@@ -37,7 +37,11 @@ architectures.
 
 ## Prerequisites
 
-- DGX Spark system with NVIDIA AI Workbench installed or ready to install
+**Hardware Requirements:**
+-  NVIDIA Grace Blackwell GB10 Superchip System
+
+**Software Requirements:**
+- NVIDIA AI Workbench installed or ready to install
 - Free NVIDIA API key: Generate at [NGC API Keys](https://org.ngc.nvidia.com/setup/api-keys)
 - Free Tavily API key: Generate at [Tavily](https://tavily.com/)
 - Internet connection for cloning repositories and accessing APIs
@@ -54,30 +58,28 @@ architectures.
 * **Estimated time:** 30-45 minutes (including AI Workbench installation if needed)
 * **Risk level:** Low - Uses pre-built containers and established APIs
 * **Rollback:** Simply delete the cloned project from AI Workbench to remove all components. No system changes are made outside the AI Workbench environment.
+* **Last Updated:** 11/21/2025
+  * Minor copyedits
 
 ## Instructions
 
 ## Step 1. Install NVIDIA AI Workbench
 
-This step installs AI Workbench on your DGX Spark system and completes the initial setup wizard.
+Install AI Workbench on your DGX Spark system and complete the initial setup wizard.
 
-On your DGX Spark system, open the **NVIDIA AI Workbench** application and click **Begin Installation**.
+On your DGX Spark, open the **NVIDIA AI Workbench** application and click "Begin Installation".
 
 1. The installation wizard will prompt for authentication
 2. Wait for the automated install to complete (several minutes)
 3. Click "Let's Get Started" when installation finishes
 
-**Troubleshooting installation issues**
-
-If you encounter the following error message, reboot your DGX system and then reopen NVIDIA AI Workbench:
-
-"An error occurred ... container tool failed to reach ready state. try again: docker is not running"
+> [!NOTE]
+> If you encounter the following error message, reboot your DGX Spark and then reopen NVIDIA AI Workbench:
+> "An error occurred ... container tool failed to reach ready state. try again: docker is not running"
 
 ## Step 2. Verify API key requirements
 
-This step ensures you have the required API keys before proceeding with the project setup.
-
-Verify you have both required API keys. Keep these keys safe!
+Next, you should ensure you have both required API keys before proceeding with the project setup. Keep these keys safe!
 
 * Tavily API Key: https://tavily.com/
 * NVIDIA API Key: https://org.ngc.nvidia.com/setup/api-keys 
@@ -87,21 +89,21 @@ Keep both keys available for the next step.
 
 ## Step 3. Clone the agentic RAG project
 
-This step clones the pre-built agentic RAG project from GitHub into your AI Workbench environment.
+You'll then clone the pre-built agentic RAG project from GitHub into your AI Workbench environment.
 
-From the AI Workbench landing page, select the **Local** location if not done so already, then click **Clone Project** from the top right corner.
+From the AI Workbench landing page, select the **Local** location, if not done so already, then click "Clone Project" from the top right corner.
 
 Paste this Git repository URL in the clone dialog: https://github.com/NVIDIA/workbench-example-agentic-rag
 
-Click **Clone** to begin the clone and build process.
+Click "Clone" to begin the clone and build process.
 
 ## Step 4. Configure project secrets
 
-This step configures the API keys required for the agentic RAG application to function properly.
+You can then configure the API keys required for the agentic RAG application to function properly.
 
 While the project builds, configure the API keys using the yellow warning banner that appears:
 
-1. Click **Configure** in the yellow banner
+1. Click "Configure" in the yellow banner
 2. Enter your ``NVIDIA_API_KEY``
 3. Enter your ``TAVILY_API_KEY``
 4. Save the configuration
@@ -110,7 +112,7 @@ Wait for the project build to complete before proceeding.
 
 ## Step 5. Launch the chat application
 
-This step starts the web-based chat interface where you can interact with the agentic RAG system.
+You can now start the web-based chat interface where you can interact with the agentic RAG system.
 
 Navigate to **Environment** > **Project Container** > **Apps** > **Chat** and start the web application.
 
@@ -118,7 +120,7 @@ A browser window will open automatically and load with the Gradio chat interface
 
 ## Step 6. Test the basic functionality
 
-This step verifies the agentic RAG system is working by submitting a sample query.
+Verify the agentic RAG system is working by submitting a sample query.
 
 In the chat application, click on or type a sample query such as: `How do I add an integration in the CLI?`
 
@@ -126,20 +128,18 @@ Wait for the agentic system to process and respond. The response, while general,
 
 ## Step 7. Validate project
 
-This step confirms the complete setup is working correctly by testing the core features.
+Confirm your setup is working correctly by testing the core features.
 
 Verify the following components are functioning:
 
-```bash
-✓ Web application loads without errors
-✓ Sample queries return responses
-✓ No API authentication errors appear
-✓ The agentic reasoning process is visible in the interface under "Monitor"
-```
+* Web application loads without errors
+* Sample queries return responses
+* No API authentication errors appear
+* The agentic reasoning process is visible in the interface under "Monitor"
 
 ## Step 8. Complete optional quickstart
 
-This step demonstrates advanced features by uploading data, retrieving context, and testing custom queries.
+You can evaluate advanced features by uploading data, retrieving context, and testing custom queries.
 
 **Substep A: Upload sample dataset**
 Complete the in-app quickstart instructions to upload the sample dataset and test improved RAG-based responses.
@@ -149,7 +149,7 @@ Upload a custom dataset, adjust the Router prompt, and submit custom queries to 
 
 ## Step 10. Cleanup and rollback
 
-This step explains how to remove the project if needed and what changes were made to your system.
+You can remove the project if needed.
 
 > [!WARNING]
 > This will permanently delete the project and all associated data.
@@ -160,13 +160,12 @@ To remove the project completely:
 2. Select "Delete Project"
 3. Confirm deletion when prompted
 
-**Rollback notes:** All changes are contained within AI Workbench. No system-level modifications were made outside the AI Workbench environment.
+> [!NOTE]
+> All changes are contained within AI Workbench. No system-level modifications were made outside the AI Workbench environment.
 
 ## Step 11. Next steps
 
-This step provides guidance on further exploration and development with the agentic RAG system.
-
-Explore advanced features:
+You can also explore further advanced features and development options with the agentic RAG system:
 
 * Modify component prompts in the project code
 * Upload different documents to test routing and customization
@@ -183,3 +182,6 @@ Consider customizing the Gradio UI or integrating the agentic RAG components int
 | 401 Unauthorized | Wrong or malformed API key | Replace key in Project Secrets and restart |
 | 403 Unauthorized | API key lacks permissions | Generate new key with proper access |
 | Agentic loop timeout | Complex query exceeding time limit | Try simpler query or retry |
+
+
+For latest known issues, please review the [DGX Spark User Guide](https://docs.nvidia.com/dgx/dgx-spark/known-issues.html).

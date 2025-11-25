@@ -14,13 +14,11 @@
 
 ## Basic idea
 
-ComfyUI is an open-source web server application for AI image generation using diffusion-based models like SDXL, Flux and others.
-It has a browser-based UI that lets you create, edit and run image generation and editing workflows with multiple steps.
-Generation and editing steps (e.g. loading a model, adding text or sampling) are configurable in the UI as a node, and you connect nodes with wires to form a workflow.  
+ComfyUI is an open-source web server application for AI image generation using diffusion-based models like SDXL, Flux, and others. It has a browser-based UI that lets you create, edit, and run image generation and editing workflows with multiple steps. These generation and editing steps (e.g., loading a model, adding text or sampling) are configurable in the UI as a node, and you connect nodes with wires to form a workflow.
 
-ComfyUI uses the host's GPU for inference, so you can install it on your Spark and do all of your image generation and editing directly on device.  
+ComfyUI uses the host's GPU for inference, so you can install it on your DGX Spark and do all of your image generation and editing directly on your device.  
 
-Workflows are saved as JSON files, so you can version them for future work, collaboration and reproducibility.
+Workflows are saved as JSON files, so you can version them for future work, collaboration, and reproducibility.
 
 ## What you'll accomplish
 
@@ -37,7 +35,7 @@ You'll install and configure ComfyUI on your NVIDIA DGX Spark device so you can 
 ## Prerequisites
 
 **Hardware Requirements:**
--  NVIDIA Spark device with Blackwell architecture
+-  NVIDIA Grace Blackwell GB10 Superchip System
 -  Minimum 8GB GPU memory for Stable Diffusion models
 -  At least 20GB available storage space
 
@@ -71,7 +69,7 @@ All required assets can be found [in the ComfyUI repository on GitHub](https://g
 
 ## Step 1. Verify system prerequisites
 
-Check that your NVIDIA Spark device meets the requirements before proceeding with installation.
+Check that your NVIDIA DGX Spark device meets the requirements before proceeding with installation.
 
 ```bash
 python3 --version
@@ -80,7 +78,7 @@ nvcc --version
 nvidia-smi
 ```
 
-Expected output should show Python 3.8+, pip available, CUDA toolkit and GPU detection.
+Expected output should show Python 3.8+, pip available, CUDA toolkit, and GPU detection.
 
 ## Step 2. Create Python virtual environment
 
@@ -146,7 +144,7 @@ The server will bind to all network interfaces on port 8188, making it accessibl
 
 ## Step 8. Validate installation
 
-Check that ComfyUI is running correctly and accessible via web browser.
+Check that ComfyUI is running correctly and accessible via your web browser.
 
 ```bash
 curl -I http://localhost:8188
@@ -198,3 +196,6 @@ The image generation should complete within 30-60 seconds depending on your hard
 ```bash
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 ```
+
+
+For latest known issues, please review the [DGX Spark User Guide](https://docs.nvidia.com/dgx/dgx-spark/known-issues.html).

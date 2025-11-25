@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Instructions](#instructions)
+- [Direct Installation](#direct-installation)
 - [Access with NVIDIA Sync](#access-with-nvidia-sync)
 - [Troubleshooting](#troubleshooting)
 
@@ -14,44 +14,44 @@
 ## Overview
 
 ## Basic idea
-This walkthrough establishes a local Visual Studio Code development environment directly on DGX Spark devices. By installing VS Code natively on the ARM64-based Spark system, you gain access to a full-featured IDE with extensions, integrated terminal, and Git integration while leveraging the specialized hardware for development and testing.
+This walkthrough will help you set up Visual Studio Code, a full-featured IDE with extensions, an integrated terminal, and Git integration, while leveraging your DGX Spark device for development and testing. There are two different approaches for using VS Code:
+
+ * **Direct Installation**: Install the VS Code development environment directly on your ARM64-based Spark system for local development on the target hardware without remote development overhead.
+
+ * **Access with NVIDIA Sync**: Set up NVIDIA Sync to remotely connect to Spark over SSH and configure VS Code as one of your development tools.
 
 ## What you'll accomplish
-You will have Visual Studio Code running natively on your DGX Spark device with access to the system's ARM64 architecture and GPU resources. This setup enables direct code development, debugging, and execution on the target hardware without remote development overhead.
+You will have VS Code set up for development on your DGX Spark device with access to the system's ARM64 architecture and GPU resources. This setup enables direct code development, debugging, and execution.
 
 ## What to know before starting
+You should have basic experience working with the VS Code interface and features; the approach you choose will require some additional understanding:
 
-• Basic experience working with Visual Studio Code interface and features
+* **Direct Installation**:
+  * Familiarity with package management on Linux systems
+  * Understanding of file permissions and authentication on Linux
 
-• Familiarity with package management on Linux systems
-
-• Understanding of file permissions and authentication on Linux
+* **Access with NVIDIA Sync**:
+  * Familiarity with SSH concepts
 
 ## Prerequisites
+Your DGX Spark [device is set up](https://docs.nvidia.com/dgx/dgx-spark/first-boot.html). You will also need the following:
 
-• DGX Spark device with administrative privileges
+* **Direct Installation**:
+  * DGX Spark set up with administrative privileges
+  * Active internet connection for downloading the VS Code installer
 
-• Active internet connection for downloading the VS Code installer
-
-• Verify ARM64 architecture:
-  ```bash
-  uname -m
-#  # Expected output: aarch64
-  ```
-• Verify GUI desktop environment available:
-  ```bash
-  echo $DISPLAY
-#  # Should return display information like :0 or :10.0
-  ```
-
+* **Access with NVIDIA Sync**:
+  * VS Code installed on your laptop, downloaded from https://code.visualstudio.com/download.
 
 ## Time & risk
 
 * **Duration:** 10-15 minutes
 * **Risk level:** Low - installation uses official packages with standard rollback
 * **Rollback:** Standard package removal via system package manager
+* **Last Updated:** 11/21/2025
+  * Clarify options and minor copyedits
 
-## Instructions
+## Direct Installation
 
 ## Step 1. Verify system requirements
 
@@ -60,12 +60,17 @@ Before installing VS Code, confirm your DGX Spark system meets the requirements 
 ```bash
 ## Verify ARM64 architecture
 uname -m
+## Expected output: aarch64
 
 ## Check available disk space (VS Code requires ~200MB)
 df -h /
 
 ## Verify desktop environment is running
 ps aux | grep -E "(gnome|kde|xfce)"
+
+## Verify GUI desktop environment is available
+  echo $DISPLAY
+## Should return display information like :0 or :10.0
 ```
 
 ## Step 2. Download VS Code ARM64 installer
@@ -180,14 +185,14 @@ NVIDIA Sync will automatically configure SSH key-based authentication for secure
 
 - Click the NVIDIA Sync icon in your system tray/taskbar
 - Ensure your device is connected (click "Connect" if needed)
-- Click on "VS Code" to launch it with an automatic SSH connection to your Spark
-- Wait for the remote connection to be established (may ask your local machine for a password or to authorize the connection)
-- It may prompt you to "trust the authors of the files in this folder" when you first land in the home directory after a successful SSH connection
+- Click on "VS Code" to launch it with an automatic SSH connection to your DGX Spark
+- Wait for the remote connection to be established (your local machine may ask for a password or to authorize the connection)
+- You may be prompted to "trust the authors of the files in this folder" when you first land in the home directory after a successful SSH connection
 
 ## Step 3. Validation and follow-ups
 
-- Verify that you can access your Spark's filesystem with VS Code as a text editor
-- Open the integrated terminal in VS Code and run test commands like `hostnamectl` and `whoami` to ensure you are remotely accessing your Spark
+- Verify that you can access your DGX Spark's filesystem with VS Code as a text editor
+- Open the integrated terminal in VS Code and run test commands like `hostnamectl` and `whoami` to ensure you are remotely accessing your DGX Spark
 - Navigate to a specific file path or directory and start editing/writing files
 - Install VS Code extensions for your development workflow (Python, Docker, GitLens, etc.)
 - Clone repositories from GitHub or other version control systems
@@ -200,3 +205,6 @@ NVIDIA Sync will automatically configure SSH key-based authentication for secure
 | `dpkg: dependency problems` during install | Missing dependencies | Run `sudo apt-get install -f` |
 | VS Code won't launch with GUI error | No display server/X11 | Verify GUI desktop is running: `echo $DISPLAY` |
 | Extensions fail to install | Network connectivity or ARM64 compatibility | Check internet connection, verify extension ARM64 support |
+
+
+For latest known issues, please review the [DGX Spark User Guide](https://docs.nvidia.com/dgx/dgx-spark/known-issues.html).
