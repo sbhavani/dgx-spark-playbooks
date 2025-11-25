@@ -39,6 +39,7 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [Open WebUI with Ollama](nvidia/open-webui/)
 - [Fine-tune with Pytorch](nvidia/pytorch-fine-tune/)
 - [RAG Application in AI Workbench](nvidia/rag-ai-workbench/)
+- [SGLang Inference Server](nvidia/sglang/)
 - [Speculative Decoding](nvidia/speculative-decoding/)
 - [Set up Tailscale on Your Spark](nvidia/tailscale/)
 - [TRT LLM for Inference](nvidia/trt-llm/)
