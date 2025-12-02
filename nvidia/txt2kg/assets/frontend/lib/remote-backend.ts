@@ -1,18 +1,34 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 import { GraphDBService, GraphDBType } from './graph-db-service';
-import { PineconeService } from './pinecone';
+import { QdrantService } from './qdrant';
 import { EmbeddingsService } from './embeddings';
 import { TextProcessor } from './text-processor';
 import type { Triple } from '@/types/graph';
 
 /**
  * Remote backend implementation that uses a graph database for storage,
- * Pinecone for vector embeddings, and SentenceTransformer for generating embeddings.
+ * Qdrant for vector embeddings, and SentenceTransformer for generating embeddings.
  * Follows the implementation in PyTorch Geometric's txt2kg.py
  * Enhanced with LangChain text processing for better extraction
  */
 export class RemoteBackendService {
   private graphDBService: GraphDBService;
-  private pineconeService: PineconeService;
+  private pineconeService: QdrantService;
   private embeddingsService: EmbeddingsService;
   private textProcessor: TextProcessor;
   private initialized: boolean = false;
@@ -20,7 +36,7 @@ export class RemoteBackendService {
 
   private constructor() {
     this.graphDBService = GraphDBService.getInstance();
-    this.pineconeService = PineconeService.getInstance();
+    this.pineconeService = QdrantService.getInstance();
     this.embeddingsService = EmbeddingsService.getInstance();
     this.textProcessor = TextProcessor.getInstance();
   }

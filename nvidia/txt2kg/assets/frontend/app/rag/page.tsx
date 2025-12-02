@@ -1,3 +1,19 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 "use client";
 
 import { useState, useEffect } from "react";
@@ -12,6 +28,7 @@ import { ArrowLeft, BarChart2, Search as SearchIcon } from "lucide-react";
 export default function RagPage() {
   const router = useRouter();
   const [results, setResults] = useState<Triple[] | null>(null);
+  const [llmAnswer, setLlmAnswer] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [vectorEnabled, setVectorEnabled] = useState(false);
@@ -20,6 +37,7 @@ export default function RagPage() {
     avgRelevance: number;
     precision: number;
     recall: number;
+    queryTimesByMode?: Record<string, number>;
   } | null>(null);
   const [currentParams, setCurrentParams] = useState<RagParams>({
     kNeighbors: 4096,
@@ -64,7 +82,8 @@ export default function RagPage() {
             avgQueryTime: data.avgQueryTime,
             avgRelevance: data.avgRelevance,
             precision: data.precision,
-            recall: data.recall
+            recall: data.recall,
+            queryTimesByMode: data.queryTimesByMode
           });
         }
       } catch (error) {
@@ -84,12 +103,20 @@ export default function RagPage() {
     let resultCount = 0;
     let relevanceScore = 0;
     
+    // Debug logging
+    console.log('🔍 Query params:', {
+      usePureRag: params.usePureRag,
+      useVectorSearch: params.useVectorSearch,
+      vectorEnabled,
+      queryMode: params.queryMode
+    });
+    
     try {
       // If using pure RAG (Pinecone + LangChain) without graph search
       if (params.usePureRag) {
         queryMode = 'pure-rag';
         try {
-          console.log('Using pure RAG with just Pinecone and LangChain for query:', query);
+          console.log('Using pure RAG with Qdrant and NVIDIA LLM for query:', query);
           const ragResponse = await fetch('/api/rag-query', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -101,17 +128,22 @@ export default function RagPage() {
           
           if (ragResponse.ok) {
             const data = await ragResponse.json();
+            console.log('📥 RAG Response data:', { 
+              hasAnswer: !!data.answer, 
+              answerLength: data.answer?.length,
+              documentCount: data.documentCount 
+            });
             // Handle the answer - we might need to display differently than triples
             if (data.answer) {
-              // Special UI handling for text answer rather than triples
-              setResults([{
-                subject: 'Answer',
-                predicate: '',
-                object: data.answer,
-                usedFallback: data.usedFallback
-              }]);
-              
-              resultCount = 1;
+              console.log('✅ Setting answer in results:', data.answer.substring(0, 100) + '...');
+
+              // Set the LLM answer for display (same as traditional mode)
+              setLlmAnswer(data.answer);
+
+              // Set empty results array since Pure RAG doesn't return triples
+              setResults([]);
+
+              resultCount = data.documentCount || 0;
               relevanceScore = data.relevanceScore || 0;
               
               // Log the query with performance metrics
@@ -121,7 +153,7 @@ export default function RagPage() {
                 resultCount
               });
               
-              console.log('Pure RAG query completed successfully');
+              console.log(`✅ Pure RAG query completed. Retrieved ${resultCount} document chunks`);
               setIsLoading(false);
               return;
             }
@@ -136,8 +168,8 @@ export default function RagPage() {
         }
       }
       
-      // If we have vector embeddings, use enhanced query with metadata
-      if (vectorEnabled && params.useVectorSearch) {
+      // If we have vector embeddings AND explicitly selected vector search, use enhanced query with metadata
+      if (vectorEnabled && params.useVectorSearch && !params.usePureRag) {
         queryMode = 'vector-search';
         try {
           console.log('Using enhanced RAG with LangChain for query:', query);
@@ -184,35 +216,71 @@ export default function RagPage() {
         }
       }
       
-      // Call the traditional backend API as fallback or if explicitly selected
+      // Call the LLM-enhanced graph query API
+      console.log('✅ Using Graph Search + LLM approach');
       queryMode = 'traditional';
-      const response = await fetch(`/api/query`, {
+      
+      // Get selected LLM model from localStorage
+      let llmModel = undefined;
+      let llmProvider = undefined;
+      try {
+        const savedModel = localStorage.getItem("selectedModelForRAG");
+        if (savedModel) {
+          const modelData = JSON.parse(savedModel);
+          llmModel = modelData.model;
+          llmProvider = modelData.provider;
+          console.log(`Using LLM: ${llmModel} (${llmProvider})`);
+        }
+      } catch (e) {
+        console.warn("Could not load selected LLM model, using default");
+      }
+      
+      const response = await fetch(`/api/graph-query-llm`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           query,
-          kNeighbors: params.kNeighbors,
-          fanout: params.fanout,
-          numHops: params.numHops,
-          topK: params.topK,
-          queryMode: queryMode, // Explicitly pass the query mode
-          useTraditional: true  // Force use of the direct pattern matching approach
+          topK: params.topK || 5,
+          useTraditional: true,
+          llmModel,
+          llmProvider
         }),
       });
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to query the RAG backend');
+        throw new Error(errorData.error || 'Failed to query with LLM');
       }
       
       const data = await response.json();
+
+      // Log sample of retrieved triples for debugging
+      console.log('📊 Retrieved Triples (sample):', data.triples.slice(0, 3));
+      console.log('🤖 LLM-Generated Answer (preview):', data.answer?.substring(0, 200) + '...');
+      console.log('📈 Triple Count:', data.count);
+
+      // DEBUG: Check if depth/pathLength are present in received data
+      if (data.triples && data.triples.length > 0) {
+        console.log('🔍 First triple structure:', JSON.stringify(data.triples[0], null, 2));
+        console.log('🔍 Has depth?', 'depth' in data.triples[0]);
+        console.log('🔍 Has pathLength?', 'pathLength' in data.triples[0]);
+      }
       
-      // Update the results
-      setResults(data.relevantTriples || []);
+      // Update the results with the triples (for display)
+      setResults(data.triples || []);
       resultCount = data.count || 0;
-      relevanceScore = data.relevanceScore || 0;
+      relevanceScore = 0; // No relevance score for traditional search
+      
+      // Store the LLM answer for display
+      if (data.answer) {
+        console.log('✅ Setting llmAnswer state (length:', data.answer.length, 'chars)');
+        setLlmAnswer(data.answer);
+      } else {
+        console.log('⚠️ No answer in response');
+        setLlmAnswer(null);
+      }
       
       // Log the query with performance metrics
       logQuery(query, queryMode, {
@@ -279,6 +347,7 @@ export default function RagPage() {
 
   const clearResults = () => {
     setResults(null);
+    setLlmAnswer(null);
     setErrorMessage(null);
   };
 
@@ -318,22 +387,34 @@ export default function RagPage() {
                 </div>
                 
                 <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Avg. Query Time:</span>
-                    <span className="font-medium">{metrics.avgQueryTime > 0 ? `${metrics.avgQueryTime.toFixed(2)}ms` : "No data"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Relevance Score:</span>
-                    <span className="font-medium">{metrics.avgRelevance > 0 ? `${(metrics.avgRelevance * 100).toFixed(1)}%` : "No data"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Precision:</span>
-                    <span className="font-medium">{metrics.precision > 0 ? `${(metrics.precision * 100).toFixed(1)}%` : "No data"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Recall:</span>
-                    <span className="font-medium">{metrics.recall > 0 ? `${(metrics.recall * 100).toFixed(1)}%` : "No data"}</span>
-                  </div>
+                  {/* Query times by mode */}
+                  {metrics.queryTimesByMode && Object.keys(metrics.queryTimesByMode).length > 0 ? (
+                    <>
+                      {metrics.queryTimesByMode['pure-rag'] !== undefined && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Pure RAG:</span>
+                          <span className="font-medium">{(metrics.queryTimesByMode['pure-rag'] / 1000).toFixed(2)}s</span>
+                        </div>
+                      )}
+                      {metrics.queryTimesByMode['traditional'] !== undefined && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Graph Search:</span>
+                          <span className="font-medium">{(metrics.queryTimesByMode['traditional'] / 1000).toFixed(2)}s</span>
+                        </div>
+                      )}
+                      {metrics.queryTimesByMode['vector-search'] !== undefined && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">GraphRAG:</span>
+                          <span className="font-medium">{(metrics.queryTimesByMode['vector-search'] / 1000).toFixed(2)}s</span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Avg. Query Time:</span>
+                      <span className="font-medium">{metrics.avgQueryTime > 0 ? `${metrics.avgQueryTime.toFixed(2)}ms` : "No data"}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -349,14 +430,81 @@ export default function RagPage() {
               vectorEnabled={vectorEnabled}
             />
             
+            {/* LLM Answer Section */}
+            {llmAnswer && (
+              <div className="mt-8 nvidia-build-card">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-6 h-6 rounded-md bg-nvidia-green/15 flex items-center justify-center">
+                    <SearchIcon className="h-3 w-3 text-nvidia-green" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">Answer</h3>
+                  {currentParams.queryMode && (
+                    <span className="text-xs px-2.5 py-1 rounded-full font-medium bg-nvidia-green/10 text-nvidia-green border border-nvidia-green/20">
+                      {currentParams.queryMode === 'pure-rag' ? 'Pure RAG' :
+                       currentParams.queryMode === 'vector-search' ? 'GraphRAG' :
+                       'Graph Search'}
+                    </span>
+                  )}
+                </div>
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  {(() => {
+                    // Parse <think> tags
+                    const thinkMatch = llmAnswer.match(/<think>([\s\S]*?)<\/think>/);
+                    const thinkContent = thinkMatch ? thinkMatch[1].trim() : null;
+                    const mainAnswer = thinkContent
+                      ? llmAnswer.replace(/<think>[\s\S]*?<\/think>/, '').trim()
+                      : llmAnswer;
+
+                    return (
+                      <>
+                        {thinkContent && (
+                          <details className="mb-4 bg-muted/10 border border-border/20 rounded-xl overflow-hidden group">
+                            <summary className="cursor-pointer p-4 hover:bg-muted/20 transition-colors flex items-center gap-2">
+                              <svg className="w-4 h-4 transform transition-transform group-open:rotate-90" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                              <span className="text-sm font-medium text-muted-foreground">Reasoning Process</span>
+                            </summary>
+                            <div className="p-4 pt-0 text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap border-t border-border/10">
+                              {thinkContent}
+                            </div>
+                          </details>
+                        )}
+                        <div className="bg-muted/20 border border-border/20 p-6 rounded-xl">
+                          <div
+                            className="text-foreground leading-relaxed whitespace-pre-wrap"
+                            dangerouslySetInnerHTML={{
+                              __html: mainAnswer
+                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                            }}
+                          />
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+            
             {/* Results Section */}
-            {results && results.length > 0 && (
+            {results && results.length > 0 && !currentParams.usePureRag && (
               <div className="mt-8 nvidia-build-card">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-6 h-6 rounded-md bg-nvidia-green/15 flex items-center justify-center">
                     <SearchIcon className="h-3 w-3 text-nvidia-green" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground">Results ({results.length})</h3>
+                  <h3 className="text-lg font-semibold text-foreground">
+                    {llmAnswer ? `Retrieved Knowledge (${results.length})` : `Results (${results.length})`}
+                  </h3>
+                  {results.some((r: any) => r.pathLength && r.pathLength > 1) && (
+                    <span className="text-xs px-2.5 py-1 rounded-full font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1.5">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      Multi-hop enabled
+                    </span>
+                  )}
                 </div>
                 <div className="space-y-4">
                   {results.map((triple, index) => (
@@ -389,8 +537,33 @@ export default function RagPage() {
                         </div>
                       )}
                       {triple.confidence && !currentParams.usePureRag && (
-                        <div className="mt-2 text-xs text-muted-foreground">
-                          Confidence: {(triple.confidence * 100).toFixed(1)}%
+                        <div className="mt-3 flex items-center gap-4 text-xs">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full bg-nvidia-green/60"></div>
+                            <span className="text-muted-foreground">
+                              Confidence: <span className="font-medium text-foreground">{(triple.confidence * 100).toFixed(1)}%</span>
+                            </span>
+                          </div>
+                          {triple.depth !== undefined && (
+                            <div className="flex items-center gap-1.5">
+                              <svg className="w-3 h-3 text-nvidia-green/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                              <span className="text-muted-foreground">
+                                Hop: <span className="font-medium text-foreground">{triple.depth + 1}</span>
+                              </span>
+                            </div>
+                          )}
+                          {triple.pathLength !== undefined && triple.pathLength > 1 && (
+                            <div className="flex items-center gap-1.5">
+                              <svg className="w-3 h-3 text-amber-500/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                              </svg>
+                              <span className="text-amber-600/80 dark:text-amber-400/80">
+                                Multi-hop path (length: <span className="font-medium">{triple.pathLength}</span>)
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -399,7 +572,7 @@ export default function RagPage() {
               </div>
             )}
             
-            {results && results.length === 0 && !isLoading && (
+            {results && results.length === 0 && !isLoading && !currentParams.usePureRag && (
               <div className="mt-8 nvidia-build-card border-dashed">
                 <div className="text-center py-8">
                   <div className="w-12 h-12 rounded-xl bg-muted/30 flex items-center justify-center mx-auto mb-4">

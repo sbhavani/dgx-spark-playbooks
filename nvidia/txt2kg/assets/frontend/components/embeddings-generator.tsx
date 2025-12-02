@@ -1,3 +1,19 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 "use client"
 
 import { useState, useEffect } from "react"
@@ -814,20 +830,21 @@ function TriplesContent({
         <h4 className="text-sm font-semibold text-foreground">Processing Options</h4>
         
         <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Switch 
-              id="use-langchain-triples" 
+          {/* Hidden: Use LangChain toggle - LangChain is always used for triple extraction */}
+          {/* <div className="flex items-center space-x-2">
+            <Switch
+              id="use-langchain-triples"
               checked={useLangChain}
               onCheckedChange={setUseLangChain}
               disabled={isProcessing}
             />
             <Label htmlFor="use-langchain-triples" className="text-sm cursor-pointer">Use LangChain</Label>
-          </div>
+          </div> */}
           {/* <p className="text-xs text-muted-foreground pl-7">
             Leverages LangChain for knowledge extraction from documents
           </p> */}
-          
-          {useLangChain && (
+
+          {false && useLangChain && (
             <div className="mt-3">
               <AdvancedOptions title="LangChain Options" defaultOpen={false}>
                 <div className="space-y-3">
@@ -952,7 +969,7 @@ function TriplesContent({
                   </Label>
                 </div>
                 <p className="text-xs text-muted-foreground ml-6 mb-3">
-                  PyG's txt2kg.py chunking algorithm with configurable chunk size and overlap. Set overlap to 0 for original PyG behavior.
+                  PyG's txt2kg.py chunking algorithm with configurable chunk size and overlap.
                 </p>
               </div>
             </div>

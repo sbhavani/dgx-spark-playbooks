@@ -1,3 +1,19 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 "use client"
 
 import React, { useEffect, useRef, useState, useCallback } from 'react'
@@ -7,10 +23,9 @@ import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Loader2, Cpu, Server, Monitor, Wifi, RotateCcw } from 'lucide-react'
+import { Loader2, Cpu, Monitor, RotateCcw } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
-import { EnhancedWebGPUClusteringEngine, RemoteWebGPUClusteringClient } from '@/utils/remote-webgpu-clustering'
-import { WebRTCGraphViewer } from './webrtc-graph-viewer'
+import { WebGPUClusteringEngine } from '@/utils/webgpu-clustering'
 import { ForceGraphWrapper } from './force-graph-wrapper'
 
 interface PerformanceMetrics {
@@ -33,7 +48,7 @@ interface WebGPU3DViewerProps {
 }
 
 interface RenderingMode {
-  id: 'local' | 'hybrid' | 'webrtc'
+  id: 'local' | 'hybrid'
   name: string
   description: string
   available: boolean
@@ -50,9 +65,7 @@ export function WebGPU3DViewer({
   const [activeMode, setActiveMode] = useState<string>('local')
   const [isInitializing, setIsInitializing] = useState(true)
   const [renderingModes, setRenderingModes] = useState<RenderingMode[]>([])
-  const [clusteringEngine, setClusteringEngine] = useState<EnhancedWebGPUClusteringEngine | null>(null)
-  const [remoteClient, setRemoteClient] = useState<RemoteWebGPUClusteringClient | null>(null)
-  const [capabilities, setCapabilities] = useState<any>(null)
+  const [clusteringEngine, setClusteringEngine] = useState<WebGPUClusteringEngine | null>(null)
 
   const { toast } = useToast()
 
@@ -62,26 +75,11 @@ export function WebGPU3DViewer({
       try {
         setIsInitializing(true)
         
-        // Initialize enhanced clustering engine
-        const engine = new EnhancedWebGPUClusteringEngine([32, 18, 24], remoteServiceUrl)
+        // Initialize local WebGPU clustering engine
+        const engine = new WebGPUClusteringEngine([32, 18, 24])
         await new Promise(resolve => setTimeout(resolve, 200)) // Give time to initialize
         
-        // Initialize remote client for WebRTC capabilities
-        const client = new RemoteWebGPUClusteringClient(remoteServiceUrl, false) // Disable proxy mode for WebSocket
-        const remoteAvailable = await client.checkAvailability()
-        const remoteCaps = client.getCapabilities()
-        
         setClusteringEngine(engine)
-        
-        if (remoteAvailable) {
-          console.log('Remote client available, setting client state')
-          setRemoteClient(client)
-          setCapabilities(remoteCaps)
-        } else {
-          console.log('Remote client not available')
-          setRemoteClient(null)
-          setCapabilities(null)
-        }
         
         // Determine available rendering modes
         const modes: RenderingMode[] = [
@@ -89,21 +87,15 @@ export function WebGPU3DViewer({
             id: 'local',
             name: 'Local WebGPU',
             description: 'Client-side WebGPU clustering and Three.js rendering',
-            available: Boolean(engine.isAvailable() && !engine.isUsingRemote()),
-            recommended: Boolean(engine.isAvailable() && !engine.isUsingRemote())
+            available: Boolean(engine.isAvailable()),
+            recommended: true
           },
           {
             id: 'hybrid',
-            name: 'Hybrid GPU/CPU',
-            description: 'Server GPU clustering, client CPU rendering',
-            available: Boolean(remoteAvailable && remoteCaps?.modes?.hybrid?.available),
-            recommended: Boolean(!engine.isAvailable() || engine.isUsingRemote())
-          },
-          {
-            id: 'webrtc',
-            name: 'WebRTC Streaming',
-            description: 'Full server GPU rendering streamed to browser',
-            available: Boolean(remoteAvailable && remoteCaps?.modes?.webrtc_stream?.available)
+            name: 'CPU Fallback',
+            description: 'CPU-based rendering fallback',
+            available: true,
+            recommended: !engine.isAvailable()
           }
         ]
         
@@ -417,63 +409,30 @@ export function WebGPU3DViewer({
           </Card>
         </TabsContent>
 
-        {/* WebRTC Streaming Mode */}
-        <TabsContent value="webrtc" className="space-y-4">
-          <WebRTCGraphViewer
-            graphData={graphData}
-            remoteServiceUrl={remoteServiceUrl}
-            autoRefresh={true}
-            refreshInterval={1000}
-            onError={onError}
-          />
-        </TabsContent>
       </Tabs>
 
       {/* Service Status */}
-      {capabilities && (
+      {clusteringEngine && (
         <Card>
           <CardHeader>
             <CardTitle>Service Status</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="space-y-1">
                 <p className="font-medium">Local WebGPU</p>
-                <Badge variant={clusteringEngine?.isAvailable() && !clusteringEngine?.isUsingRemote() ? 'default' : 'secondary'}>
-                  {clusteringEngine?.isAvailable() && !clusteringEngine?.isUsingRemote() ? 'Available' : 'Not Available'}
+                <Badge variant={clusteringEngine?.isAvailable() ? 'default' : 'secondary'}>
+                  {clusteringEngine?.isAvailable() ? 'Available' : 'Not Available'}
                 </Badge>
               </div>
               
               <div className="space-y-1">
-                <p className="font-medium">Remote Service</p>
-                <Badge variant={remoteClient ? 'default' : 'secondary'}>
-                  {remoteClient ? 'Connected' : 'Disconnected'}
-                </Badge>
-              </div>
-              
-              <div className="space-y-1">
-                <p className="font-medium">Server GPU</p>
-                <Badge variant={capabilities?.gpuAcceleration?.rapidsAvailable ? 'default' : 'secondary'}>
-                  {capabilities?.gpuAcceleration?.rapidsAvailable ? 'RAPIDS' : 'CPU Only'}
-                </Badge>
-              </div>
-              
-              <div className="space-y-1">
-                <p className="font-medium">WebRTC</p>
-                <Badge variant={capabilities?.modes?.webrtc_stream?.available ? 'default' : 'secondary'}>
-                  {capabilities?.modes?.webrtc_stream?.available ? 'Available' : 'Not Available'}
+                <p className="font-medium">Clustering</p>
+                <Badge variant={clusteringEngine?.isAvailable() ? 'default' : 'secondary'}>
+                  {clusteringEngine?.isAvailable() ? 'GPU Accelerated' : 'CPU Fallback'}
                 </Badge>
               </div>
             </div>
-            
-            {capabilities && (
-              <div className="mt-4 pt-4 border-t text-xs text-gray-600">
-                <p>
-                  Cluster dimensions: {capabilities.clusterDimensions?.join(' × ')} 
-                  ({capabilities.maxClusterCount?.toLocaleString()} total clusters)
-                </p>
-              </div>
-            )}
           </CardContent>
         </Card>
       )}

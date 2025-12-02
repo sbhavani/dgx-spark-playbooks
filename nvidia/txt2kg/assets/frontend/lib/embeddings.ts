@@ -1,3 +1,19 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 import { getShouldStopEmbeddings, resetStopEmbeddings } from "@/app/api/stop-embeddings/route";
 
 /**
@@ -8,7 +24,7 @@ export class EmbeddingsService {
   private apiUrl: string;
   private modelId: string;
   private static instance: EmbeddingsService;
-  private dimension: number = 768; // Dimension for gte-modernbert-base
+  private dimension: number = 384; // Dimension for all-MiniLM-L6-v2 (default model)
   private useNvidiaApi: boolean = false;
   private nvidiaApiKey: string = '';
   private nvidiaModel: string = 'nvidia/llama-3.2-nv-embedqa-1b-v2';
@@ -16,7 +32,7 @@ export class EmbeddingsService {
 
   private constructor() {
     this.apiUrl = process.env.EMBEDDINGS_API_URL || 'http://localhost:8000';
-    this.modelId = process.env.EMBEDDINGS_MODEL_ID || 'Alibaba-NLP/gte-modernbert-base';
+    this.modelId = process.env.EMBEDDINGS_MODEL_ID || 'all-MiniLM-L6-v2';
     
     // Always get NVIDIA API key from environment variables
     this.nvidiaApiKey = process.env.NVIDIA_API_KEY || '';

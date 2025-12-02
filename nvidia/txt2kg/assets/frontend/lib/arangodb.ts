@@ -1,3 +1,19 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 import { Database, aql } from 'arangojs';
 
 /**
@@ -9,6 +25,7 @@ export class ArangoDBService {
   private static instance: ArangoDBService;
   private collectionName: string = 'entities';
   private edgeCollectionName: string = 'relationships';
+  private documentsCollectionName: string = 'processed_documents';
 
   private constructor() {}
 
@@ -72,6 +89,16 @@ export class ArangoDBService {
         await this.db.collection(this.edgeCollectionName).ensureIndex({
           type: 'persistent',
           fields: ['type']
+        });
+      }
+
+      // Create documents collection if it doesn't exist
+      if (!collectionNames.includes(this.documentsCollectionName)) {
+        await this.db.createCollection(this.documentsCollectionName);
+        await this.db.collection(this.documentsCollectionName).ensureIndex({
+          type: 'persistent',
+          fields: ['documentName'],
+          unique: true
         });
       }
 
@@ -251,6 +278,88 @@ export class ArangoDBService {
   }
 
   /**
+   * Check if a document has already been processed and stored in ArangoDB
+   * @param documentName - Name of the document to check
+   * @returns Promise resolving to true if document exists, false otherwise
+   */
+  public async isDocumentProcessed(documentName: string): Promise<boolean> {
+    if (!this.db) {
+      throw new Error('ArangoDB connection not initialized. Call initialize() first.');
+    }
+
+    try {
+      const existing = await this.executeQuery(
+        `FOR d IN ${this.documentsCollectionName} FILTER d.documentName == @documentName RETURN d`,
+        { documentName }
+      );
+      return existing.length > 0;
+    } catch (error) {
+      console.error('Error checking if document is processed:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Mark a document as processed in ArangoDB
+   * @param documentName - Name of the document
+   * @param tripleCount - Number of triples stored for this document
+   * @returns Promise resolving when the document is marked as processed
+   */
+  public async markDocumentAsProcessed(documentName: string, tripleCount: number): Promise<void> {
+    if (!this.db) {
+      throw new Error('ArangoDB connection not initialized. Call initialize() first.');
+    }
+
+    try {
+      const collection = this.db.collection(this.documentsCollectionName);
+      await collection.save({
+        documentName,
+        tripleCount,
+        processedAt: new Date().toISOString()
+      });
+      console.log(`Marked document "${documentName}" as processed with ${tripleCount} triples`);
+    } catch (error) {
+      // If error is due to unique constraint (document already exists), update it instead
+      if (error && typeof error === 'object' && 'errorNum' in error && error.errorNum === 1210) {
+        console.log(`Document "${documentName}" already exists, updating...`);
+        await this.executeQuery(
+          `FOR d IN ${this.documentsCollectionName} 
+           FILTER d.documentName == @documentName 
+           UPDATE d WITH { tripleCount: @tripleCount, processedAt: @processedAt } IN ${this.documentsCollectionName}`,
+          { 
+            documentName, 
+            tripleCount,
+            processedAt: new Date().toISOString()
+          }
+        );
+      } else {
+        console.error('Error marking document as processed:', error);
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Get all processed documents from ArangoDB
+   * @returns Promise resolving to array of processed document names
+   */
+  public async getProcessedDocuments(): Promise<string[]> {
+    if (!this.db) {
+      throw new Error('ArangoDB connection not initialized. Call initialize() first.');
+    }
+
+    try {
+      const documents = await this.executeQuery(
+        `FOR d IN ${this.documentsCollectionName} RETURN d.documentName`
+      );
+      return documents;
+    } catch (error) {
+      console.error('Error getting processed documents:', error);
+      return [];
+    }
+  }
+
+  /**
    * Get graph data in a format compatible with the existing application
    * @returns Promise resolving to nodes and relationships
    */
@@ -398,13 +507,185 @@ export class ArangoDBService {
   }
 
   /**
+   * Perform graph traversal to find relevant triples using ArangoDB's native graph capabilities
+   * @param keywords - Array of keywords to search for
+   * @param maxDepth - Maximum traversal depth (default: 2)
+   * @param maxResults - Maximum number of results to return (default: 100)
+   * @returns Promise resolving to array of triples with relevance scores
+   */
+  public async graphTraversal(
+    keywords: string[],
+    maxDepth: number = 2,
+    maxResults: number = 100
+  ): Promise<Array<{
+    subject: string;
+    predicate: string;
+    object: string;
+    confidence: number;
+    depth?: number;
+  }>> {
+    console.log(`[ArangoDB] graphTraversal called with keywords: ${keywords.join(', ')}`);
+
+    if (!this.db) {
+      throw new Error('ArangoDB connection not initialized. Call initialize() first.');
+    }
+
+    try {
+      // Build case-insensitive keyword matching conditions
+      const keywordConditions = keywords
+        .filter(kw => kw.length > 2)  // Filter short words
+        .map(kw => kw.toLowerCase());
+
+      if (keywordConditions.length === 0) {
+        return [];
+      }
+
+      // AQL query that:
+      // 1. Finds seed nodes matching keywords
+      // 2. Performs graph traversal from those nodes
+      // 3. Scores results based on keyword matches and depth
+      const query = `
+        // Find all entities matching keywords (case-insensitive)
+        LET seedNodes = (
+          FOR entity IN ${this.collectionName}
+            LET lowerName = LOWER(entity.name)
+            LET matches = (
+              FOR keyword IN @keywords
+                FILTER CONTAINS(lowerName, keyword)
+                RETURN 1
+            )
+            FILTER LENGTH(matches) > 0
+            RETURN {
+              node: entity,
+              matchCount: LENGTH(matches)
+            }
+        )
+
+        // Perform graph traversal from seed nodes
+        // Multi-hop: Extract ALL edges in each path, not just the final edge
+        LET traversalResults = (
+          FOR seed IN seedNodes
+            FOR v, e, p IN 0..@maxDepth ANY seed.node._id ${this.edgeCollectionName}
+              OPTIONS {uniqueVertices: 'global', bfs: true}
+              FILTER e != null
+
+              // Extract all edges from the path for multi-hop context
+              LET pathEdges = (
+                FOR edgeIdx IN 0..(LENGTH(p.edges) - 1)
+                  LET pathEdge = p.edges[edgeIdx]
+                  LET subjectEntity = DOCUMENT(pathEdge._from)
+                  LET objectEntity = DOCUMENT(pathEdge._to)
+                  LET subjectLower = LOWER(subjectEntity.name)
+                  LET objectLower = LOWER(objectEntity.name)
+                  LET predicateLower = LOWER(pathEdge.type)
+
+                  // Calculate score for this edge
+                  LET subjectMatches = (
+                    FOR kw IN @keywords
+                      FILTER CONTAINS(subjectLower, kw)
+                      LET isExact = (subjectLower == kw)
+                      RETURN isExact ? 1000 : (LENGTH(kw) * LENGTH(kw))
+                  )
+                  LET objectMatches = (
+                    FOR kw IN @keywords
+                      FILTER CONTAINS(objectLower, kw)
+                      LET isExact = (objectLower == kw)
+                      RETURN isExact ? 1000 : (LENGTH(kw) * LENGTH(kw))
+                  )
+                  LET predicateMatches = (
+                    FOR kw IN @keywords
+                      FILTER CONTAINS(predicateLower, kw)
+                      LET isExact = (predicateLower == kw)
+                      RETURN isExact ? 50 : (LENGTH(kw) * LENGTH(kw))
+                  )
+
+                  LET totalScore = SUM(subjectMatches) + SUM(objectMatches) + SUM(predicateMatches)
+
+                  // Depth penalty (edges earlier in path get slight boost)
+                  LET depthPenalty = 1.0 / (1.0 + (edgeIdx * 0.1))
+
+                  LET confidence = MIN([totalScore * depthPenalty / 1000.0, 1.0])
+
+                  FILTER confidence > 0
+
+                  RETURN {
+                    subject: subjectEntity.name,
+                    predicate: pathEdge.type,
+                    object: objectEntity.name,
+                    confidence: confidence,
+                    depth: edgeIdx,
+                    _edgeId: pathEdge._id,
+                    pathLength: LENGTH(p.edges)
+                  }
+              )
+
+              // Return all edges from this path
+              FOR pathTriple IN pathEdges
+                RETURN pathTriple
+        )
+
+        // Remove duplicates by edge ID and sort by confidence
+        LET uniqueResults = (
+          FOR result IN traversalResults
+            COLLECT edgeId = result._edgeId INTO groups
+            LET best = FIRST(
+              FOR g IN groups
+                SORT g.result.confidence DESC
+                RETURN g.result
+            )
+            RETURN best
+        )
+
+        // Sort by confidence and limit results
+        FOR result IN uniqueResults
+          SORT result.confidence DESC, result.depth ASC
+          LIMIT @maxResults
+          RETURN {
+            subject: result.subject,
+            predicate: result.predicate,
+            object: result.object,
+            confidence: result.confidence,
+            depth: result.depth,
+            pathLength: result.pathLength
+          }
+      `;
+
+      console.log(`[ArangoDB] Executing query with ${keywordConditions.length} keywords`);
+
+      const results = await this.executeQuery(query, {
+        keywords: keywordConditions,
+        maxDepth,
+        maxResults
+      });
+
+      console.log(`[ArangoDB] Multi-hop graph traversal found ${results.length} triples for keywords: ${keywords.join(', ')}`);
+
+      // Log top 10 results with confidence scores
+      if (results.length > 0) {
+        console.log('[ArangoDB] Top 10 triples by confidence (multi-hop):');
+        results.slice(0, 10).forEach((triple: any, idx: number) => {
+          const pathInfo = triple.pathLength ? ` path=${triple.pathLength}` : '';
+          console.log(`  ${idx + 1}. [conf=${triple.confidence?.toFixed(3)}] ${triple.subject} -> ${triple.predicate} -> ${triple.object} (depth=${triple.depth}${pathInfo})`);
+        });
+      } else {
+        console.log('[ArangoDB] No triples found!');
+      }
+
+      return results;
+    } catch (error) {
+      console.error('Error performing graph traversal in ArangoDB:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get basic info about the ArangoDB connection
    */
   public getDriverInfo(): Record<string, any> {
     if (!this.db) {
       return { status: 'not connected' };
     }
-    
+
     return {
       status: 'connected',
       url: this.db.url,

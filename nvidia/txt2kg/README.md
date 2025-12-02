@@ -54,8 +54,9 @@ The setup includes:
   - Document processing time scales with document size and complexity
 
 - **Rollback**: Stop and remove Docker containers, delete downloaded models if needed
-- **Last Updated**: 11/19/2025
-  - Updated GPU Visualization Service
+- **Last Updated**: 12/02/2025
+  - Knowledge graph search with multi-hop graph traversal
+  - Improved UI/UX
 
 ## Instructions
 

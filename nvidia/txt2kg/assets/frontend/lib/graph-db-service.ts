@@ -1,3 +1,19 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 import { Neo4jService } from './neo4j';
 import { ArangoDBService } from './arangodb';
 import type { Triple } from '@/types/graph';
@@ -163,6 +179,30 @@ export class GraphDBService {
       return this.neo4jService.getDriverInfo();
     } else {
       return this.arangoDBService.getDriverInfo();
+    }
+  }
+
+  /**
+   * Perform graph traversal using native database capabilities
+   * Only available for ArangoDB
+   */
+  public async graphTraversal(
+    keywords: string[],
+    maxDepth: number = 2,
+    maxResults: number = 100
+  ): Promise<Array<{
+    subject: string;
+    predicate: string;
+    object: string;
+    confidence: number;
+    depth?: number;
+  }>> {
+    if (this.activeDBType === 'arangodb') {
+      return await this.arangoDBService.graphTraversal(keywords, maxDepth, maxResults);
+    } else {
+      // Neo4j doesn't have this method yet, return empty array
+      console.warn('graphTraversal is only available for ArangoDB');
+      return [];
     }
   }
 

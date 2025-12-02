@@ -1,10 +1,25 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 "use client"
 
 import React, { useEffect, useRef, useState, useCallback } from "react"
 import type { Triple } from "@/utils/text-processing"
 import { Maximize2, Minimize2, Pause, Play, RefreshCw, ZoomIn, X, LayoutGrid } from "lucide-react"
 import { WebGPUClusteringEngine } from "@/utils/webgpu-clustering"
-import { EnhancedWebGPUClusteringEngine } from "@/utils/remote-webgpu-clustering"
 import * as d3 from 'd3'
 import * as THREE from 'three'
 
@@ -389,7 +404,7 @@ export function ForceGraphWrapper({
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Add WebGPU clustering engine ref
-  const clusteringEngineRef = useRef<any>(null); // Can be WebGPUClusteringEngine or EnhancedWebGPUClusteringEngine
+  const clusteringEngineRef = useRef<WebGPUClusteringEngine | null>(null);
   // Track if WebGPU clustering is available
   const [isClusteringAvailable, setIsClusteringAvailable] = useState<boolean>(false);
   // Track if clustering is enabled
@@ -1498,7 +1513,7 @@ export function ForceGraphWrapper({
     }
   }, [graphRef.current, jsonData]);
 
-  // Enhanced WebGPU clustering initialization for 3D views with remote fallback
+  // WebGPU clustering initialization for 3D views
   useEffect(() => {
     async function initClustering() {
       try {
@@ -1506,36 +1521,22 @@ export function ForceGraphWrapper({
         if (layoutType === '3d' && !clusteringEngineRef.current) {
           console.log("🔧 Initializing clustering engine for 3D view...");
           
-          // Use enhanced clustering engine for 3D views with remote fallback
-          const enhancedEngine = new EnhancedWebGPUClusteringEngine([32, 18, 24], 'http://localhost:8083');
+          // Use WebGPU clustering engine for 3D views
+          const engine = new WebGPUClusteringEngine([32, 18, 24]);
           
           console.log("⏳ Waiting for engine initialization...");
-          // Wait longer for proper initialization (remote service check takes time)
-          await new Promise(resolve => setTimeout(resolve, 2000)); // Increased timeout even more
+          await new Promise(resolve => setTimeout(resolve, 1000));
           
-          console.log("🔍 Checking enhanced engine availability...");
-          console.log("Engine available:", enhancedEngine.isAvailable());
-          console.log("Engine using remote:", enhancedEngine.isUsingRemote());
-          console.log("Engine capabilities:", enhancedEngine.getCapabilities());
+          console.log("🔍 Checking engine availability...");
+          console.log("Engine available:", engine.isAvailable());
           
           // Store the engine reference regardless of availability for debugging
-          clusteringEngineRef.current = enhancedEngine;
+          clusteringEngineRef.current = engine;
           
-          if (enhancedEngine.isAvailable()) {
+          if (engine.isAvailable()) {
             setIsClusteringAvailable(true);
-            
-            if (enhancedEngine.isUsingRemote()) {
-              console.log("✅ Using remote WebGPU clustering service for 3D view");
-              setUsingCpuFallback(false); // Remote GPU is available
-              
-              // Set up event listeners for remote clustering updates
-              enhancedEngine.on('clusteringComplete', (result: any) => {
-                console.log(`🚀 Remote clustering completed in ${result.processingTime}s`);
-              });
-            } else {
-              console.log("✅ Local WebGPU clustering engine initialized for 3D view");
-              setUsingCpuFallback(false); // Local WebGPU is also not CPU fallback
-            }
+            console.log("✅ Local WebGPU clustering engine initialized for 3D view");
+            setUsingCpuFallback(false);
             
             // Auto-enable clustering for large 3D graphs
             if (graphData && graphData.nodes && graphData.nodes.length > 200) {
@@ -2357,7 +2358,7 @@ export function ForceGraphWrapper({
       try {
         console.log("🔄 Applying GPU clustering to", graphData.nodes.length, "nodes");
         
-        // Use the correct updateNodePositions method from EnhancedWebGPUClusteringEngine
+        // Use the updateNodePositions method from WebGPUClusteringEngine
         const success = await clusteringEngineRef.current.updateNodePositions(
           graphData.nodes,
           graphData.links || []

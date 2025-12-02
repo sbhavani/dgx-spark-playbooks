@@ -14,6 +14,8 @@ const nextConfig = {
   experimental: {
     // webpackBuildWorker: true,
   },
+  // Enable standalone output for optimized Docker builds
+  output: 'standalone',
   // Make environment variables accessible to server components
   env: {
     NVIDIA_API_KEY: process.env.NVIDIA_API_KEY,

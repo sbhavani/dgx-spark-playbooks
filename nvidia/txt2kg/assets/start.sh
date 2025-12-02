@@ -1,4 +1,20 @@
 #!/bin/bash
+#
+# SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
 # Setup script for txt2kg project
 
@@ -78,6 +94,32 @@ else
   exit 1
 fi
 
+# Check Docker daemon permissions
+echo "Checking Docker permissions..."
+if ! docker info &> /dev/null; then
+  echo ""
+  echo "=========================================="
+  echo "ERROR: Docker Permission Denied"
+  echo "=========================================="
+  echo ""
+  echo "You don't have permission to connect to the Docker daemon."
+  echo ""
+  echo "To fix this, run one of the following:"
+  echo ""
+  echo "Option 1 (Recommended): Add your user to the docker group"
+  echo "  sudo usermod -aG docker \$USER"
+  echo "  newgrp docker"
+  echo ""
+  echo "Option 2: Run this script with sudo (not recommended)"
+  echo "  sudo ./start.sh"
+  echo ""
+  echo "After adding yourself to the docker group, you may need to log out"
+  echo "and log back in for the changes to take effect."
+  echo ""
+  exit 1
+fi
+echo "✓ Docker permissions OK"
+
 # Build the docker-compose command
 if [ "$USE_COMPLETE" = true ]; then
   CMD="$DOCKER_COMPOSE_CMD -f $(pwd)/deploy/compose/docker-compose.complete.yml"
@@ -121,6 +163,7 @@ echo "  2. Open http://localhost:3001 in your browser"
 echo "  3. Upload documents and start building your knowledge graph!"
 echo ""
 echo "Other options:"
+echo "  • Stop services: ./stop.sh"
 echo "  • Run frontend in dev mode: ./start.sh --dev-frontend"
 echo "  • Use complete stack: ./start.sh --complete"
 echo "  • View logs: docker compose logs -f"
