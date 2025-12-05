@@ -65,6 +65,8 @@ df -h .
   * Quantization process is memory-intensive and may fail on systems with insufficient GPU memory
   * Output files are large (several GB) and require adequate storage space
 * **Rollback**: Remove the output directory and any pulled Docker images to restore original state.
+* **Last Updated**: 12/05/2025
+  * Fix broken client CURL request in Step 8
 
 ## Instructions
 
@@ -213,7 +215,7 @@ curl -X POST http://localhost:8000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
-    "prompt": "What is artificial intelligence?",
+    "messages": [{"role": "user", "content": "What is artificial intelligence?"}],
     "max_tokens": 100,
     "temperature": 0.7,
     "stream": false
