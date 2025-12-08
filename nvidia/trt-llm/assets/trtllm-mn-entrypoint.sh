@@ -47,7 +47,7 @@ sed -i.bak \
 echo "root:root" | chpasswd
 
 # Configure SSH client for root to disable host key checks within *
-echo -e '\nHost *\n    StrictHostKeyChecking no\n    Port '$SSH_PORT'\n    UserKnownHostsFile=/dev/null' > /etc/ssh/ssh_config.d/trt-llm.conf && \
+printf '\nHost *\n    StrictHostKeyChecking no\n    Port %s\n    UserKnownHostsFile=/dev/null\n' "$SSH_PORT" > /etc/ssh/ssh_config.d/trt-llm.conf && \
     chmod 600 /etc/ssh/ssh_config.d/trt-llm.conf
 
 # Fix login session for container
