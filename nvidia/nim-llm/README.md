@@ -61,6 +61,8 @@ You'll launch a NIM container on your DGX Spark device to expose a GPU-accelerat
   * GPU memory requirements vary by model size
   * Container startup time depends on model loading
 * **Rollback:** Stop and remove containers with `docker stop <CONTAINER_NAME> && docker rm <CONTAINER_NAME>`. Remove cached models from `~/.cache/nim` if disk space recovery is needed.
+* **Last Updated:** 12/09/2025
+  * Update docker container version to cuda:13.0.1-devel-ubuntu24.04
 
 ## Instructions
 
@@ -71,7 +73,7 @@ Check that your system meets the basic requirements for running GPU-enabled cont
 ```bash
 nvidia-smi
 docker --version
-docker run --rm --gpus all nvidia/cuda:12.0-base-ubuntu20.04 nvidia-smi
+docker run --rm --gpus all nvcr.io/nvidia/cuda:13.0.1-devel-ubuntu24.04 nvidia-smi
 ```
 
 ### Step 2. Configure NGC authentication
@@ -91,6 +93,9 @@ Choose a specific LLM NIM from NGC and set up local caching for model assets.
 export CONTAINER_NAME="nim-llm-demo"
 export IMG_NAME="nvcr.io/nim/meta/llama-3.1-8b-instruct-dgx-spark:latest"
 export LOCAL_NIM_CACHE=~/.cache/nim
+export LOCAL_NIM_WORKSPACE=~/.local/share/nim/workspace
+mkdir -p "$LOCAL_NIM_WORKSPACE"
+chmod -R a+w "$LOCAL_NIM_WORKSPACE"
 mkdir -p "$LOCAL_NIM_CACHE"
 chmod -R a+w "$LOCAL_NIM_CACHE"
 ```
@@ -101,12 +106,11 @@ Start the containerized LLM service with GPU acceleration and proper resource al
 
 ```bash
 docker run -it --rm --name=$CONTAINER_NAME \
-  --runtime=nvidia \
   --gpus all \
   --shm-size=16GB \
   -e NGC_API_KEY=$NGC_API_KEY \
   -v "$LOCAL_NIM_CACHE:/opt/nim/.cache" \
-  -u $(id -u) \
+  -v "$LOCAL_NIM_WORKSPACE:/opt/nim/workspace" \
   -p 8000:8000 \
   $IMG_NAME
 ```

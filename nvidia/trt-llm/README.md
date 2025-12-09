@@ -18,18 +18,17 @@
 - [Run on two Sparks](#run-on-two-sparks)
   - [Step 1. Configure network connectivity](#step-1-configure-network-connectivity)
   - [Step 2. Configure Docker permissions](#step-2-configure-docker-permissions)
-  - [Step 3. Install NVIDIA Container Toolkit & setup Docker environment](#step-3-install-nvidia-container-toolkit-setup-docker-environment)
-  - [Step 4. Enable resource advertising](#step-4-enable-resource-advertising)
-  - [Step 5. Initialize Docker Swarm](#step-5-initialize-docker-swarm)
-  - [Step 6. Join worker nodes and deploy](#step-6-join-worker-nodes-and-deploy)
-  - [Step 7. Create hosts file](#step-7-create-hosts-file)
-  - [Step 8. Find your Docker container ID](#step-8-find-your-docker-container-id)
-  - [Step 9. Generate configuration file](#step-9-generate-configuration-file)
-  - [Step 10. Download model](#step-10-download-model)
-  - [Step 11. Serve the model](#step-11-serve-the-model)
-  - [Step 12. Validate API server](#step-12-validate-api-server)
-  - [Step 14. Cleanup and rollback](#step-14-cleanup-and-rollback)
-  - [Step 15. Next steps](#step-15-next-steps)
+  - [Step 3. Create OpenMPI hostfile](#step-3-create-openmpi-hostfile)
+  - [Step 4. Start containers on both nodes](#step-4-start-containers-on-both-nodes)
+  - [Step 5. Verify containers are running](#step-5-verify-containers-are-running)
+  - [Step 6. Copy hostfile to primary container](#step-6-copy-hostfile-to-primary-container)
+  - [Step 7. Save container reference](#step-7-save-container-reference)
+  - [Step 8. Generate configuration file](#step-8-generate-configuration-file)
+  - [Step 9. Download model](#step-9-download-model)
+  - [Step 10. Serve the model](#step-10-serve-the-model)
+  - [Step 11. Validate API server](#step-11-validate-api-server)
+  - [Step 12. Cleanup and rollback](#step-12-cleanup-and-rollback)
+  - [Step 13. Next steps](#step-13-next-steps)
 - [Open WebUI for TensorRT-LLM](#open-webui-for-tensorrt-llm)
   - [Step 1. Set up the prerequisites to use Open WebUI with TRT-LLM](#step-1-set-up-the-prerequisites-to-use-open-webui-with-trt-llm)
   - [Step 2. Launch Open WebUI container](#step-2-launch-open-webui-container)
@@ -438,132 +437,98 @@ If you see a permission denied error (something like permission denied while try
 sudo usermod -aG docker $USER
 newgrp docker
 ```
-### Step 3. Install NVIDIA Container Toolkit & setup Docker environment
 
-Ensure the NVIDIA drivers and the NVIDIA Container Toolkit are installed on each node (both manager and workers) that will provide GPU resources. This package enables Docker containers to access the host's GPU hardware. Ensure you complete the [installation steps](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html), including the [Docker configuration](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker) for NVIDIA Container Toolkit.
+Repeat this step on both nodes.
 
-### Step 4. Enable resource advertising
+### Step 3. Create OpenMPI hostfile
 
-First, find your GPU UUID by running:
-```bash
-nvidia-smi -a | grep UUID
-```
-
-Next, modify the Docker daemon configuration to advertise the GPU to Swarm. Edit **/etc/docker/daemon.json**:
+Create a hostfile with the IP addresses of both nodes for MPI operations. On each node, get the IP address of your network interface:
 
 ```bash
-sudo nano /etc/docker/daemon.json
+ip a show enp1s0f0np0
 ```
 
-Add or modify the file to include the nvidia runtime and GPU UUID (replace **GPU-45cbf7b3-f919-7228-7a26-b06628ebefa1** with your actual GPU UUID):
-
-```json
-{
-  "runtimes": {
-    "nvidia": {
-      "path": "nvidia-container-runtime",
-      "runtimeArgs": []
-    }
-  },
-  "default-runtime": "nvidia",
-  "node-generic-resources": [
-    "NVIDIA_GPU=GPU-45cbf7b3-f919-7228-7a26-b06628ebefa1"
-    ]
-}
-```
-
-Modify the NVIDIA Container Runtime to advertise the GPUs to the Swarm by uncommenting the swarm-resource line in the **config.toml** file. You can do this either with your preferred text editor (e.g., vim, nano...) or with the following command:
-```bash
-sudo sed -i 's/^#\s*\(swarm-resource\s*=\s*".*"\)/\1/' /etc/nvidia-container-runtime/config.toml
-```
-
-Finally, restart the Docker daemon to apply all changes:
-```bash
-sudo systemctl restart docker
-```
-
-Repeat these steps on all nodes.
-
-### Step 5. Initialize Docker Swarm
-
-On whichever node you want to use as primary, run the following swarm initialization command
-```bash
-docker swarm init --advertise-addr $(ip -o -4 addr show enp1s0f0np0 | awk '{print $4}' | cut -d/ -f1) $(ip -o -4 addr show enp1s0f1np1 | awk '{print $4}' | cut -d/ -f1)
-```
-
-The typical output of the above would be similar to the following:
-```
-Swarm initialized: current node (node-id) is now a manager.
-
-To add a worker to this swarm, run the following command:
-
-    docker swarm join --token <worker-token> <advertise-addr>:<port>
-
-To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
-```
-
-### Step 6. Join worker nodes and deploy
-
-Now we can proceed with setting up the worker nodes of your cluster. Repeat these steps on all worker nodes.
-
-Run the command suggested by the docker swarm init on each worker node to join the Docker swarm
-```bash
-docker swarm join --token <worker-token> <advertise-addr>:<port>
-```
-
-On both nodes, download the [**trtllm-mn-entrypoint.sh**](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main/nvidia/trt-llm/assets/trtllm-mn-entrypoint.sh) script into your home directory and run the following command to make it executable:
+Or if you're using the second interface:
 
 ```bash
-chmod +x $HOME/trtllm-mn-entrypoint.sh
+ip a show enp1s0f1np1
 ```
 
-On your primary node, deploy the TRT-LLM multi-node stack by downloading the [**docker-compose.yml**](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main/nvidia/trt-llm/assets/docker-compose.yml) file into your home directory and running the following command:
+Look for the `inet` line to find the IP address (e.g., `192.168.1.10/24`).
+
+On your primary node, create the hostfile `~/openmpi-hostfile` with the collected IPs:
+
 ```bash
-docker stack deploy -c $HOME/docker-compose.yml trtllm-multinode
+cat > ~/openmpi-hostfile <<EOF
+192.168.1.10
+192.168.1.11
+EOF
 ```
-> [!NOTE]
-> Ensure you download both files into the same directory from which you are running the command.
 
-You can verify the status of your worker nodes using the following
+Replace the IP addresses with your actual node IPs.
+
+### Step 4. Start containers on both nodes
+
+On **each node** (primary and worker), run the following command to start the TRT-LLM container:
+
 ```bash
-docker stack ps trtllm-multinode
-```
-
-If everything is healthy, you should see a similar output to the following:
-```
-nvidia@spark-1b3b:~$ docker stack ps trtllm-multinode
-ID             NAME                            IMAGE                                          NODE         DESIRED STATE   CURRENT STATE             ERROR     PORTS
-oe9k5o6w41le   trtllm-multinode_trtllm.1       nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3   spark-1d84   Running         Running 2 minutes ago
-phszqzk97p83   trtllm-multinode_trtllm.2       nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3   spark-1b3b   Running         Running 2 minutes ago
+docker run -d --rm \
+  --name trtllm-multinode \
+  --gpus '"device=all"' \
+  --network host \
+  --ulimit memlock=-1 \
+  --ulimit stack=67108864 \
+  --device /dev/infiniband:/dev/infiniband \
+  -e UCX_NET_DEVICES="enp1s0f0np0,enp1s0f1np1" \
+  -e NCCL_SOCKET_IFNAME="enp1s0f0np0,enp1s0f1np1" \
+  -e OMPI_MCA_btl_tcp_if_include="enp1s0f0np0,enp1s0f1np1" \
+  -e OMPI_MCA_orte_default_hostfile="/etc/openmpi-hostfile" \
+  -e OMPI_MCA_rmaps_ppr_n_pernode="1" \
+  -e OMPI_ALLOW_RUN_AS_ROOT="1" \
+  -e OMPI_ALLOW_RUN_AS_ROOT_CONFIRM="1" \
+  -v ~/.cache/huggingface/:/root/.cache/huggingface/ \
+  -v ~/.ssh:/tmp/.ssh:ro \
+  nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3 \
+  sh -c "curl https://raw.githubusercontent.com/NVIDIA/dgx-spark-playbooks/refs/heads/main/nvidia/trt-llm/assets/trtllm-mn-entrypoint.sh | sh"
 ```
 
 > [!NOTE]
-> If your "Current state" is not "Running", see troubleshooting section for more information.
+> Make sure to run this command on **both** the primary and worker nodes.
 
-### Step 7. Create hosts file
+### Step 5. Verify containers are running
 
-You can check the available nodes using `docker node ls`
-```
-nvidia@spark-1b3b:~$ docker node ls
-ID                            HOSTNAME     STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
-hza2b7yisatqiezo33zx4in4i *   spark-1b3b   Ready     Active         Leader           28.3.3
-m1k22g3ktgnx36qz4jg5fzhr4     spark-1d84   Ready     Active                          28.3.3
-```
+On each node, verify the container is running:
 
-Generate a file containing all Docker Swarm node addresses for MPI operations, and then copy it over to your container:
 ```bash
-docker node ls --format '{{.ID}}' | xargs -n1 docker node inspect --format '{{ .Status.Addr }}' > ~/openmpi-hostfile
-docker cp ~/openmpi-hostfile $(docker ps -q -f name=trtllm-multinode):/etc/openmpi-hostfile
+docker ps
 ```
 
-### Step 8. Find your Docker container ID
+You should see output similar to:
 
-You can use `docker ps` to find your Docker container ID. Alternatively, you can save the container ID in a variable:
+```
+CONTAINER ID   IMAGE                                                 COMMAND                  CREATED          STATUS          PORTS     NAMES
+abc123def456   nvcr.io/nvidia/tensorrt-llm/release:1.0.0rc3         "sh -c 'curl https:…"    10 seconds ago   Up 8 seconds              trtllm-multinode
+```
+
+### Step 6. Copy hostfile to primary container
+
+On your primary node, copy the OpenMPI hostfile into the container:
+
 ```bash
-export TRTLLM_MN_CONTAINER=$(docker ps -q -f name=trtllm-multinode)
+docker cp ~/openmpi-hostfile trtllm-multinode:/etc/openmpi-hostfile
 ```
 
-### Step 9. Generate configuration file
+### Step 7. Save container reference
+
+On your primary node, save the container name in a variable for convenience:
+
+```bash
+export TRTLLM_MN_CONTAINER=trtllm-multinode
+```
+
+### Step 8. Generate configuration file
+
+On your primary node, generate the configuration file inside the container:
 
 ```bash
 docker exec $TRTLLM_MN_CONTAINER bash -c 'cat <<EOF > /tmp/extra-llm-api-config.yml
@@ -576,9 +541,10 @@ cuda_graph_config:
 EOF'
 ```
 
-### Step 10. Download model
+### Step 9. Download model
 
 We can download a model using the following command. You can replace `nvidia/Qwen3-235B-A22B-FP4` with the model of your choice.
+
 ```bash
 ## Need to specify huggingface token for model download.
 export HF_TOKEN=<your-huggingface-token>
@@ -589,7 +555,9 @@ docker exec \
   -it $TRTLLM_MN_CONTAINER bash -c 'mpirun -x HF_TOKEN bash -c "huggingface-cli download $MODEL"'
 ```
 
-### Step 11. Serve the model
+### Step 10. Serve the model
+
+On your primary node, start the TensorRT-LLM server:
 
 ```bash
 docker exec \
@@ -612,8 +580,9 @@ This will start the TensorRT-LLM server on port 8355. You can then make inferenc
 
 **Expected output:** Server startup logs and ready message.
 
-### Step 12. Validate API server
-Once the server is running, you can test it with a CURL request. Please ensure the CURL request is run on the primary node where you previously ran Step 11.
+### Step 11. Validate API server
+
+Once the server is running, you can test it with a CURL request. Run this on the primary node:
 
 ```bash
 curl -s http://localhost:8355/v1/chat/completions \
@@ -627,24 +596,24 @@ curl -s http://localhost:8355/v1/chat/completions \
 
 **Expected output:** JSON response with generated text completion.
 
-### Step 14. Cleanup and rollback
+### Step 12. Cleanup and rollback
 
-Stop and remove containers by using the following command on the leader node:
+Stop and remove containers on **each node**. SSH to each node and run:
 
 ```bash
-docker stack rm trtllm-multinode
+docker stop trtllm-multinode
 ```
 
 > [!WARNING]
-> This removes all inference data and performance reports. Copy `/opt/*perf-report.json` files before cleanup if needed.
+> This removes all inference data and performance reports. Copy any necessary files before cleanup if needed.
 
-Remove downloaded models to free disk space:
+Remove downloaded models to free disk space on each node:
 
 ```bash
 rm -rf $HOME/.cache/huggingface/hub/models--nvidia--Qwen3*
 ```
 
-### Step 15. Next steps
+### Step 13. Next steps
 
 You can now deploy other models on your DGX Spark cluster.
 
