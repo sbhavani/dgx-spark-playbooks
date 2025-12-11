@@ -51,6 +51,8 @@ ALl files required for fine-tuning are included in the folder in [the GitHub rep
 
 * **Time estimate:** 30-45 mins for setup and runing fine-tuning. Fine-tuning run time varies depending on model size 
 * **Risks:** Model downloads can be large (several GB), ARM64 package compatibility issues may require troubleshooting.
+* **Last Updated:** 11/07/2025
+  * Fix broken commands to access files from GitHub
 
 ## Instructions
 

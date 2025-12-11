@@ -73,7 +73,7 @@ all traffic automatically encrypted and NAT traversal handled transparently.
   * Network connectivity issues during initial setup
   * Authentication provider service dependencies
 * **Rollback**: Tailscale can be completely removed with `sudo apt remove tailscale` and all network routing automatically reverts to default settings.
-* **Last Updated:** 11/21/2025
+* **Last Updated:** 11/07/2025
   * Minor copyedits
 
 ## Instructions

@@ -55,6 +55,8 @@ These examples demonstrate how to accelerate large language model inference whil
 * **Duration:** 10-20 minutes for setup, additional time for model downloads (varies by network speed)
 * **Risks:** GPU memory exhaustion with large models, container registry access issues, network timeouts during downloads
 * **Rollback:** Stop Docker containers and optionally clean up downloaded model cache.
+* **Last Updated:** 10/12/2025
+  * First publication
 
 ## Instructions
 

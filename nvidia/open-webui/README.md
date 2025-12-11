@@ -38,6 +38,8 @@ You will have a fully functional Open WebUI installation running on your DGX Spa
 * **Risks**:
   * Docker permission issues may require user group changes and session restart
   * Large model downloads may take significant time depending on network speed
+* **Last Updated:** 10/28/2025
+  * Minor copyedits
 
 ## Set up Open WebUI on Remote Spark with NVIDIA Sync
 

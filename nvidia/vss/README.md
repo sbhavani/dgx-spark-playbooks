@@ -52,6 +52,9 @@ You will deploy NVIDIA's VSS AI Blueprint on NVIDIA Spark hardware with Blackwel
   * Network configuration conflicts if shared network already exists
   * Remote API endpoints may have rate limits or connectivity issues (hybrid deployment)
 * **Rollback:** Stop all containers with `docker compose down`, remove shared network with `docker network rm vss-shared-network`, and clean up temporary media directories.
+* **Last Updated:** 10/18/2025
+  * Update required OS and Driver versions
+  * Add instructions to fully local VSS deployment
 
 ## Instructions
 

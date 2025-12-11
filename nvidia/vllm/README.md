@@ -1,6 +1,6 @@
-# Install and Use vLLM for Inference
+# vLLM for Inference
 
-> Use a container or build vLLM from source for Spark
+> Install and use vLLM on DGX Spark
 
 ## Table of Contents
 
@@ -52,6 +52,8 @@ support for ARM64.
 * **Duration:** 30 minutes for Docker approach
 * **Risks:** Container registry access requires internal credentials
 * **Rollback:** Container approach is non-destructive.
+* **Last Updated:** 10/18/2025
+  * Minor copyedits
 
 ## Instructions
 

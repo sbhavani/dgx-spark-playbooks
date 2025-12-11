@@ -65,6 +65,8 @@ All required assets can be found [here on GitHub](https://github.com/NVIDIA/dgx-
   * Package dependency conflicts in Python environment
   * Performance validation may require architecture-specific optimizations
 * **Rollback:** Container environments provide isolation; remove containers and restart to reset state.
+* **Last Updated:** 11/07/2025
+  * Minor copyedits
 
 ## Instructions
 

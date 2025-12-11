@@ -52,6 +52,9 @@ All required files for this playbook can be found [here on GitHub](https://githu
 
 - **Rollback:** Network changes can be reversed by removing netplan configs or IP assignments
 
+- **Last Updated:** 11/24/2025
+  * Minor copyedits
+
 ## Run on Two Sparks
 
 ## Step 1. Ensure Same Username on Both Systems

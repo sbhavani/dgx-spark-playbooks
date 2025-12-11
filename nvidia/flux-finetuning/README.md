@@ -47,6 +47,8 @@ The setup includes:
   * Docker permission issues may require user group changes and session restart
   * The recipe would require hyperparameter tuning and a high-quality dataset for the best results
 * **Rollback**: Stop and remove Docker containers, delete downloaded models if needed.
+* **Last Updated:** 11/07/2025
+  * Minor copyedits
 
 ## Instructions
 

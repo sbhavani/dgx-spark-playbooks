@@ -46,7 +46,7 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [Text to Knowledge Graph](nvidia/txt2kg/)
 - [Unsloth on DGX Spark](nvidia/unsloth/)
 - [Vibe Coding in VS Code](nvidia/vibe-coding/)
-- [Install and Use vLLM for Inference](nvidia/vllm/)
+- [vLLM for Inference](nvidia/vllm/)
 - [VS Code](nvidia/vscode/)
 - [Build a Video Search and Summarization (VSS) Agent](nvidia/vss/)
 

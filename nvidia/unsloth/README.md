@@ -55,6 +55,9 @@ The Python test script can be found [here on GitHub](https://github.com/NVIDIA/d
   * CUDA toolkit configuration issues may prevent kernel compilation
   * Memory constraints on smaller models require batch size adjustments
 * **Rollback**: Uninstall packages with `pip uninstall unsloth torch torchvision`.
+* **Last Updated:** 11/07/2025
+  * Add required python dependencies
+  * Fix broken commands to access files on GitHub
 
 ## Instructions
 

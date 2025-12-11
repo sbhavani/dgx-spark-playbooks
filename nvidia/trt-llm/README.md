@@ -1,6 +1,6 @@
 # TRT LLM for Inference
 
-> Install and configure TRT LLM to run on a single Spark or on two Sparks
+> Install and use TensorRT-LLM on DGX Spark Sparks
 
 ## Table of Contents
 
@@ -117,6 +117,8 @@ Reminder: not all model architectures are supported for NVFP4 quantization.
 * **Duration**: 45-60 minutes for setup and API server deployment
 * **Risk level**: Medium - container pulls and model downloads may fail due to network issues
 * **Rollback**: Stop inference servers and remove downloaded models to free resources.
+* **Last Updated:** 10/18/2025
+  * Fix broken links
 
 ## Single Spark
 

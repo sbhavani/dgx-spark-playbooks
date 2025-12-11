@@ -41,9 +41,11 @@ and proper GPU topology detection.
 
 ## Time & risk
 
-- **Duration**: 30 minutes for setup and validation
-- **Risk level**: Medium - involves network configuration changes
-- **Rollback**: The NCCL & NCCL Tests repositories can be deleted from DGX Spark
+* **Duration**: 30 minutes for setup and validation
+* **Risk level**: Medium - involves network configuration changes
+* **Rollback**: The NCCL & NCCL Tests repositories can be deleted from DGX Spark
+* **Last Updated:** 10/12/2025
+  * First publication
 
 ## Run on two Sparks
 

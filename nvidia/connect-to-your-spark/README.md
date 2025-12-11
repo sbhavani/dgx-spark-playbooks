@@ -67,6 +67,8 @@ applications, and manage your DGX Spark remotely from your laptop.
 - **Time estimate:** 5-10 minutes
 - **Risk level:** Low - SSH setup involves credential configuration but no system-level changes to the DGX Spark device
 - **Rollback:** SSH key removal can be done by editing `~/.ssh/authorized_keys` on your DGX Spark.
+- **Last Updated:** 10/28/2025
+  * Minor copyedits
 
 ## Connect with NVIDIA Sync
 

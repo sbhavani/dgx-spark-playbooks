@@ -43,6 +43,8 @@ You'll have a fully configured DGX Spark system capable of:
 * **Duration:** About 30 minutes 
 * **Risks:** Data download slowness or failure due to network issues
 * **Rollback:** No permanent system changes made during normal usage.
+* **Last Updated:** 10/21/2025
+  * First publication
 
 ## Instructions
 

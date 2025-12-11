@@ -58,7 +58,7 @@ architectures.
 * **Estimated time:** 30-45 minutes (including AI Workbench installation if needed)
 * **Risk level:** Low - Uses pre-built containers and established APIs
 * **Rollback:** Simply delete the cloned project from AI Workbench to remove all components. No system changes are made outside the AI Workbench environment.
-* **Last Updated:** 11/21/2025
+* **Last Updated:** 10/28/2025
   * Minor copyedits
 
 ## Instructions

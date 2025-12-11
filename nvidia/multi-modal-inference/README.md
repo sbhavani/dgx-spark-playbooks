@@ -65,6 +65,9 @@ All necessary files can be found in the TensorRT repository [here on GitHub](htt
   - Remove downloaded models from HuggingFace cache
   - Then exit the container environment
 
+* **Last Updated:** 10/12/2025
+  * First publication
+
 ## Instructions
 
 ## Step 1. Launch the TensorRT container environment

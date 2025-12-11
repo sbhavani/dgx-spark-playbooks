@@ -44,12 +44,15 @@ the powerful GPU capabilities of your Spark device without complex network confi
 
 ## Time & risk
 
-**Duration**: 10-15 minutes for initial setup, 2-3 minutes for model download (varies by model size)
+* **Duration**: 10-15 minutes for initial setup, 2-3 minutes for model download (varies by model size)
 
-**Risk level**: Low - No system-level changes, easily reversible by stopping the custom app
+* **Risk level**: Low - No system-level changes, easily reversible by stopping the custom app
 
-**Rollback**: Stop the custom app in NVIDIA Sync and uninstall Ollama with standard package
+* **Rollback**: Stop the custom app in NVIDIA Sync and uninstall Ollama with standard package
 removal if needed
+
+* **Last Updated:** 10/12/2025
+  * First publication
 
 ## Instructions
 

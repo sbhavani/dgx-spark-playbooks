@@ -67,6 +67,8 @@ model adaptation for specialized domains while leveraging hardware-specific opti
 * **Duration:** 30-60 minutes for initial setup, 1-7 hours for training depending on model size and dataset.
 * **Risks:** Model downloads require significant bandwidth and storage. Training may consume substantial GPU memory and require parameter tuning for hardware constraints.
 * **Rollback:** Remove Docker containers and cloned repositories. Training checkpoints are saved locally and can be deleted to reclaim storage space.
+* **Last Updated:** 10/12/2025
+  * First publication
 
 ## Instructions
 

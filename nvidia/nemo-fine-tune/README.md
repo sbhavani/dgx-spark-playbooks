@@ -47,6 +47,8 @@ All necessary files for the playbook can be found [here on GitHub](https://githu
 * **Duration:** 45-90 minutes for complete setup and initial model fine-tuning
 * **Risks:** Model downloads can be large (several GB), ARM64 package compatibility issues may require troubleshooting, distributed training setup complexity increases with multi-node configurations
 * **Rollback:** Virtual environments can be completely removed; no system-level changes are made to the host system beyond package installations.
+* **Last Updated:** 10/22/2025
+  * Minor copyedits
 
 ## Instructions
 
