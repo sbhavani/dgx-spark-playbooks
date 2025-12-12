@@ -117,8 +117,8 @@ Reminder: not all model architectures are supported for NVFP4 quantization.
 * **Duration**: 45-60 minutes for setup and API server deployment
 * **Risk level**: Medium - container pulls and model downloads may fail due to network issues
 * **Rollback**: Stop inference servers and remove downloaded models to free resources.
-* **Last Updated:** 10/18/2025
-  * Fix broken links
+* **Last Updated:** 12/11/2025
+  * Improve TRT-LLM Run on Two Sparks workflow
 
 ## Single Spark
 

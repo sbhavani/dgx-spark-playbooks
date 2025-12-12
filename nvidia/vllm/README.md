@@ -52,8 +52,9 @@ support for ARM64.
 * **Duration:** 30 minutes for Docker approach
 * **Risks:** Container registry access requires internal credentials
 * **Rollback:** Container approach is non-destructive.
-* **Last Updated:** 10/18/2025
-  * Minor copyedits
+* **Last Updated:** 12/11/2025
+  * Upgrade vLLM container
+  * Improve cluster setup instructions
 
 ## Instructions
 
@@ -246,9 +247,9 @@ Start the vLLM inference server with tensor parallelism across both nodes.
 ```bash
 ## On Node 1, enter container and start server
 export VLLM_CONTAINER=$(docker ps --format '{{.Names}}' | grep -E '^node-[0-9]+$')
-docker exec -it $VLLM_CONTAINER /bin/bash
-vllm serve meta-llama/Llama-3.3-70B-Instruct \
---tensor-parallel-size 2 --max_model_len 2048
+docker exec -it $VLLM_CONTAINER /bin/bash -c '
+  vllm serve meta-llama/Llama-3.3-70B-Instruct \
+    --tensor-parallel-size 2 --max_model_len 2048'
 ```
 
 ## Step 9. Test 70B model inference
@@ -258,13 +259,13 @@ Verify the deployment with a sample inference request.
 ```bash
 ## Test from Node 1 or external client
 curl http://localhost:8000/v1/completions \
--H "Content-Type: application/json" \
--d '{
-"model": "meta-llama/Llama-3.3-70B-Instruct",
-"prompt": "Write a haiku about a GPU",
-"max_tokens": 32,
-"temperature": 0.7
-}'
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "meta-llama/Llama-3.3-70B-Instruct",
+    "prompt": "Write a haiku about a GPU",
+    "max_tokens": 32,
+    "temperature": 0.7
+  }'
 ```
 
 Expected output includes a generated haiku response.
@@ -288,10 +289,10 @@ Start the server with memory-constrained parameters for the large model.
 ```bash
 ## On Node 1, launch with restricted parameters
 export VLLM_CONTAINER=$(docker ps --format '{{.Names}}' | grep -E '^node-[0-9]+$')
-docker exec -it $VLLM_CONTAINER /bin/bash
-vllm serve hugging-quants/Meta-Llama-3.1-405B-Instruct-AWQ-INT4 \
---tensor-parallel-size 2 --max-model-len 256 --gpu-memory-utilization 1.0 \
---max-num-seqs 1 --max_num_batched_tokens 256
+docker exec -it $VLLM_CONTAINER /bin/bash -c '
+  vllm serve hugging-quants/Meta-Llama-3.1-405B-Instruct-AWQ-INT4 \
+    --tensor-parallel-size 2 --max-model-len 256 --gpu-memory-utilization 1.0 \
+    --max-num-seqs 1 --max_num_batched_tokens 256'
 ```
 
 ## Step 12. (Optional) Test 405B model inference
@@ -300,13 +301,13 @@ Verify the 405B deployment with constrained parameters.
 
 ```bash
 curl http://localhost:8000/v1/completions \
--H "Content-Type: application/json" \
--d '{
-"model": "hugging-quants/Meta-Llama-3.1-405B-Instruct-AWQ-INT4",
-"prompt": "Write a haiku about a GPU",
-"max_tokens": 32,
-"temperature": 0.7
-}'
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "hugging-quants/Meta-Llama-3.1-405B-Instruct-AWQ-INT4",
+    "prompt": "Write a haiku about a GPU",
+    "max_tokens": 32,
+    "temperature": 0.7
+  }'
 ```
 
 ## Step 13. Validate deployment
