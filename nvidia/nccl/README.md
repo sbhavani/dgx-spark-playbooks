@@ -44,14 +44,14 @@ and proper GPU topology detection.
 * **Duration**: 30 minutes for setup and validation
 * **Risk level**: Medium - involves network configuration changes
 * **Rollback**: The NCCL & NCCL Tests repositories can be deleted from DGX Spark
-* **Last Updated:** 10/12/2025
-  * First publication
+* **Last Updated:** 12/15/2025
+  * Use nccl latest version v2.28.9-1
 
 ## Run on two Sparks
 
 ## Step 1. Configure network connectivity
 
-Follow the network setup instructions from the Connect two Sparks playbook to establish connectivity between your DGX Spark nodes.
+Follow the network setup instructions from the [Connect two Sparks](https://build.nvidia.com/spark/connect-two-sparks/stacked-sparks) playbook to establish connectivity between your DGX Spark nodes.
 
 This includes:
 - Physical QSFP cable connection
@@ -67,7 +67,7 @@ architecture support:
 ```bash
 ## Install dependencies and build NCCL
 sudo apt-get update && sudo apt-get install -y libopenmpi-dev
-git clone -b v2.28.3-1 https://github.com/NVIDIA/nccl.git ~/nccl/
+git clone -b v2.28.9-1 https://github.com/NVIDIA/nccl.git ~/nccl/
 cd ~/nccl/
 make -j src.build NVCC_GENCODE="-gencode=arch=compute_121,code=sm_121"
 
@@ -80,7 +80,7 @@ export LD_LIBRARY_PATH="$NCCL_HOME/lib:$CUDA_HOME/lib64/:$MPI_HOME/lib:$LD_LIBRA
 
 ## Step 3. Build NCCL test suite
 
-Compile the NCCL test suite to validate communication performance:
+Compile the NCCL test suite on **both nodes**:
 
 ```bash
 ## Clone and build NCCL tests
@@ -91,7 +91,7 @@ make MPI=1
 
 ## Step 4. Find the active network interface and IP addresses
 
-Execute multi-node NCCL performance test using the active network interface. First, identify which network ports are available and up:
+First, identify which network ports are available and up:
 
 ```bash
 ## Check network port status
