@@ -42,7 +42,7 @@ FP8, FP4).
 - Hugging Face [token](https://huggingface.co/settings/tokens) configured with access to both FLUX.1 model repositories
 - At least 48GB VRAM available for FP16 Flux.1 Schnell operations
 - Verify GPU access: `nvidia-smi`
-- Check Docker GPU integration: `docker run --rm --gpus all nvidia/cuda:12.0-base-ubuntu20.04 nvidia-smi`
+- Check Docker GPU integration: `docker run --rm --gpus all nvcr.io/nvidia/pytorch:25.11-py3 nvidia-smi`
 
 ## Ancillary files
 
@@ -65,8 +65,9 @@ All necessary files can be found in the TensorRT repository [here on GitHub](htt
   - Remove downloaded models from HuggingFace cache
   - Then exit the container environment
 
-* **Last Updated:** 10/12/2025
-  * First publication
+* **Last Updated:** 12/15/2025
+  * Upgrade to latest pytorch container version nvcr.io/nvidia/pytorch:25.11-py3
+  * Add HuggingFace token setup instructions for model access
 
 ## Instructions
 
@@ -79,7 +80,7 @@ the TensorRT development environment with all required dependencies pre-installe
 docker run --gpus all --ipc=host --ulimit memlock=-1 \
 --ulimit stack=67108864 -it --rm --ipc=host \
 -v $HOME/.cache/huggingface:/root/.cache/huggingface \
-nvcr.io/nvidia/pytorch:25.10-py3
+nvcr.io/nvidia/pytorch:25.11-py3
 ```
 
 ## Step 2. Clone and set up TensorRT repository
@@ -105,6 +106,11 @@ pip install nvidia-modelopt[torch,onnx]
 sed -i '/^nvidia-modelopt\[.*\]=.*/d' requirements.txt
 pip3 install -r requirements.txt
 pip install onnxconverter_common
+```
+
+Set up your HuggingFace token to access open models.
+```bash
+export HF_TOKEN = <YOUR_HUGGING_FACE_TOKEN>
 ```
 
 ## Step 4. Run Flux.1 Dev model inference

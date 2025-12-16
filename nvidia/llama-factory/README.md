@@ -42,7 +42,7 @@ model adaptation for specialized domains while leveraging hardware-specific opti
 
 - CUDA 12.9 or newer version installed: `nvcc --version`
 
-- Docker installed and configured for GPU access: `docker run --gpus all nvidia/cuda:12.9-devel nvidia-smi`
+- Docker installed and configured for GPU access: `docker run --gpus all nvcr.io/nvidia/pytorch:25.11-py3 nvidia-smi`
 
 - Git installed: `git --version`
 
@@ -67,8 +67,8 @@ model adaptation for specialized domains while leveraging hardware-specific opti
 * **Duration:** 30-60 minutes for initial setup, 1-7 hours for training depending on model size and dataset.
 * **Risks:** Model downloads require significant bandwidth and storage. Training may consume substantial GPU memory and require parameter tuning for hardware constraints.
 * **Rollback:** Remove Docker containers and cloned repositories. Training checkpoints are saved locally and can be deleted to reclaim storage space.
-* **Last Updated:** 10/12/2025
-  * First publication
+* **Last Updated:** 12/15/2025
+  * Upgrade to latest pytorch container version nvcr.io/nvidia/pytorch:25.11-py3
 
 ## Instructions
 
@@ -91,7 +91,7 @@ Start the NVIDIA PyTorch container with GPU access and mount your workspace dire
 > This NVIDIA PyTorch container supports CUDA 13
 
 ```bash
-docker run --gpus all --ipc=host --ulimit memlock=-1 -it --ulimit stack=67108864 --rm -v "$PWD":/workspace nvcr.io/nvidia/pytorch:25.09-py3 bash
+docker run --gpus all --ipc=host --ulimit memlock=-1 -it --ulimit stack=67108864 --rm -v "$PWD":/workspace nvcr.io/nvidia/pytorch:25.11-py3 bash
 ```
 
 ## Step 3. Clone LLaMA Factory repository

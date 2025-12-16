@@ -51,8 +51,9 @@ ALl files required for fine-tuning are included in the folder in [the GitHub rep
 
 * **Time estimate:** 30-45 mins for setup and runing fine-tuning. Fine-tuning run time varies depending on model size 
 * **Risks:** Model downloads can be large (several GB), ARM64 package compatibility issues may require troubleshooting.
-* **Last Updated:** 11/07/2025
+* **Last Updated:** 12/15/2025
   * Fix broken commands to access files from GitHub
+  * Upgrade to latest pytorch container version nvcr.io/nvidia/pytorch:25.11-py3
 
 ## Instructions
 
@@ -76,7 +77,7 @@ newgrp docker
 ## Step 2.  Pull the latest Pytorch container
 
 ```bash
-docker pull nvcr.io/nvidia/pytorch:25.09-py3
+docker pull nvcr.io/nvidia/pytorch:25.11-py3
 ```
 
 ## Step 3. Launch Docker
@@ -85,19 +86,19 @@ docker pull nvcr.io/nvidia/pytorch:25.09-py3
 docker run --gpus all -it --rm --ipc=host \
 -v $HOME/.cache/huggingface:/root/.cache/huggingface \
 -v ${PWD}:/workspace -w /workspace \
-nvcr.io/nvidia/pytorch:25.09-py3
+nvcr.io/nvidia/pytorch:25.11-py3
 ```
 
 ## Step 4. Install dependencies inside the container
 
 ```bash
-pip install transformers peft datasets "trl==0.19.1" "bitsandbytes==0.48"
+pip install transformers peft datasets trl bitsandbytes
 ```
 
 ## Step 5: Authenticate with Huggingface
 
 ```bash
-huggingface-cli login
+hf auth login
 ##<input your huggingface token.
 ##<Enter n for git credential>
 ```

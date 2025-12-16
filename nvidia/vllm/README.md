@@ -53,16 +53,16 @@ support for ARM64.
 * **Risks:** Container registry access requires internal credentials
 * **Rollback:** Container approach is non-destructive.
 * **Last Updated:** 12/11/2025
-  * Upgrade vLLM container
-  * Improve cluster setup instructions
+  * Upgrade vLLM container to latest version nvcr.io/nvidia/vllm:25.11-py3
+  * Improve cluster setup instructions for Run on two Sparks
 
 ## Instructions
 
 ## Step 1. Pull vLLM container image
 
-Find the latest container build from https://catalog.ngc.nvidia.com/orgs/nvidia/containers/vllm?version=25.09-py3
+Find the latest container build from https://catalog.ngc.nvidia.com/orgs/nvidia/containers/vllm?version=25.11-py3
 ```
-docker pull nvcr.io/nvidia/vllm:25.09-py3
+docker pull nvcr.io/nvidia/vllm:25.11-py3
 ```
 
 ## Step 2. Test vLLM in container
@@ -71,7 +71,7 @@ Launch the container and start vLLM server with a test model to verify basic fun
 
 ```bash
 docker run -it --gpus all -p 8000:8000 \
-nvcr.io/nvidia/vllm:25.09-py3 \
+nvcr.io/nvidia/vllm:25.11-py3 \
 vllm serve "Qwen/Qwen2.5-Math-1.5B-Instruct"
 ```
 
@@ -99,7 +99,7 @@ Expected response should contain `"content": "204"` or similar mathematical calc
 For container approach (non-destructive):
 
 ```bash
-docker rm $(docker ps -aq --filter ancestor=nvcr.io/nvidia/vllm:25.09-py3)
+docker rm $(docker ps -aq --filter ancestor=nvcr.io/nvidia/vllm:25.11-py3)
 docker rmi nvcr.io/nvidia/vllm
 ```
 

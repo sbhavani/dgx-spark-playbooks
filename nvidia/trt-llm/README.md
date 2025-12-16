@@ -702,7 +702,7 @@ docker rmi ghcr.io/open-webui/open-webui:main
 | Container pull timeout | Network connectivity issues | Retry pull or use local mirror |
 | Import tensorrt_llm fails | Container runtime issues | Restart Docker daemon and retry |
 
-## Common Issues for running on two Starks
+## Common Issues for running on two Sparks
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|

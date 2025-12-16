@@ -51,7 +51,7 @@ This quantization approach aims to preserve accuracy while providing significant
 Verify your setup:
 ```bash
 ## Check Docker GPU access
-docker run --rm --gpus all nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev nvidia-smi
+docker run --rm --gpus all nvcr.io/nvidia/tensorrt-llm/release:1.2.0rc5 nvidia-smi
 
 ## Verify sufficient disk space
 df -h .
@@ -65,8 +65,9 @@ df -h .
   * Quantization process is memory-intensive and may fail on systems with insufficient GPU memory
   * Output files are large (several GB) and require adequate storage space
 * **Rollback**: Remove the output directory and any pulled Docker images to restore original state.
-* **Last Updated**: 12/05/2025
+* **Last Updated**: 12/15/2025
   * Fix broken client CURL request in Step 8
+  * Update ModelOptimizer project name
 
 ## Instructions
 
@@ -119,7 +120,7 @@ docker run --rm -it --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=671
   -e HF_TOKEN=$HF_TOKEN \
   nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev \
   bash -c "
-    git clone -b 0.35.0 --single-branch https://github.com/NVIDIA/TensorRT-Model-Optimizer.git /app/TensorRT-Model-Optimizer && \
+    git clone -b 0.35.0 --single-branch https://github.com/NVIDIA/Model-Optimizer.git /app/TensorRT-Model-Optimizer && \
     cd /app/TensorRT-Model-Optimizer && pip install -e '.[dev]' && \
     export ROOT_SAVE_PATH='/workspace/output_models' && \
     /app/TensorRT-Model-Optimizer/examples/llm_ptq/scripts/huggingface_example.sh \

@@ -47,8 +47,8 @@ All necessary files for the playbook can be found [here on GitHub](https://githu
 * **Duration:** 45-90 minutes for complete setup and initial model fine-tuning
 * **Risks:** Model downloads can be large (several GB), ARM64 package compatibility issues may require troubleshooting, distributed training setup complexity increases with multi-node configurations
 * **Rollback:** Virtual environments can be completely removed; no system-level changes are made to the host system beyond package installations.
-* **Last Updated:** 10/22/2025
-  * Minor copyedits
+* **Last Updated:** 12/15/2025
+  * Upgrade to latest pytorch container version nvcr.io/nvidia/pytorch:25.11-py3
 
 ## Instructions
 
@@ -73,7 +73,7 @@ free -h
 ## Step 2. Get the container image
 
 ```bash
-docker pull nvcr.io/nvidia/pytorch:25.08-py3
+docker pull nvcr.io/nvidia/pytorch:25.11-py3
 ```
 
 ## Step 3. Launch Docker
@@ -84,7 +84,7 @@ docker run \
   --ulimit memlock=-1 \
   -it --ulimit stack=67108864 \
   --entrypoint /usr/bin/bash \
-  --rm nvcr.io/nvidia/pytorch:25.08-py3
+  --rm nvcr.io/nvidia/pytorch:25.11-py3
 ```
 
 ## Step 4. Install package management tools
