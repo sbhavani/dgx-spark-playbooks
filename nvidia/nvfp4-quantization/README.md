@@ -51,7 +51,7 @@ This quantization approach aims to preserve accuracy while providing significant
 Verify your setup:
 ```bash
 ## Check Docker GPU access
-docker run --rm --gpus all nvcr.io/nvidia/tensorrt-llm/release:1.2.0rc5 nvidia-smi
+docker run --rm --gpus all nvcr.io/nvidia/tensorrt-llm/release:spark-single-gpu-dev nvidia-smi
 
 ## Verify sufficient disk space
 df -h .
