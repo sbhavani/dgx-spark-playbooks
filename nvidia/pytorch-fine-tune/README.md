@@ -51,9 +51,10 @@ ALl files required for fine-tuning are included in the folder in [the GitHub rep
 
 * **Time estimate:** 30-45 mins for setup and runing fine-tuning. Fine-tuning run time varies depending on model size 
 * **Risks:** Model downloads can be large (several GB), ARM64 package compatibility issues may require troubleshooting.
-* **Last Updated:** 12/15/2025
+* **Last Updated:** 12/16/2025
   * Fix broken commands to access files from GitHub
   * Upgrade to latest pytorch container version nvcr.io/nvidia/pytorch:25.11-py3
+  * Temporarily remove Llama3_70B_qLoRA_finetuning command to investigate slowness.
 
 ## Instructions
 
@@ -115,11 +116,6 @@ cd dgx-spark-playbooks/nvidia/pytorch-fine-tune/assets
 To run LoRA on Llama3-8B use the following command:
 ```bash
 python Llama3_8B_LoRA_finetuning.py
-```
-
-To run qLoRA fine-tuning on llama3-70B use the following command:
-```bash
-python Llama3_70B_qLoRA_finetuning.py
 ```
 
 To run full fine-tuning on llama3-3B use the following command:
