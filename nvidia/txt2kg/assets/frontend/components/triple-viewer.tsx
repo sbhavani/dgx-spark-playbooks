@@ -19,8 +19,18 @@
 import { useState, useEffect, useRef } from "react"
 import { useDocuments } from "@/contexts/document-context"
 import type { Triple } from "@/utils/text-processing"
-import { Pencil, Trash2, Plus, Download, ChevronDown, FileJson, FileText, List, Network, Check, X, Database } from "lucide-react"
+import { Pencil, Trash2, Plus, Download, ChevronDown, FileJson, FileText, List, Network, Check, X, Database, AlertCircle } from "lucide-react"
 import { TripleEditor } from "./triple-editor"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 // Add this new EntityEditor component before the TripleViewer component
 interface EntityEditorProps {
@@ -92,6 +102,12 @@ export function TripleViewer() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const dropdownRef = useRef<HTMLDivElement>(null)
+  
+  // Delete confirmation dialog state
+  const [showDeleteTripleDialog, setShowDeleteTripleDialog] = useState(false)
+  const [tripleToDelete, setTripleToDelete] = useState<{ index: number, triple: Triple } | null>(null)
+  const [showDeleteEntityDialog, setShowDeleteEntityDialog] = useState(false)
+  const [entityToDelete, setEntityToDelete] = useState<string | null>(null)
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -172,11 +188,18 @@ export function TripleViewer() {
   }
 
   const handleDeleteTriple = (index: number) => {
-    if (selectedDoc) {
-      if (confirm("Are you sure you want to delete this triple?")) {
-        deleteTriple(selectedDoc.id, index)
-      }
+    if (selectedDoc && selectedDoc.triples) {
+      setTripleToDelete({ index, triple: selectedDoc.triples[index] })
+      setShowDeleteTripleDialog(true)
     }
+  }
+  
+  const confirmDeleteTriple = () => {
+    if (selectedDoc && tripleToDelete !== null) {
+      deleteTriple(selectedDoc.id, tripleToDelete.index)
+    }
+    setShowDeleteTripleDialog(false)
+    setTripleToDelete(null)
   }
 
   const exportTriplesCSV = () => {
@@ -286,16 +309,22 @@ export function TripleViewer() {
 
   const handleDeleteEntity = (entity: string) => {
     if (!selectedDoc || !selectedDoc.triples) return;
-    
-    if (confirm(`Are you sure you want to delete the entity "${entity}"? This will remove all triples containing this entity.`)) {
+    setEntityToDelete(entity)
+    setShowDeleteEntityDialog(true)
+  };
+  
+  const confirmDeleteEntity = () => {
+    if (selectedDoc && selectedDoc.triples && entityToDelete) {
       // Filter out all triples that contain the entity
       const filteredTriples = selectedDoc.triples.filter(triple => 
-        triple.subject !== entity && triple.object !== entity
+        triple.subject !== entityToDelete && triple.object !== entityToDelete
       );
       
       // Update the document with the filtered triples
       updateTriples(selectedDoc.id, filteredTriples);
     }
+    setShowDeleteEntityDialog(false)
+    setEntityToDelete(null)
   };
 
   // Function to store triples in the Neo4j database
@@ -856,6 +885,66 @@ export function TripleViewer() {
           )}
         </>
       )}
+      
+      {/* Delete Triple Confirmation Dialog */}
+      <AlertDialog open={showDeleteTripleDialog} onOpenChange={setShowDeleteTripleDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-destructive" />
+              Delete Triple
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this triple?
+              {tripleToDelete && (
+                <div className="mt-3 p-3 bg-muted/50 rounded-lg text-sm font-mono">
+                  <span className="text-foreground">{normalizeText(tripleToDelete.triple.subject)}</span>
+                  <span className="text-muted-foreground mx-2">→</span>
+                  <span className="text-primary">{normalizeText(tripleToDelete.triple.predicate)}</span>
+                  <span className="text-muted-foreground mx-2">→</span>
+                  <span className="text-foreground">{normalizeText(tripleToDelete.triple.object)}</span>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setTripleToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeleteTriple}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete Triple
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      
+      {/* Delete Entity Confirmation Dialog */}
+      <AlertDialog open={showDeleteEntityDialog} onOpenChange={setShowDeleteEntityDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-destructive" />
+              Delete Entity
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the entity <strong>"{entityToDelete}"</strong>?
+              <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-lg text-amber-800 dark:text-amber-300 text-sm">
+                <strong>Warning:</strong> This will remove all triples containing this entity from the knowledge graph.
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setEntityToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeleteEntity}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete Entity
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

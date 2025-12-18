@@ -28,6 +28,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import type { Triple } from "@/utils/text-processing"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -44,6 +54,10 @@ export function DocumentsTable({ onTabChange }: DocumentsTableProps) {
   const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null)
   const [editableTriples, setEditableTriples] = useState<Triple[]>([])
   const [editingTripleIndex, setEditingTripleIndex] = useState<number | null>(null)
+  
+  // Delete confirmation dialog state
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<{ type: 'single' | 'multiple', docId?: string, docName?: string } | null>(null)
 
   // Use shift-select hook for document selection
   const {
@@ -63,11 +77,32 @@ export function DocumentsTable({ onTabChange }: DocumentsTableProps) {
 
   const handleDeleteSelected = () => {
     if (selectedDocuments.length === 0) return
-
-    if (confirm(`Are you sure you want to delete ${selectedDocuments.length} selected document(s)?`)) {
+    setDeleteTarget({ type: 'multiple' })
+    setShowDeleteDialog(true)
+  }
+  
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return
+    
+    if (deleteTarget.type === 'multiple') {
       deleteDocuments(selectedDocuments)
       setSelectedDocuments([])
+      toast({
+        title: "Documents Deleted",
+        description: `Successfully deleted ${selectedDocuments.length} document(s).`,
+        duration: 3000,
+      })
+    } else if (deleteTarget.type === 'single' && deleteTarget.docId) {
+      deleteDocuments([deleteTarget.docId])
+      toast({
+        title: "Document Deleted",
+        description: `"${deleteTarget.docName}" has been deleted.`,
+        duration: 3000,
+      })
     }
+    
+    setShowDeleteDialog(false)
+    setDeleteTarget(null)
   }
   
   const openTriplesDialog = (documentId: string) => {
@@ -304,9 +339,8 @@ export function DocumentsTable({ onTabChange }: DocumentsTableProps) {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation()
-                        if (confirm(`Are you sure you want to delete ${doc.name}?`)) {
-                          deleteDocuments([doc.id])
-                        }
+                        setDeleteTarget({ type: 'single', docId: doc.id, docName: doc.name })
+                        setShowDeleteDialog(true)
                       }}
                       className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
                       aria-label={`Delete ${doc.name}`}
@@ -438,6 +472,40 @@ export function DocumentsTable({ onTabChange }: DocumentsTableProps) {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-destructive" />
+              Delete {deleteTarget?.type === 'multiple' ? 'Documents' : 'Document'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget?.type === 'multiple' ? (
+                <>
+                  Are you sure you want to delete <strong>{selectedDocuments.length}</strong> selected document{selectedDocuments.length !== 1 ? 's' : ''}? 
+                  This action cannot be undone.
+                </>
+              ) : (
+                <>
+                  Are you sure you want to delete <strong>"{deleteTarget?.docName}"</strong>? 
+                  This action cannot be undone.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteTarget(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
