@@ -455,7 +455,11 @@ export function SettingsModal() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <button className="flex items-center justify-center gap-2 p-2 hover:bg-primary/10 rounded-full transition-colors" title="Settings">
+        <button 
+          className="flex items-center justify-center gap-2 p-2 hover:bg-primary/10 rounded-full transition-colors" 
+          aria-label="Open settings"
+          title="Settings"
+        >
           <Settings className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
         </button>
       </DialogTrigger>
