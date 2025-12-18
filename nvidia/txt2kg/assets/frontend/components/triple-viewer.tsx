@@ -59,11 +59,16 @@ function EntityEditor({ entity, onSave, onCancel }: EntityEditorProps) {
         <button
           type="button"
           onClick={onCancel}
+          aria-label="Cancel editing entity"
           className="p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted/30"
         >
           <X className="h-4 w-4" />
         </button>
-        <button type="submit" className="p-2 text-primary hover:text-primary/80 rounded-full hover:bg-primary/10">
+        <button 
+          type="submit" 
+          aria-label="Save entity changes"
+          className="p-2 text-primary hover:text-primary/80 rounded-full hover:bg-primary/10"
+        >
           <Check className="h-4 w-4" />
         </button>
       </div>
@@ -383,8 +388,11 @@ export function TripleViewer() {
           <label className="text-sm font-semibold text-foreground whitespace-nowrap">Select Document</label>
           <div className="relative w-64">
             <button
-              className="w-full flex items-center justify-between bg-card border border-border rounded-lg p-3 text-foreground text-sm hover:bg-muted/30 transition-colors"
+              className="w-full flex items-center justify-between bg-card border border-border rounded-lg p-3 text-foreground text-sm hover:bg-muted/30 transition-colors focus-visible:ring-2 focus-visible:ring-nvidia-green focus-visible:ring-offset-2"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              aria-haspopup="listbox"
+              aria-expanded={isDropdownOpen}
+              aria-label={`Select document. Currently selected: ${selectedDoc?.name || 'None'}`}
             >
               <span className="truncate">
                 {selectedDoc?.name || "Select document"}
@@ -400,13 +408,18 @@ export function TripleViewer() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                aria-hidden="true"
               >
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </button>
             
             {isDropdownOpen && (
-              <div className="absolute z-10 mt-1 w-full bg-card border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
+              <div 
+                className="absolute z-10 mt-1 w-full bg-card border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto"
+                role="listbox"
+                aria-label="Processed documents"
+              >
                 <div className="p-2 sticky top-0 bg-card border-b border-border">
                   <input
                     type="text"
@@ -425,6 +438,8 @@ export function TripleViewer() {
                   filteredDocs.map((doc) => (
                     <button
                       key={doc.id}
+                      role="option"
+                      aria-selected={doc.id === selectedDoc?.id}
                       className={`w-full text-left p-2 hover:bg-muted/30 text-sm ${
                         doc.id === selectedDoc?.id ? 'bg-primary/10 text-primary' : ''
                       }`}
@@ -657,6 +672,7 @@ export function TripleViewer() {
                               <button
                                 onClick={() => setEditingIndex(index)}
                                 className="p-1.5 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted/50 transition-colors"
+                                aria-label={`Edit triple: ${normalizeText(triple.subject)} ${normalizeText(triple.predicate)} ${normalizeText(triple.object)}`}
                                 title="Edit Triple"
                               >
                                 <Pencil className="h-3.5 w-3.5" />
@@ -664,6 +680,7 @@ export function TripleViewer() {
                               <button
                                 onClick={() => handleDeleteTriple(index)}
                                 className="p-1.5 text-muted-foreground hover:text-destructive rounded-full hover:bg-destructive/10 transition-colors"
+                                aria-label={`Delete triple: ${normalizeText(triple.subject)} ${normalizeText(triple.predicate)} ${normalizeText(triple.object)}`}
                                 title="Delete Triple"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
@@ -805,6 +822,7 @@ export function TripleViewer() {
                               <button
                                 onClick={() => setEditingEntityIndex(index)}
                                 className="p-1.5 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted/30"
+                                aria-label={`Edit entity: ${normalizeText(entity)}`}
                                 title="Edit Entity"
                               >
                                 <Pencil className="h-3.5 w-3.5" />
@@ -812,6 +830,7 @@ export function TripleViewer() {
                               <button
                                 onClick={() => handleDeleteEntity(entity)}
                                 className="p-1.5 text-muted-foreground hover:text-destructive rounded-full hover:bg-destructive/10"
+                                aria-label={`Delete entity: ${normalizeText(entity)}`}
                                 title="Delete Entity"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
