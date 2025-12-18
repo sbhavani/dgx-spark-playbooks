@@ -20,9 +20,8 @@
 
 # Parse command line arguments
 DEV_FRONTEND=false
-USE_COMPLETE=false
-USE_VECTOR_SEARCH=false
 USE_VLLM=false
+USE_VECTOR_SEARCH=false
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -30,16 +29,12 @@ while [[ $# -gt 0 ]]; do
       DEV_FRONTEND=true
       shift
       ;;
-    --complete)
-      USE_COMPLETE=true
+    --vllm)
+      USE_VLLM=true
       shift
       ;;
     --vector-search)
       USE_VECTOR_SEARCH=true
-      shift
-      ;;
-    --vllm)
-      USE_VLLM=true
       shift
       ;;
     --help|-h)
@@ -47,18 +42,17 @@ while [[ $# -gt 0 ]]; do
       echo ""
       echo "Options:"
       echo "  --dev-frontend    Run frontend in development mode (without Docker)"
-      echo "  --vllm            Use vLLM instead of Ollama (recommended for DGX Spark/GB300)"
-      echo "  --complete        Use complete stack (vLLM, Pinecone, Sentence Transformers)"
-      echo "  --vector-search   Enable vector search services in minimal stack (Qdrant + Sentence Transformers)"
+      echo "  --vllm            Use Neo4j + vLLM (GPU-accelerated, for DGX Spark/GB300)"
+      echo "  --vector-search   Enable vector search services (Qdrant + Sentence Transformers)"
       echo "  --help, -h        Show this help message"
       echo ""
-      echo "Default: Starts minimal stack (Neo4j + Ollama + Next.js frontend)"
+      echo "Default: Starts ArangoDB + Ollama"
       echo ""
       echo "Examples:"
-      echo "  ./start.sh                # Start minimal demo with Ollama"
-      echo "  ./start.sh --vllm         # Start with vLLM for GPU acceleration (DGX Spark)"
-      echo "  ./start.sh --vector-search # Start minimal demo + vector search services"
-      echo "  ./start.sh --complete     # Start with all optional services"
+      echo "  ./start.sh                       # Default: ArangoDB + Ollama"
+      echo "  ./start.sh --vllm                # Use Neo4j + vLLM (GPU)"
+      echo "  ./start.sh --vector-search       # Add Qdrant + Sentence Transformers"
+      echo "  ./start.sh --vllm --vector-search  # vLLM + vector search"
       exit 0
       ;;
     *)
@@ -134,35 +128,32 @@ if ! docker info &> /dev/null; then
 fi
 echo "✓ Docker permissions OK"
 
-# Build the docker-compose command
-if [ "$USE_COMPLETE" = true ]; then
-  CMD="$DOCKER_COMPOSE_CMD -f $(pwd)/deploy/compose/docker-compose.complete.yml"
-  echo "Using complete stack (Ollama, vLLM, Pinecone, Sentence Transformers)..."
-elif [ "$USE_VLLM" = true ]; then
-  if [ "$USE_VECTOR_SEARCH" = true ]; then
-    CMD="$DOCKER_COMPOSE_CMD -f $(pwd)/deploy/compose/docker-compose.neo4j-vllm.yml --profile vector-search"
-    echo "Using vLLM configuration + vector search (Neo4j + vLLM + Qdrant + Sentence Transformers)..."
-  else
-    CMD="$DOCKER_COMPOSE_CMD -f $(pwd)/deploy/compose/docker-compose.neo4j-vllm.yml"
-    echo "Using vLLM configuration (Neo4j + vLLM + Next.js frontend)..."
-    echo "  ⚡ GPU-accelerated inference with unified memory support for DGX Spark/GB300"
-  fi
+# Select compose file and build command
+COMPOSE_DIR="$(pwd)/deploy/compose"
+PROFILES=""
+
+if [ "$USE_VLLM" = true ]; then
+  COMPOSE_FILE="$COMPOSE_DIR/docker-compose.vllm.yml"
+  echo "Using Neo4j + vLLM (GPU-accelerated)..."
+  echo "  ⚡ Optimized for DGX Spark/GB300 with unified memory support"
 else
-  if [ "$USE_VECTOR_SEARCH" = true ]; then
-    CMD="$DOCKER_COMPOSE_CMD -f $(pwd)/deploy/compose/docker-compose.yml --profile vector-search"
-    echo "Using minimal configuration + vector search (Neo4j + Ollama + Qdrant + Sentence Transformers)..."
-  else
-    CMD="$DOCKER_COMPOSE_CMD -f $(pwd)/deploy/compose/docker-compose.yml"
-    echo "Using minimal configuration (Neo4j + Ollama + Next.js frontend)..."
-  fi
+  COMPOSE_FILE="$COMPOSE_DIR/docker-compose.yml"
+  echo "Using ArangoDB + Ollama configuration..."
+fi
+
+CMD="$DOCKER_COMPOSE_CMD -f $COMPOSE_FILE"
+
+if [ "$USE_VECTOR_SEARCH" = true ]; then
+  PROFILES="--profile vector-search"
+  echo "Enabling vector search (Qdrant + Sentence Transformers)..."
 fi
 
 # Execute the command
 echo ""
 echo "Starting services..."
-echo "Running: $CMD up -d"
+echo "Running: $CMD $PROFILES up -d"
 cd $(dirname "$0")
-eval "$CMD up -d"
+eval "$CMD $PROFILES up -d"
 
 echo ""
 echo "=========================================="
@@ -171,34 +162,24 @@ echo "=========================================="
 echo ""
 echo "Core Services:"
 echo "  • Web UI: http://localhost:3001"
-echo "  • Neo4j Browser: http://localhost:7474"
-if [ "$USE_VLLM" = true ] || [ "$USE_COMPLETE" = true ]; then
+if [ "$USE_VLLM" = true ]; then
+  echo "  • Neo4j Browser: http://localhost:7474"
   echo "  • vLLM API: http://localhost:8001 (GPU-accelerated)"
 else
+  echo "  • ArangoDB: http://localhost:8529"
   echo "  • Ollama API: http://localhost:11434"
 fi
 echo ""
 
-if [ "$USE_COMPLETE" = true ]; then
-  echo "Additional Services (Complete Stack):"
-  echo "  • Local Pinecone: http://localhost:5081"
-  echo "  • Sentence Transformers: http://localhost:8000"
-  echo "  • Ollama API: http://localhost:11434"
-  echo ""
-elif [ "$USE_VLLM" = true ] && [ "$USE_VECTOR_SEARCH" = true ]; then
-  echo "Additional Services (Vector Search Profile):"
-  echo "  • Qdrant: http://localhost:6333"
-  echo "  • Sentence Transformers: http://localhost:8000"
-  echo ""
-elif [ "$USE_VECTOR_SEARCH" = true ]; then
-  echo "Additional Services (Vector Search Profile):"
+if [ "$USE_VECTOR_SEARCH" = true ]; then
+  echo "Vector Search Services:"
   echo "  • Qdrant: http://localhost:6333"
   echo "  • Sentence Transformers: http://localhost:8000"
   echo ""
 fi
 
 echo "Next steps:"
-if [ "$USE_VLLM" = true ] || [ "$USE_COMPLETE" = true ]; then
+if [ "$USE_VLLM" = true ]; then
   echo "  1. Wait for vLLM to load the model (check logs with: docker logs vllm-service -f)"
   echo "     Note: First startup may take several minutes to download the model"
   echo ""
@@ -214,7 +195,11 @@ echo ""
 echo "Other options:"
 echo "  • Stop services: ./stop.sh"
 echo "  • Run frontend in dev mode: ./start.sh --dev-frontend"
-echo "  • Use vLLM (GPU): ./start.sh --vllm (recommended for DGX Spark)"
-echo "  • Use complete stack: ./start.sh --complete"
+if [ "$USE_VLLM" = true ]; then
+  echo "  • Use Ollama: ./start.sh (without --vllm)"
+else
+  echo "  • Use vLLM (GPU): ./start.sh --vllm"
+fi
+echo "  • Add vector search: ./start.sh --vector-search"
 echo "  • View logs: docker compose logs -f"
-echo "" 
+echo ""

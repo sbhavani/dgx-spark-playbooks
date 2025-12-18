@@ -28,7 +28,7 @@ import type { Triple } from '@/types/graph';
  */
 export class RemoteBackendService {
   private graphDBService: GraphDBService;
-  private pineconeService: QdrantService;
+  private qdrantService: QdrantService;
   private embeddingsService: EmbeddingsService;
   private textProcessor: TextProcessor;
   private initialized: boolean = false;
@@ -36,7 +36,7 @@ export class RemoteBackendService {
 
   private constructor() {
     this.graphDBService = GraphDBService.getInstance();
-    this.pineconeService = QdrantService.getInstance();
+    this.qdrantService = QdrantService.getInstance();
     this.embeddingsService = EmbeddingsService.getInstance();
     this.textProcessor = TextProcessor.getInstance();
   }
@@ -70,9 +70,9 @@ export class RemoteBackendService {
     await this.graphDBService.initialize(dbType);
     console.log(`${dbType} service initialized`);
     
-    // Initialize Pinecone
-    await this.pineconeService.initialize();
-    console.log('Pinecone service initialized');
+    // Initialize Qdrant
+    await this.qdrantService.initialize();
+    console.log('Qdrant service initialized');
     
     // Initialize Embeddings service
     await this.embeddingsService.initialize();
@@ -180,9 +180,9 @@ export class RemoteBackendService {
       entityMetadata.set(entity, entityData);
     }
     
-    // Store embeddings and metadata in Pinecone
-    await this.pineconeService.storeEmbeddingsWithMetadata(entityEmbeddings, textContent, entityMetadata);
-    console.log('Stored embeddings with metadata in Pinecone');
+    // Store embeddings and metadata in Qdrant
+    await this.qdrantService.storeEmbeddingsWithMetadata(entityEmbeddings, textContent, entityMetadata);
+    console.log('Stored embeddings with metadata in Qdrant');
     
     console.log('Backend created successfully from text');
   }
@@ -225,9 +225,9 @@ export class RemoteBackendService {
       });
     }
     
-    // Store embeddings and metadata in Pinecone
-    await this.pineconeService.storeEmbeddingsWithMetadata(entityEmbeddings, textContent, entityMetadata);
-    console.log('Stored embeddings with metadata in Pinecone');
+    // Store embeddings and metadata in Qdrant
+    await this.qdrantService.storeEmbeddingsWithMetadata(entityEmbeddings, textContent, entityMetadata);
+    console.log('Stored embeddings with metadata in Qdrant');
     
     console.log('Backend created successfully from triples');
   }
@@ -288,8 +288,8 @@ export class RemoteBackendService {
     // Step 1: Generate embedding for query
     const queryEmbedding = (await this.embeddingsService.encode([query]))[0];
     
-    // Step 2: Find nearest neighbors using Pinecone
-    const seedNodes = await this.pineconeService.findSimilarEntities(queryEmbedding, kNeighbors);
+    // Step 2: Find nearest neighbors using Qdrant
+    const seedNodes = await this.qdrantService.findSimilarEntities(queryEmbedding, kNeighbors);
     console.log(`Found ${seedNodes.length} seed nodes using KNN`);
     
     // Step 3: Retrieve graph data from graph database
@@ -553,9 +553,9 @@ export class RemoteBackendService {
     // Step 1: Generate embedding for query
     const queryEmbedding = (await this.embeddingsService.encode([query]))[0];
     
-    // Step 2: Find nearest neighbors using Pinecone with metadata
+    // Step 2: Find nearest neighbors using Qdrant with metadata
     const { entities: seedNodes, metadata: seedMetadata } = 
-      await this.pineconeService.findSimilarEntitiesWithMetadata(queryEmbedding, kNeighbors);
+      await this.qdrantService.findSimilarEntitiesWithMetadata(queryEmbedding, kNeighbors);
     console.log(`Found ${seedNodes.length} seed nodes using KNN with metadata`);
     
     // Step 3: Retrieve graph data from graph database

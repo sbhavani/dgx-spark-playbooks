@@ -182,7 +182,7 @@ export function DatabaseConnection({ className }: DatabaseConnectionProps) {
   // Fetch vector DB stats
   const fetchVectorStats = async () => {
     try {
-      const response = await fetch('/api/pinecone-diag/stats');
+      const response = await fetch('/api/vector-db/stats');
       const data = await response.json();
 
       if (response.ok) {
@@ -284,7 +284,7 @@ export function DatabaseConnection({ className }: DatabaseConnectionProps) {
     
     try {
       // Call API to clear the database
-      const response = await fetch('/api/pinecone-diag/clear', {
+      const response = await fetch('/api/vector-db/clear', {
         method: 'POST',
       })
       

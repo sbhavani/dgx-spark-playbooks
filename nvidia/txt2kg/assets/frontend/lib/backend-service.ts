@@ -32,7 +32,7 @@ import type { Triple } from '@/types/graph';
  */
 export class BackendService {
   private graphDBService: GraphDBService;
-  private pineconeService: QdrantService;
+  private qdrantService: QdrantService;
   private sentenceTransformerUrl: string = 'http://sentence-transformers:80';
   private modelName: string = 'all-MiniLM-L6-v2';
   private static instance: BackendService;
@@ -49,7 +49,7 @@ export class BackendService {
   
   private constructor() {
     this.graphDBService = GraphDBService.getInstance();
-    this.pineconeService = QdrantService.getInstance();
+    this.qdrantService = QdrantService.getInstance();
     
     // Use environment variables if available
     if (process.env.SENTENCE_TRANSFORMER_URL) {
@@ -127,9 +127,9 @@ export class BackendService {
       }
     }
     
-    // Initialize Pinecone
-    if (!this.pineconeService.isInitialized()) {
-      await this.pineconeService.initialize();
+    // Initialize Qdrant
+    if (!this.qdrantService.isInitialized()) {
+      await this.qdrantService.initialize();
     }
     
     // Check if sentence-transformer service is available
@@ -192,7 +192,7 @@ export class BackendService {
   }
   
   /**
-   * Process and store triples in graph database and embeddings in Pinecone
+   * Process and store triples in graph database and embeddings in Qdrant
    */
   public async processTriples(triples: Triple[]): Promise<void> {
     // Preprocess triples: lowercase and remove duplicates
@@ -241,8 +241,8 @@ export class BackendService {
       }
     }
     
-    // Store embeddings and text content in Pinecone
-    await this.pineconeService.storeEmbeddings(entityEmbeddings, textContent);
+    // Store embeddings and text content in Qdrant
+    await this.qdrantService.storeEmbeddings(entityEmbeddings, textContent);
     
     console.log(`Backend processing complete: ${uniqueTriples.length} triples and ${entityList.length} entities stored using ${this.activeGraphDbType}`);
   }
@@ -401,8 +401,8 @@ export class BackendService {
     // Generate embedding for query
     const queryEmbedding = (await this.generateEmbeddings([queryText]))[0];
     
-    // Find nearest neighbors using Pinecone
-    const seedNodes = await this.pineconeService.findSimilarEntities(queryEmbedding, kNeighbors);
+    // Find nearest neighbors using Qdrant
+    const seedNodes = await this.qdrantService.findSimilarEntities(queryEmbedding, kNeighbors);
     console.log(`Found ${seedNodes.length} seed nodes for query: "${queryText}"`);
     
     // Get graph data from graph database
@@ -658,7 +658,7 @@ Answer:`;
     const embeddings = await this.generateEmbeddings(documents);
     
     // Store in Qdrant document-embeddings collection
-    await this.pineconeService.storeDocumentChunks(documents, embeddings, metadata);
+    await this.qdrantService.storeDocumentChunks(documents, embeddings, metadata);
     
     console.log(`✅ Stored ${documents.length} document chunks in document-embeddings collection`);
   }

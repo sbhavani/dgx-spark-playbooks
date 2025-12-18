@@ -128,21 +128,6 @@ export async function syncSettingsWithServer() {
     settings.NVIDIA_API_KEY = nvidiaApiKey;
   }
   
-  // Pinecone settings
-  const pineconeApiKey = localStorage.getItem('pinecone_api_key');
-  if (pineconeApiKey) {
-    settings.pinecone_api_key = pineconeApiKey;
-  }
-  
-  const pineconeEnvironment = localStorage.getItem('pinecone_environment');
-  if (pineconeEnvironment) {
-    settings.pinecone_environment = pineconeEnvironment;
-  }
-  
-  const pineconeIndex = localStorage.getItem('pinecone_index');
-  if (pineconeIndex) {
-    settings.pinecone_index = pineconeIndex;
-  }
   
   // Skip the API call if there are no settings to sync
   if (Object.keys(settings).length === 0) {
