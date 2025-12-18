@@ -125,6 +125,9 @@ export function LLMSelectorCompact() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-label={`Select LLM model. Currently selected: ${selectedModel.name}`}
         className="flex items-center gap-2 px-3 py-1.5 text-sm border border-border/40 rounded-lg bg-background/50 hover:bg-muted/30 transition-colors"
       >
         {getModelIcon(selectedModel.provider)}
@@ -141,7 +144,11 @@ export function LLMSelectorCompact() {
           />
           
           {/* Dropdown */}
-          <div className="absolute top-full left-0 mt-2 w-64 border border-border/40 rounded-lg bg-popover shadow-lg z-50 overflow-hidden">
+          <div 
+            className="absolute top-full left-0 mt-2 w-64 border border-border/40 rounded-lg bg-popover shadow-lg z-50 overflow-hidden"
+            role="listbox"
+            aria-label="Available LLM models"
+          >
             <div className="p-2 border-b border-border/40 bg-muted/30">
               <h4 className="text-xs font-semibold text-foreground">Select LLM for Answer Generation</h4>
             </div>
@@ -150,6 +157,8 @@ export function LLMSelectorCompact() {
                 <button
                   key={model.id}
                   type="button"
+                  role="option"
+                  aria-selected={selectedModel.id === model.id}
                   onClick={() => handleSelectModel(model)}
                   className={`w-full flex items-start gap-2 p-3 hover:bg-muted/50 transition-colors text-left ${
                     selectedModel.id === model.id ? 'bg-nvidia-green/10' : ''
