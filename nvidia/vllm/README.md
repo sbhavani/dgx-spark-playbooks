@@ -235,7 +235,7 @@ Expected output shows 2 nodes with available GPU resources.
 Authenticate with Hugging Face and download the recommended production-ready model.
 
 ```bash
-## From within the same container where `ray serve` ran, run the following
+## From within the same container where `ray status` ran, run the following
 hf auth login
 hf download meta-llama/Llama-3.3-70B-Instruct
 ```
