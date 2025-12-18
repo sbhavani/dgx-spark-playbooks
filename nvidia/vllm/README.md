@@ -235,9 +235,9 @@ Expected output shows 2 nodes with available GPU resources.
 Authenticate with Hugging Face and download the recommended production-ready model.
 
 ```bash
-## On Node 1, authenticate and download
-huggingface-cli login
-huggingface-cli download meta-llama/Llama-3.3-70B-Instruct
+## From within the same container where `ray serve` ran, run the following
+hf auth login
+hf download meta-llama/Llama-3.3-70B-Instruct
 ```
 
 ## Step 8. Launch inference server for Llama 3.3 70B
