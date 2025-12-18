@@ -20,6 +20,7 @@
 
 # Parse command line arguments
 USE_COMPLETE=false
+USE_VECTOR_SEARCH=false
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -27,17 +28,23 @@ while [[ $# -gt 0 ]]; do
       USE_COMPLETE=true
       shift
       ;;
+    --vector-search)
+      USE_VECTOR_SEARCH=true
+      shift
+      ;;
     --help|-h)
       echo "Usage: ./stop.sh [OPTIONS]"
       echo ""
       echo "Options:"
       echo "  --complete        Stop complete stack (vLLM, Pinecone, Sentence Transformers)"
+      echo "  --vector-search   Stop minimal stack with vector search profile (Qdrant + Sentence Transformers)"
       echo "  --help, -h        Show this help message"
       echo ""
-      echo "Default: Stops minimal stack with Ollama, ArangoDB, and Next.js frontend"
+      echo "Default: Stops minimal stack (Neo4j + Ollama + Next.js frontend)"
       echo ""
       echo "Examples:"
       echo "  ./stop.sh                # Stop minimal demo"
+      echo "  ./stop.sh --vector-search # Stop minimal demo + vector search services"
       echo "  ./stop.sh --complete     # Stop complete stack"
       exit 0
       ;;
@@ -82,8 +89,13 @@ if [ "$USE_COMPLETE" = true ]; then
   CMD="$DOCKER_COMPOSE_CMD -f $(pwd)/deploy/compose/docker-compose.complete.yml"
   echo "Stopping complete stack..."
 else
-  CMD="$DOCKER_COMPOSE_CMD -f $(pwd)/deploy/compose/docker-compose.yml"
-  echo "Stopping minimal configuration..."
+  if [ "$USE_VECTOR_SEARCH" = true ]; then
+    CMD="$DOCKER_COMPOSE_CMD -f $(pwd)/deploy/compose/docker-compose.yml --profile vector-search"
+    echo "Stopping minimal configuration + vector search..."
+  else
+    CMD="$DOCKER_COMPOSE_CMD -f $(pwd)/deploy/compose/docker-compose.yml"
+    echo "Stopping minimal configuration..."
+  fi
 fi
 
 # Execute the command

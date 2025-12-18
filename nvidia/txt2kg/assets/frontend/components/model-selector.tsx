@@ -51,9 +51,26 @@ const baseModels = [
     baseURL: "http://localhost:11434/v1",
     provider: "ollama",
   },
+  // vLLM models - GPU accelerated local inference
+  {
+    id: "vllm-qwen2.5-7b",
+    name: "vLLM Qwen2.5-7B-Instruct",
+    icon: <Server className="h-4 w-4 text-purple-500" />,
+    description: "GPU-accelerated vLLM with Qwen2.5-7B model",
+    model: "Qwen/Qwen2.5-7B-Instruct",
+    baseURL: "http://localhost:8001/v1",
+    provider: "vllm",
+  },
+  {
+    id: "vllm-nemotron-super-49b-fp8",
+    name: "vLLM Nemotron Super 49B (FP8)",
+    icon: <Server className="h-4 w-4 text-purple-500" />,
+    description: "Llama 3.3 Nemotron Super 49B - FP8 quantized, best quality",
+    model: "nvidia/Llama-3_3-Nemotron-Super-49B-v1_5-FP8",
+    baseURL: "http://localhost:8001/v1",
+    provider: "vllm",
+  },
 ]
-
-// vLLM models removed per user request
 
 // Helper function to create Ollama model objects
 const createOllamaModel = (modelName: string) => ({
