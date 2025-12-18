@@ -269,7 +269,7 @@ For multi-node runs, we provide 2 configuration files:
 
 These configuration files need to be adapted:
 - Set `machine_rank` on each of your nodes according to its rank. Your master node should have a rank `0`. The second node has a rank `1`.
-- Set the correct IP address of your master node. Use `ifconfig` to find the correct value for your CX-7 IP address.
+- Set `main_process_ip` using the IP address of your master node. Ensure that both configuration files have the same value. Use `ifconfig` on your main node to find the correct value for the CX-7 IP address on this node.
 - Set a port number that can be used on your main node.
 
 The fields that need to be filled in your YAML files:
@@ -279,6 +279,8 @@ machine_rank: 0
 main_process_ip: < TODO: specify IP >
 main_process_port: < TODO: specify port >
 ```
+
+All the scripts and configuration files are available in this [**repository**](https://github.com/NVIDIA/dgx-spark-playbooks/blob/main/nvidia/pytorch-fine-tune/assets).
 
 ### Step 10. Run finetuning scripts
 
@@ -294,6 +296,8 @@ docker exec \
   bash /workspace/install-requirements;
   accelerate launch --config_file=/workspace/configs/config_fsdp_lora.yaml /workspace/Llama3_70B_LoRA_finetuning.py'
 ```
+
+During the run, the progress bar of the finetuning will appear on your main node's stdout only. This is an expected behavior as `accelerate` uses a wrapper around `tqdm` to display the progress on the main process only as explained [**here**](https://github.com/huggingface/accelerate/blob/main/src/accelerate/utils/tqdm.py#L25). Using `nvidia-smi` on the worker node should show that the GPU is used.
 
 ### Step 14. Cleanup and rollback
 

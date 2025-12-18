@@ -33,6 +33,7 @@ Each playbook includes prerequisites, step-by-step instructions, troubleshooting
 - [Multi-modal Inference](nvidia/multi-modal-inference/)
 - [NCCL for Two Sparks](nvidia/nccl/)
 - [Fine-tune with NeMo](nvidia/nemo-fine-tune/)
+- [Nemotron-3-Nano with llama.cpp](nvidia/nemotron/)
 - [NIM on Spark](nvidia/nim-llm/)
 - [NVFP4 Quantization](nvidia/nvfp4-quantization/)
 - [Ollama](nvidia/ollama/)
