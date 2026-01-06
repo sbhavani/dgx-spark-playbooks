@@ -635,7 +635,7 @@ export class ArangoDBService {
               subject: subjectEntity.name,
               predicate: seed.edge.type,
               object: objectEntity.name,
-              confidence: normalizedScore * 1.2 // Boost direct edge matches
+              confidence: normalizedScore * 1.2, // Boost direct edge matches
               depth: 0,
               _edgeId: seed.edge._id,
               pathLength: 1
