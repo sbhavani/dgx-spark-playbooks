@@ -211,7 +211,7 @@ export class ArangoDBService {
     try {
       const collection = this.db.collection(this.collectionName);
       const doc = properties.name ? { ...properties, _key: this.generateEntityKey(properties.name) } : properties;
-      return await collection.save(doc, { overwriteMode: 'ignore' });
+      return await collection.save(doc, { overwriteMode: 'update' });
     } catch (error) {
       console.error('Error creating node in ArangoDB:', error);
       throw error;
@@ -254,56 +254,74 @@ export class ArangoDBService {
 
   /**
    * Import triples (subject, predicate, object) into the graph database
+   * Batches inserts every 1000 documents by default
    * @param triples - Array of triples to import
+   * @param batchSize - Number of documents to insert per batch (default: 1000)
    * @returns Promise resolving when import is complete
    */
-  public async importTriples(triples: { subject: string; predicate: string; object: string }[]): Promise<void> {
+  public async importTriples(
+    triples: { subject: string; predicate: string; object: string }[],
+    batchSize: number = 1000
+  ): Promise<void> {
     if (!this.db) {
       throw new Error('ArangoDB connection not initialized. Call initialize() first.');
     }
 
+    let entityBatch: Array<{ _key: string; name: string }> = [];
+    let edgeBatch: Array<{ _key: string; _from: string; _to: string; type: string }> = [];
+
+    const importEntities = async () => {
+      if (entityBatch.length === 0) return;
+      await this.db!.collection(this.collectionName).saveAll(entityBatch, { overwriteMode: 'ignore' });
+      console.log(`[ArangoDB] Imported ${entityBatch.length} entities`);
+      entityBatch = [];
+    };
+
+    const importEdges = async () => {
+      if (edgeBatch.length === 0) return;
+      await this.db!.collection(this.edgeCollectionName).saveAll(edgeBatch, { overwriteMode: 'ignore' });
+      console.log(`[ArangoDB] Imported ${edgeBatch.length} edges`);
+      edgeBatch = [];
+    };
+
     try {
-      // Process triples in batches to improve performance
       for (const triple of triples) {
-        // Normalize triple values
         const normalizedSubject = triple.subject.trim();
         const normalizedPredicate = triple.predicate.trim();
         const normalizedObject = triple.object.trim();
-        
-        // Skip invalid triples
+
         if (!normalizedSubject || !normalizedPredicate || !normalizedObject) {
           console.warn('Skipping invalid triple:', triple);
           continue;
         }
-        
-        // Upsert subject and object nodes
-        const subjectNode = await this.upsertEntity(normalizedSubject);
-        const objectNode = await this.upsertEntity(normalizedObject);
 
-        // Upsert relationship
-        await this.createRelationship(
-          subjectNode._key,
-          objectNode._key,
-          normalizedPredicate
-        );
+        const subjectKey = this.generateEntityKey(normalizedSubject);
+        const objectKey = this.generateEntityKey(normalizedObject);
+        const edgeKey = this.generateEdgeKey(subjectKey, objectKey, normalizedPredicate);
+
+        entityBatch.push({ _key: subjectKey, name: normalizedSubject });
+        entityBatch.push({ _key: objectKey, name: normalizedObject });
+
+        edgeBatch.push({
+          _key: edgeKey,
+          _from: `${this.collectionName}/${subjectKey}`,
+          _to: `${this.collectionName}/${objectKey}`,
+          type: normalizedPredicate
+        });
+
+        if (entityBatch.length >= batchSize) await importEntities();
+        if (edgeBatch.length >= batchSize) await importEdges();
       }
-      
+
+      // Flush remaining
+      await importEntities();
+      await importEdges();
+
       console.log(`Successfully imported ${triples.length} triples into ArangoDB`);
     } catch (error) {
       console.error('Error importing triples into ArangoDB:', error);
       throw error;
     }
-  }
-
-  /**
-   * Helper method to upsert (create or update) an entity
-   * @param name - Entity name
-   * @returns Promise resolving to the entity
-   */
-  private async upsertEntity(name: string): Promise<any> {
-    const collection = this.db!.collection(this.collectionName);
-    const key = this.generateEntityKey(name);
-    return await collection.save({ _key: key, name: name }, { overwriteMode: 'update' });
   }
 
   /**
