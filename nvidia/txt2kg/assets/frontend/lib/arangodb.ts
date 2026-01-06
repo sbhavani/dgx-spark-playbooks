@@ -210,7 +210,7 @@ export class ArangoDBService {
 
     try {
       const collection = this.db.collection(this.collectionName);
-      const doc = properties.name ? { ...properties, _key: this.generateEntityKey(properties.name) } : properties;
+      const doc = { ...properties, _key: this.generateEntityKey(properties.name) }
       return await collection.save(doc, { overwriteMode: 'update' });
     } catch (error) {
       console.error('Error creating node in ArangoDB:', error);
