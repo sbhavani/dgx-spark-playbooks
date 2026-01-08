@@ -1,18 +1,34 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 import { GraphDBService, GraphDBType } from './graph-db-service';
-import { PineconeService } from './pinecone';
+import { QdrantService } from './qdrant';
 import { EmbeddingsService } from './embeddings';
 import { TextProcessor } from './text-processor';
 import type { Triple } from '@/types/graph';
 
 /**
  * Remote backend implementation that uses a graph database for storage,
- * Pinecone for vector embeddings, and SentenceTransformer for generating embeddings.
+ * Qdrant for vector embeddings, and SentenceTransformer for generating embeddings.
  * Follows the implementation in PyTorch Geometric's txt2kg.py
  * Enhanced with LangChain text processing for better extraction
  */
 export class RemoteBackendService {
   private graphDBService: GraphDBService;
-  private pineconeService: PineconeService;
+  private qdrantService: QdrantService;
   private embeddingsService: EmbeddingsService;
   private textProcessor: TextProcessor;
   private initialized: boolean = false;
@@ -20,7 +36,7 @@ export class RemoteBackendService {
 
   private constructor() {
     this.graphDBService = GraphDBService.getInstance();
-    this.pineconeService = PineconeService.getInstance();
+    this.qdrantService = QdrantService.getInstance();
     this.embeddingsService = EmbeddingsService.getInstance();
     this.textProcessor = TextProcessor.getInstance();
   }
@@ -44,18 +60,19 @@ export class RemoteBackendService {
 
   /**
    * Initialize the remote backend with all required services
-   * @param graphDbType - Type of graph database to use
+   * @param graphDbType - Type of graph database to use (defaults to GRAPH_DB_TYPE env var)
    */
-  public async initialize(graphDbType: GraphDBType = 'arangodb'): Promise<void> {
-    console.log('Initializing remote backend...');
+  public async initialize(graphDbType?: GraphDBType): Promise<void> {
+    const dbType = graphDbType || (process.env.GRAPH_DB_TYPE as GraphDBType) || 'arangodb';
+    console.log(`Initializing remote backend with ${dbType}...`);
     
     // Initialize Graph Database
-    await this.graphDBService.initialize(graphDbType);
-    console.log(`${graphDbType} service initialized`);
+    await this.graphDBService.initialize(dbType);
+    console.log(`${dbType} service initialized`);
     
-    // Initialize Pinecone
-    await this.pineconeService.initialize();
-    console.log('Pinecone service initialized');
+    // Initialize Qdrant
+    await this.qdrantService.initialize();
+    console.log('Qdrant service initialized');
     
     // Initialize Embeddings service
     await this.embeddingsService.initialize();
@@ -163,9 +180,9 @@ export class RemoteBackendService {
       entityMetadata.set(entity, entityData);
     }
     
-    // Store embeddings and metadata in Pinecone
-    await this.pineconeService.storeEmbeddingsWithMetadata(entityEmbeddings, textContent, entityMetadata);
-    console.log('Stored embeddings with metadata in Pinecone');
+    // Store embeddings and metadata in Qdrant
+    await this.qdrantService.storeEmbeddingsWithMetadata(entityEmbeddings, textContent, entityMetadata);
+    console.log('Stored embeddings with metadata in Qdrant');
     
     console.log('Backend created successfully from text');
   }
@@ -208,9 +225,9 @@ export class RemoteBackendService {
       });
     }
     
-    // Store embeddings and metadata in Pinecone
-    await this.pineconeService.storeEmbeddingsWithMetadata(entityEmbeddings, textContent, entityMetadata);
-    console.log('Stored embeddings with metadata in Pinecone');
+    // Store embeddings and metadata in Qdrant
+    await this.qdrantService.storeEmbeddingsWithMetadata(entityEmbeddings, textContent, entityMetadata);
+    console.log('Stored embeddings with metadata in Qdrant');
     
     console.log('Backend created successfully from triples');
   }
@@ -271,8 +288,8 @@ export class RemoteBackendService {
     // Step 1: Generate embedding for query
     const queryEmbedding = (await this.embeddingsService.encode([query]))[0];
     
-    // Step 2: Find nearest neighbors using Pinecone
-    const seedNodes = await this.pineconeService.findSimilarEntities(queryEmbedding, kNeighbors);
+    // Step 2: Find nearest neighbors using Qdrant
+    const seedNodes = await this.qdrantService.findSimilarEntities(queryEmbedding, kNeighbors);
     console.log(`Found ${seedNodes.length} seed nodes using KNN`);
     
     // Step 3: Retrieve graph data from graph database
@@ -536,9 +553,9 @@ export class RemoteBackendService {
     // Step 1: Generate embedding for query
     const queryEmbedding = (await this.embeddingsService.encode([query]))[0];
     
-    // Step 2: Find nearest neighbors using Pinecone with metadata
+    // Step 2: Find nearest neighbors using Qdrant with metadata
     const { entities: seedNodes, metadata: seedMetadata } = 
-      await this.pineconeService.findSimilarEntitiesWithMetadata(queryEmbedding, kNeighbors);
+      await this.qdrantService.findSimilarEntitiesWithMetadata(queryEmbedding, kNeighbors);
     console.log(`Found ${seedNodes.length} seed nodes using KNN with metadata`);
     
     // Step 3: Retrieve graph data from graph database

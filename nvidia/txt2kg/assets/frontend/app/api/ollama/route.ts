@@ -1,3 +1,19 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 import { NextRequest, NextResponse } from 'next/server';
 import { llmService } from '@/lib/llm-service';
 
@@ -41,7 +57,7 @@ export async function POST(req: NextRequest) {
   console.log(`[${new Date().toISOString()}] /api/ollama: POST request received`);
   
   try {
-    const { text, model = 'qwen3:1.7b', temperature = 0.1, maxTokens = 8192 } = await req.json();
+    const { text, model = 'qwen3:1.7b', temperature = 0.1, maxTokens = 4096 } = await req.json();
     console.log(`[${new Date().toISOString()}] /api/ollama: Parsed body - model: ${model}, text length: ${text?.length || 0}, maxTokens: ${maxTokens}`);
 
     if (!text || typeof text !== 'string') {

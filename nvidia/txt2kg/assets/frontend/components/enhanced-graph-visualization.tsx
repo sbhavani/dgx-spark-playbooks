@@ -1,14 +1,26 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 "use client"
 
-import React, { useState, useCallback } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
-import { Zap, Cpu, Eye, Settings } from 'lucide-react'
+import { Cpu, Eye } from 'lucide-react'
 import { ForceGraphWrapper } from './force-graph-wrapper'
-import { PyGraphistryViewer } from './pygraphistry-viewer'
 import type { Triple } from '@/utils/text-processing'
 
 interface GraphData {
@@ -45,7 +57,6 @@ export function EnhancedGraphVisualization({
   highlightedNodes,
   onError
 }: EnhancedGraphVisualizationProps) {
-  const [activeTab, setActiveTab] = useState<'threejs' | 'pygraphistry'>('threejs')
   const [gpuPreferred, setGpuPreferred] = useState(false)
   
   // Convert triples to graph data format if needed
@@ -100,10 +111,6 @@ export function EnhancedGraphVisualization({
     return null
   }, [graphData, triples])
 
-  const handleTabChange = useCallback((value: string) => {
-    setActiveTab(value as 'threejs' | 'pygraphistry')
-  }, [])
-
   const handleError = useCallback((error: Error) => {
     console.error('Graph visualization error:', error)
     if (onError) {
@@ -130,77 +137,27 @@ export function EnhancedGraphVisualization({
                 <span>{linkCount} edges</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Switch
-                  id="gpu-preferred"
-                  checked={gpuPreferred}
-                  onCheckedChange={(checked) => {
-                    setGpuPreferred(checked)
-                    if (checked && activeTab === 'threejs') {
-                      setActiveTab('pygraphistry')
-                    }
-                  }}
-                />
-                <label htmlFor="gpu-preferred" className="text-sm font-medium">
-                  GPU Preferred
-                </label>
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Cpu className="w-3 h-3" />
+                  WebGPU Accelerated
+                </Badge>
               </div>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-0 h-[calc(100%-80px)]">
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full">
-            <div className="px-6 pb-4">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="threejs" className="flex items-center gap-2">
-                  <Cpu className="w-4 h-4" />
-                  Client-Side (Three.js)
-                  <Badge variant="secondary" className="ml-1">WebGPU</Badge>
-                </TabsTrigger>
-                <TabsTrigger value="pygraphistry" className="flex items-center gap-2">
-                  <Zap className="w-4 h-4" />
-                  Server-Side (PyGraphistry)
-                  <Badge variant="secondary" className="ml-1">GPU</Badge>
-                </TabsTrigger>
-              </TabsList>
-            </div>
-            
-            <TabsContent value="threejs" className="h-[calc(100%-80px)] px-6 pb-6 mt-0">
-              <div className="h-full rounded-lg border overflow-hidden">
-                <ForceGraphWrapper
-                  jsonData={jsonData || {
-                    nodes: processedGraphData?.nodes || [],
-                    links: processedGraphData?.links || []
-                  }}
-                  fullscreen={fullscreen}
-                  layoutType={layoutType}
-                  highlightedNodes={highlightedNodes}
-                  onError={handleError}
-                />
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="pygraphistry" className="h-[calc(100%-80px)] px-6 pb-6 mt-0">
-              <div className="h-full">
-                {processedGraphData ? (
-                  <PyGraphistryViewer
-                    graphData={processedGraphData}
-                    onError={handleError}
-                  />
-                ) : (
-                  <div className="h-full flex items-center justify-center border rounded-lg bg-muted/50">
-                    <div className="text-center space-y-2">
-                      <div className="text-muted-foreground">
-                        No graph data available for PyGraphistry visualization
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Please load graph data to enable GPU-accelerated visualization
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-          </Tabs>
+        <CardContent className="p-6 h-[calc(100%-80px)]">
+          <div className="h-full rounded-lg border overflow-hidden">
+            <ForceGraphWrapper
+              jsonData={jsonData || {
+                nodes: processedGraphData?.nodes || [],
+                links: processedGraphData?.links || []
+              }}
+              fullscreen={fullscreen}
+              layoutType={layoutType}
+              highlightedNodes={highlightedNodes}
+              onError={handleError}
+            />
+          </div>
         </CardContent>
       </Card>
     </div>

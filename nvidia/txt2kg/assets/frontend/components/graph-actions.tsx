@@ -1,16 +1,28 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 "use client"
 
-import { Network, Zap, HelpCircle } from "lucide-react"
+import { Network, Zap } from "lucide-react"
 import { useDocuments } from "@/contexts/document-context"
 import { Loader2 } from "lucide-react"
-import { useState } from "react"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function GraphActions() {
   const { documents, processDocuments, isProcessing, openGraphVisualization } = useDocuments()
-  const [useLangChain, setUseLangChain] = useState(false)
 
   const hasNewDocuments = documents.some((doc) => doc.status === "New")
   const hasProcessedDocuments = documents.some(
@@ -30,7 +42,7 @@ export function GraphActions() {
       }
       
       await processDocuments(newDocumentIds, {
-        useLangChain,
+        useLangChain: false,
         useGraphTransformer: false,
         promptConfigs: undefined
       });
@@ -39,62 +51,67 @@ export function GraphActions() {
     }
   }
 
+  // Helper to get tooltip content for disabled Process button
+  const getProcessTooltip = () => {
+    if (isProcessing) return "Processing in progress..."
+    if (!hasNewDocuments && documents.length === 0) return "Upload documents first to extract knowledge triples"
+    if (!hasNewDocuments) return "All documents have been processed"
+    return "Extract knowledge triples from uploaded documents"
+  }
+
+  // Helper to get tooltip content for disabled View Graph button
+  const getViewGraphTooltip = () => {
+    if (isProcessing) return "Wait for processing to complete"
+    if (!hasProcessedDocuments && documents.length === 0) return "Upload and process documents first"
+    if (!hasProcessedDocuments) return "Process documents first to generate knowledge triples"
+    return "Visualize the knowledge graph from extracted triples"
+  }
+
   return (
-    <div className="flex gap-3 items-center">
-      <div className="flex items-center space-x-2 mr-2">
-        <div className="flex items-center gap-1.5">
-          <Switch
-            id="use-langchain-graph"
-            checked={useLangChain}
-            onCheckedChange={(value) => {
-              setUseLangChain(value);
-              // Dispatch custom event to update other components
-              window.dispatchEvent(new CustomEvent('langChainToggled', { 
-                detail: { useLangChain: value } 
-              }));
-            }}
-          />
-          <Label htmlFor="use-langchain-graph" className="text-xs font-medium">Use LangChain</Label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-              </TooltipTrigger>
-              <TooltipContent className="max-w-[220px] p-3">
-                <p className="text-xs">
-                  Enabling LangChain uses AI-powered knowledge extraction for more accurate triple generation.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+    <TooltipProvider>
+      <div className="flex gap-3 items-center">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              className={`btn-primary ${!hasNewDocuments || isProcessing ? "opacity-60 cursor-not-allowed" : ""}`}
+              disabled={!hasNewDocuments || isProcessing}
+              onClick={handleProcessDocuments}
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Zap className="h-4 w-4" />
+                  Process Documents
+                </>
+              )}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{getProcessTooltip()}</p>
+          </TooltipContent>
+        </Tooltip>
+        
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              className={`btn-primary ${!hasProcessedDocuments || isProcessing ? "opacity-60 cursor-not-allowed" : ""}`}
+              disabled={!hasProcessedDocuments || isProcessing}
+              onClick={() => openGraphVisualization()}
+            >
+              <Network className="h-4 w-4" />
+              View Knowledge Graph
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{getViewGraphTooltip()}</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
-      <button
-        className={`btn-primary ${!hasNewDocuments || isProcessing ? "opacity-60 cursor-not-allowed" : ""}`}
-        disabled={!hasNewDocuments || isProcessing}
-        onClick={handleProcessDocuments}
-      >
-        {isProcessing ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Processing...
-          </>
-        ) : (
-          <>
-            <Zap className="h-4 w-4" />
-            Process Documents
-          </>
-        )}
-      </button>
-      <button
-        className={`btn-primary ${!hasProcessedDocuments || isProcessing ? "opacity-60 cursor-not-allowed" : ""}`}
-        disabled={!hasProcessedDocuments || isProcessing}
-        onClick={() => openGraphVisualization()}
-      >
-        <Network className="h-4 w-4" />
-        View Knowledge Graph
-      </button>
-    </div>
+    </TooltipProvider>
   )
 }
 

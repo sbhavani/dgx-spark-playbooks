@@ -1,9 +1,25 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 import { NextRequest, NextResponse } from 'next/server';
 import { EmbeddingsService } from '@/lib/embeddings';
-import { PineconeService } from '@/lib/pinecone';
+import { QdrantService } from '@/lib/qdrant';
 
 /**
- * Generate embeddings for text chunks and store them in Pinecone
+ * Generate embeddings for text chunks and store them in Qdrant
  */
 export async function POST(request: NextRequest) {
   try {
@@ -38,26 +54,26 @@ export async function POST(request: NextRequest) {
     console.log('Generating embeddings for chunks...');
     const embeddings = await embeddingsService.encode(chunks);
     console.log(`Generated ${embeddings.length} embeddings`);
-    
-    // Initialize PineconeService
-    const pineconeService = PineconeService.getInstance();
-    
-    // Check if Pinecone server is running
-    const isPineconeRunning = await pineconeService.isPineconeRunning();
-    if (!isPineconeRunning) {
+
+    // Initialize QdrantService
+    const qdrantService = QdrantService.getInstance();
+
+    // Check if Qdrant server is running
+    const isQdrantRunning = await qdrantService.isQdrantRunning();
+    if (!isQdrantRunning) {
       return NextResponse.json(
-        { error: 'Pinecone server is not available. Please make sure it is running.' },
+        { error: 'Qdrant server is not available. Please make sure it is running.' },
         { status: 503 }
       );
     }
     
-    if (!pineconeService.isInitialized()) {
+    if (!qdrantService.isInitialized()) {
       try {
-        await pineconeService.initialize();
+        await qdrantService.initialize();
       } catch (initError) {
-        console.error('Error initializing Pinecone:', initError);
+        console.error('Error initializing Qdrant:', initError);
         return NextResponse.json(
-          { error: `Failed to initialize Pinecone: ${initError instanceof Error ? initError.message : String(initError)}` },
+          { error: `Failed to initialize Qdrant: ${initError instanceof Error ? initError.message : String(initError)}` },
           { status: 500 }
         );
       }
@@ -73,13 +89,13 @@ export async function POST(request: NextRequest) {
       textContent.set(chunkIds[i], chunks[i]);
     }
     
-    // Store embeddings in PineconeService with retry logic
+    // Store embeddings in Qdrant with retry logic
     try {
-      await pineconeService.storeEmbeddings(entityEmbeddings, textContent);
+      await qdrantService.storeEmbeddings(entityEmbeddings, textContent);
     } catch (storeError) {
-      console.error('Error storing embeddings in Pinecone:', storeError);
+      console.error('Error storing embeddings in Qdrant:', storeError);
       return NextResponse.json(
-        { error: `Failed to store embeddings in Pinecone: ${storeError instanceof Error ? storeError.message : String(storeError)}` },
+        { error: `Failed to store embeddings in Qdrant: ${storeError instanceof Error ? storeError.message : String(storeError)}` },
         { status: 500 }
       );
     }

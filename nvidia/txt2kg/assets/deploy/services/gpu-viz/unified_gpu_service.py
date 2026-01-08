@@ -1,8 +1,25 @@
 #!/usr/bin/env python3
+#
+# SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 """
 Unified GPU Graph Visualization Service
 
-Provides local GPU processing with cuGraph and CPU fallback with NetworkX.
+Combines PyGraphistry cloud processing and local GPU processing with cuGraph
+into a single FastAPI service for maximum flexibility.
 """
 
 import os
@@ -21,6 +38,9 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 import networkx as nx
 from enum import Enum
+
+# PyGraphistry imports
+import graphistry
 
 # GPU-accelerated imports (available in NVIDIA PyG container)
 try:
@@ -48,6 +68,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class ProcessingMode(str, Enum):
+    PYGRAPHISTRY_CLOUD = "pygraphistry_cloud"
     LOCAL_GPU = "local_gpu" 
     LOCAL_CPU = "local_cpu"
 
@@ -75,7 +96,12 @@ class GraphGenerationRequest(BaseModel):
 
 class UnifiedVisualizationRequest(BaseModel):
     graph_data: GraphData
-    processing_mode: ProcessingMode = ProcessingMode.LOCAL_GPU
+    processing_mode: ProcessingMode = ProcessingMode.PYGRAPHISTRY_CLOUD
+    
+    # PyGraphistry Cloud options
+    layout_type: Optional[str] = "force"
+    gpu_acceleration: Optional[bool] = True  
+    clustering: Optional[bool] = False
     
     # Local GPU options
     layout_algorithm: Optional[str] = "force_atlas2"
@@ -90,144 +116,8 @@ class GraphGenerationStatus(BaseModel):
     result: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
 
-class LargeGraphGenerator:
-    """Optimized graph generation using NetworkX and NumPy for performance"""
-    
-    @staticmethod
-    def generate_random_graph(num_nodes: int, avg_degree: int = 5, seed: Optional[int] = None) -> GraphData:
-        """Generate random graph using Erdős–Rényi model"""
-        if seed:
-            np.random.seed(seed)
-            
-        # Calculate edge probability for desired average degree
-        p = avg_degree / (num_nodes - 1)
-        
-        # Use NetworkX for efficient generation
-        G = nx.erdos_renyi_graph(num_nodes, p, seed=seed)
-        
-        return LargeGraphGenerator._networkx_to_graphdata(G)
-    
-    @staticmethod
-    def generate_scale_free_graph(num_nodes: int, m: int = 3, seed: Optional[int] = None) -> GraphData:
-        """Generate scale-free graph using Barabási–Albert model"""
-        G = nx.barabasi_albert_graph(num_nodes, m, seed=seed)
-        return LargeGraphGenerator._networkx_to_graphdata(G)
-    
-    @staticmethod
-    def generate_small_world_graph(num_nodes: int, k: int = 6, p: float = 0.1, seed: Optional[int] = None) -> GraphData:
-        """Generate small-world graph using Watts-Strogatz model"""
-        G = nx.watts_strogatz_graph(num_nodes, k, p, seed=seed)
-        return LargeGraphGenerator._networkx_to_graphdata(G)
-    
-    @staticmethod
-    def generate_clustered_graph(num_nodes: int, num_clusters: int = 100, seed: Optional[int] = None) -> GraphData:
-        """Generate clustered graph with intra and inter-cluster connections"""
-        if seed:
-            np.random.seed(seed)
-            
-        cluster_size = num_nodes // num_clusters
-        G = nx.Graph()
-        
-        # Add nodes with cluster information
-        for i in range(num_nodes):
-            cluster_id = i // cluster_size
-            G.add_node(i, cluster=cluster_id)
-        
-        # Generate intra-cluster edges
-        intra_prob = 0.1
-        for cluster in range(num_clusters):
-            cluster_start = cluster * cluster_size
-            cluster_end = min(cluster_start + cluster_size, num_nodes)
-            cluster_nodes = list(range(cluster_start, cluster_end))
-            
-            # Create subgraph for cluster
-            cluster_subgraph = nx.erdos_renyi_graph(len(cluster_nodes), intra_prob)
-            
-            # Add edges to main graph with proper node mapping
-            for edge in cluster_subgraph.edges():
-                G.add_edge(cluster_nodes[edge[0]], cluster_nodes[edge[1]])
-        
-        # Generate inter-cluster edges
-        inter_prob = 0.001
-        for i in range(num_nodes):
-            for j in range(i + 1, num_nodes):
-                if G.nodes[i].get('cluster') != G.nodes[j].get('cluster'):
-                    if np.random.random() < inter_prob:
-                        G.add_edge(i, j)
-        
-        return LargeGraphGenerator._networkx_to_graphdata(G)
-    
-    @staticmethod
-    def generate_hierarchical_graph(num_nodes: int, branching_factor: int = 3, seed: Optional[int] = None) -> GraphData:
-        """Generate hierarchical (tree-like) graph"""
-        G = nx.random_tree(num_nodes, seed=seed)
-        
-        # Add some cross-links to make it more interesting
-        if seed:
-            np.random.seed(seed)
-        
-        # Add 10% additional edges for cross-connections
-        num_additional_edges = max(1, num_nodes // 10)
-        nodes = list(G.nodes())
-        
-        for _ in range(num_additional_edges):
-            u, v = np.random.choice(nodes, 2, replace=False)
-            if not G.has_edge(u, v):
-                G.add_edge(u, v)
-        
-        return LargeGraphGenerator._networkx_to_graphdata(G)
-    
-    @staticmethod
-    def generate_grid_graph(dimensions: List[int], seed: Optional[int] = None) -> GraphData:
-        """Generate 2D or 3D grid graph"""
-        if len(dimensions) == 2:
-            G = nx.grid_2d_graph(dimensions[0], dimensions[1])
-        elif len(dimensions) == 3:
-            G = nx.grid_graph(dimensions)
-        else:
-            raise ValueError("Grid dimensions must be 2D or 3D")
-        
-        # Convert coordinate tuples to integer node IDs
-        mapping = {node: i for i, node in enumerate(G.nodes())}
-        G = nx.relabel_nodes(G, mapping)
-        
-        return LargeGraphGenerator._networkx_to_graphdata(G)
-    
-    @staticmethod
-    def _networkx_to_graphdata(G: nx.Graph) -> GraphData:
-        """Convert NetworkX graph to GraphData format"""
-        nodes = []
-        links = []
-        
-        # Convert nodes
-        for node_id in G.nodes():
-            node_data = G.nodes[node_id]
-            node = {
-                "id": f"n{node_id}",
-                "name": f"Node {node_id}",
-                "val": np.random.randint(1, 11),
-                "degree": G.degree(node_id)
-            }
-            
-            # Add cluster information if available
-            if 'cluster' in node_data:
-                node['group'] = f"cluster_{node_data['cluster']}"
-            else:
-                node['group'] = f"group_{node_id % 10}"
-                
-            nodes.append(node)
-        
-        # Convert edges
-        for edge in G.edges():
-            link = {
-                "source": f"n{edge[0]}",
-                "target": f"n{edge[1]}",
-                "name": f"link_{edge[0]}_{edge[1]}",
-                "weight": np.random.uniform(0.1, 5.0)
-            }
-            links.append(link)
-        
-        return GraphData(nodes=nodes, links=links)
+# Import graph generation classes (keeping existing code)
+from pygraphistry_service import LargeGraphGenerator, init_graphistry
 
 class LocalGPUProcessor:
     """GPU-accelerated graph processing using cuGraph"""
@@ -333,10 +223,109 @@ class LocalGPUProcessor:
             logger.error(f"GPU centrality computation failed: {e}")
             return {}
 
-class UnifiedGPUService:
-    """Unified service offering local GPU and CPU processing"""
+class PyGraphistryProcessor:
+    """PyGraphistry cloud processing (existing functionality)"""
     
     def __init__(self):
+        self.initialized = init_graphistry()
+    
+    async def process_graph_data(self, request: UnifiedVisualizationRequest) -> Dict[str, Any]:
+        """Process graph data with PyGraphistry GPU acceleration"""
+        try:
+            if not self.initialized:
+                raise HTTPException(status_code=500, detail="PyGraphistry not initialized")
+            
+            # Convert to pandas DataFrames for PyGraphistry
+            nodes_df = pd.DataFrame(request.graph_data.nodes)
+            edges_df = pd.DataFrame(request.graph_data.links)
+            
+            # Ensure required columns exist
+            if 'id' not in nodes_df.columns:
+                nodes_df['id'] = nodes_df.index
+            if 'source' not in edges_df.columns or 'target' not in edges_df.columns:
+                raise HTTPException(status_code=400, detail="Links must have source and target columns")
+                
+            logger.info(f"Processing graph with {len(nodes_df)} nodes and {len(edges_df)} edges")
+            
+            # Create PyGraphistry graph object
+            g = graphistry.edges(edges_df, 'source', 'target').nodes(nodes_df, 'id')
+            
+            # Apply GPU-accelerated processing
+            if request.gpu_acceleration:
+                g = await self._apply_gpu_acceleration(g, request)
+            
+            # Apply clustering if requested
+            if request.clustering:
+                g = await self._apply_clustering(g)
+            
+            # Generate layout
+            g = await self._generate_layout(g, request.layout_type)
+            
+            # Extract processed data
+            processed_nodes = g._nodes.to_dict('records') if g._nodes is not None else nodes_df.to_dict('records')
+            processed_edges = g._edges.to_dict('records') if g._edges is not None else edges_df.to_dict('records')
+            
+            # Generate embedding URL for interactive visualization
+            embed_url = None
+            local_viz_data = None
+            
+            try:
+                embed_url = g.plot(render=False)
+                logger.info(f"Generated PyGraphistry embed URL: {embed_url}")
+            except Exception as e:
+                logger.warning(f"Could not generate embed URL (likely running in local mode): {e}")
+                
+                # Create local visualization data as fallback
+                try:
+                    local_viz_data = self._create_local_viz_data(g, processed_nodes, processed_edges)
+                    logger.info("Generated local visualization data as fallback")
+                except Exception as viz_e:
+                    logger.warning(f"Could not generate local visualization data: {viz_e}")
+            
+            return {
+                "processed_nodes": processed_nodes,
+                "processed_edges": processed_edges,
+                "embed_url": embed_url,
+                "local_viz_data": local_viz_data,
+                "processing_mode": ProcessingMode.PYGRAPHISTRY_CLOUD,
+                "stats": {
+                    "node_count": len(processed_nodes),
+                    "edge_count": len(processed_edges),
+                    "gpu_accelerated": request.gpu_acceleration,
+                    "clustered": request.clustering,
+                    "layout_type": request.layout_type,
+                    "has_embed_url": embed_url is not None,
+                    "has_local_viz": local_viz_data is not None
+                },
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"Error processing graph data: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+    
+    # ... (include other PyGraphistry methods from original service)
+    async def _apply_gpu_acceleration(self, g, request):
+        # Implementation from original service
+        pass
+    
+    async def _apply_clustering(self, g):
+        # Implementation from original service  
+        pass
+    
+    async def _generate_layout(self, g, layout_type):
+        # Implementation from original service
+        pass
+    
+    def _create_local_viz_data(self, g, processed_nodes, processed_edges):
+        # Implementation from original service
+        pass
+
+class UnifiedGPUService:
+    """Unified service offering both PyGraphistry cloud and local GPU processing"""
+    
+    def __init__(self):
+        self.pygraphistry_processor = PyGraphistryProcessor()
         self.local_gpu_processor = LocalGPUProcessor()
         self.generation_tasks = {}
         self.executor = ThreadPoolExecutor(max_workers=4)
@@ -345,8 +334,12 @@ class UnifiedGPUService:
     async def process_graph(self, request: UnifiedVisualizationRequest) -> Dict[str, Any]:
         """Process graph with selected processing mode"""
         
-        if request.processing_mode == ProcessingMode.LOCAL_GPU:
+        if request.processing_mode == ProcessingMode.PYGRAPHISTRY_CLOUD:
+            return await self.pygraphistry_processor.process_graph_data(request)
+            
+        elif request.processing_mode == ProcessingMode.LOCAL_GPU:
             return await self._process_with_local_gpu(request)
+            
         else:  # LOCAL_CPU
             return await self._process_with_local_cpu(request)
     
@@ -458,7 +451,7 @@ service = UnifiedGPUService()
 
 @app.post("/api/visualize")
 async def visualize_graph(request: UnifiedVisualizationRequest):
-    """Process graph with unified service (supports local GPU and CPU modes)"""
+    """Process graph with unified service (supports all processing modes)"""
     result = await service.process_graph(request)
     
     # Broadcast to connected WebSocket clients
@@ -485,13 +478,17 @@ async def get_capabilities():
     """Get GPU capabilities and available processing modes"""
     return {
         "processing_modes": {
+            "pygraphistry_cloud": {
+                "available": service.pygraphistry_processor.initialized,
+                "description": "PyGraphistry cloud GPU processing with interactive embeds"
+            },
             "local_gpu": {
                 "available": HAS_RAPIDS,
                 "description": "Local GPU processing with cuGraph/RAPIDS"
             },
             "local_cpu": {
                 "available": True,
-                "description": "Local CPU fallback processing with NetworkX"
+                "description": "Local CPU fallback processing"
             }
         },
         "has_rapids": HAS_RAPIDS,
@@ -543,6 +540,7 @@ async def health_check():
     """Health check endpoint"""
     return {
         "status": "healthy",
+        "pygraphistry_initialized": service.pygraphistry_processor.initialized,
         "local_gpu_available": HAS_RAPIDS,
         "torch_geometric": HAS_TORCH_GEOMETRIC,
         "timestamp": datetime.now().isoformat()
@@ -573,6 +571,7 @@ async def get_visualization_page():
             <div>
                 <label>Processing Mode:</label>
                 <select id="processingMode">
+                    <option value="pygraphistry_cloud">PyGraphistry Cloud</option>
                     <option value="local_gpu">Local GPU (cuGraph)</option>
                     <option value="local_cpu">Local CPU</option>
                 </select>
@@ -757,8 +756,23 @@ def startup_diagnostics():
     else:
         print("⚠ PyTorch Geometric not available")
     
+    # Check PyGraphistry credentials
+    print("Checking PyGraphistry credentials...")
+    personal_key = os.getenv('GRAPHISTRY_PERSONAL_KEY')
+    secret_key = os.getenv('GRAPHISTRY_SECRET_KEY')
+    api_key = os.getenv('GRAPHISTRY_API_KEY')
+    
+    if personal_key and secret_key:
+        print("✓ PyGraphistry personal key/secret found")
+    elif api_key:
+        print("✓ PyGraphistry API key found")
+    else:
+        print("⚠ No PyGraphistry credentials found - cloud mode will be limited")
+        print("  Set GRAPHISTRY_PERSONAL_KEY + GRAPHISTRY_SECRET_KEY for full cloud features")
+    
     print("")
     print("🎯 Available Processing Modes:")
+    print("  ☁️  PyGraphistry Cloud - Interactive GPU embeds (requires credentials)")
     print("  🚀 Local GPU (cuGraph) - Full local GPU processing")
     print("  💻 Local CPU          - NetworkX fallback")
     print("")
@@ -772,4 +786,4 @@ def startup_diagnostics():
 
 if __name__ == "__main__":
     startup_diagnostics()
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8080) 

@@ -1,3 +1,19 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 import { NextRequest, NextResponse } from 'next/server';
 import { getGraphDbService } from '@/lib/graph-db-util';
 import { getGraphDbType } from '../settings/route';
@@ -72,13 +88,18 @@ async function ensureConnection(request?: NextRequest): Promise<GraphDBType> {
  * GET handler for retrieving graph data from the selected graph database
  */
 export async function GET(request: NextRequest) {
+  console.log('[graph-db GET] Request received');
   try {
     // Initialize with connection parameters
+    console.log('[graph-db GET] Ensuring connection...');
     const graphDbType = await ensureConnection(request);
+    console.log(`[graph-db GET] Using database type: ${graphDbType}`);
     const graphDbService = getGraphDbService(graphDbType);
     
     // Get graph data from the database
+    console.log('[graph-db GET] Fetching graph data...');
     const graphData = await graphDbService.getGraphData();
+    console.log(`[graph-db GET] Got ${graphData.nodes.length} nodes, ${graphData.relationships.length} relationships`);
     
     // Transform to format expected by the frontend
     const nodes = graphData.nodes.map(node => ({

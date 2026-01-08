@@ -1,3 +1,19 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 import fs from 'fs';
 import path from 'path';
 import { promises as fsPromises } from 'fs';
@@ -17,6 +33,7 @@ export interface QueryLogEntry {
 
 export interface QueryLogSummary {
   query: string;
+  queryMode: 'traditional' | 'vector-search' | 'pure-rag';
   count: number;
   firstQueried: string;
   lastQueried: string;
@@ -148,9 +165,10 @@ export class QueryLoggerService {
         return [];
       }
 
-      // Group logs by query
+      // Group logs by query AND queryMode
       const querySummaries = new Map<string, {
         query: string;
+        queryMode: 'traditional' | 'vector-search' | 'pure-rag';
         count: number;
         timestamps: string[];
         executionTimes: number[];
@@ -161,8 +179,11 @@ export class QueryLoggerService {
       }>();
 
       logs.forEach(entry => {
-        const existing = querySummaries.get(entry.query) || {
+        // Use composite key: query + mode
+        const key = `${entry.query}|||${entry.queryMode}`;
+        const existing = querySummaries.get(key) || {
           query: entry.query,
+          queryMode: entry.queryMode,
           count: 0,
           timestamps: [],
           executionTimes: [],
@@ -180,12 +201,13 @@ export class QueryLoggerService {
         if (entry.metrics.recall !== undefined) existing.recalls.push(entry.metrics.recall);
         existing.resultCounts.push(entry.metrics.resultCount);
 
-        querySummaries.set(entry.query, existing);
+        querySummaries.set(key, existing);
       });
 
       // Convert to array and format
       const result: QueryLogSummary[] = Array.from(querySummaries.values()).map(summary => ({
         query: summary.query,
+        queryMode: summary.queryMode,
         count: summary.count,
         firstQueried: summary.timestamps[0],
         lastQueried: summary.timestamps[summary.timestamps.length - 1],

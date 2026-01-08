@@ -1,48 +1,69 @@
-# Use the official Node.js image from the Docker Hub
-FROM node:18-slim
-
-# Set environment variables to avoid interactive prompts
-ENV DEBIAN_FRONTEND=noninteractive
-ENV NPM_CONFIG_YES=true
-ENV PNPM_HOME=/pnpm
-ENV PATH="$PNPM_HOME:$PATH"
-
-# Set the working directory
+# Optimized multi-stage Dockerfile for faster builds
+# Stage 1: Dependencies
+FROM node:18-slim AS deps
 WORKDIR /app
 
-# Install pnpm globally with --force and yes flags
+# Install pnpm
 RUN npm install -g pnpm --force --yes
 
-# Copy package files ONLY (for better Docker layer caching)
-# Copy package.json (required) and pnpm-lock.yaml (optional)
-COPY ./frontend/package.json ./
-COPY ./frontend/pnpm-lock.yaml* ./
+# Copy dependency files
+COPY ./frontend/package.json ./frontend/pnpm-lock.yaml* ./
 
-# Copy the scripts directory (needed for setup-pinecone)
-COPY ./scripts/ /scripts/
-
-# Update the setup-pinecone.js path in package.json
-RUN sed -i 's|"setup-pinecone": "node ../scripts/setup-pinecone.js"|"setup-pinecone": "node /scripts/setup-pinecone.js"|g' package.json
-
-# Install project dependencies (this layer will be cached if package files don't change)
-# Use --no-frozen-lockfile as fallback if lockfile is missing or out of sync
-RUN pnpm config set auto-install-peers true && \
+# Install dependencies with cache mount for faster rebuilds
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm config set auto-install-peers true && \
     if [ -f pnpm-lock.yaml ]; then \
-        echo "Lock file found, installing with frozen lockfile..." && \
-        (pnpm install --no-optional --frozen-lockfile || pnpm install --no-optional --no-frozen-lockfile); \
+        pnpm install --no-optional --frozen-lockfile || pnpm install --no-optional --no-frozen-lockfile; \
     else \
-        echo "No lock file found, installing without frozen lockfile..." && \
         pnpm install --no-optional --no-frozen-lockfile; \
     fi
 
-# Copy the rest of the frontend files
+# Stage 2: Builder
+FROM node:18-slim AS builder
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm --force --yes
+
+# Copy node_modules from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/package.json ./package.json
+
+# Copy source code
 COPY ./frontend/ ./
 
-# Build the application
-RUN pnpm build
+# Set build environment variables
+ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV production
 
-# Expose the port the app runs on
+# Build with cache mount for Next.js cache
+RUN --mount=type=cache,target=/app/.next/cache \
+    pnpm build
+
+# Stage 3: Production runtime
+FROM node:18-slim AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Copy necessary files from builder
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Create data directory for query logs with proper permissions
+RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
+
+USER nextjs
+
 EXPOSE 3000
 
-# Start the application
-CMD ["pnpm", "start"]
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+
+CMD ["node", "server.js"]

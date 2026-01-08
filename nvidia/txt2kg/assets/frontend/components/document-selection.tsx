@@ -1,20 +1,30 @@
+//
+// SPDX-FileCopyrightText: Copyright (c) 1993-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 "use client"
 
 import { useState, useEffect } from "react"
 import { useDocuments } from "@/contexts/document-context"
 import { CheckCircle, Loader2, FileText, AlertCircle, X } from "lucide-react"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from "next/navigation"
 import { useShiftSelect } from "@/hooks/use-shift-select"
 
 export function DocumentSelection() {
   const { documents, processDocuments, isProcessing } = useDocuments()
-  const [useLangChain, setUseLangChain] = useState(false)
-  const [useSentenceChunking, setUseSentenceChunking] = useState(true)
-  const [useEntityExtraction, setUseEntityExtraction] = useState(true)
   const [processingStatus, setProcessingStatus] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [forceUpdate, setForceUpdate] = useState(0)
@@ -108,7 +118,7 @@ export function DocumentSelection() {
       
       // Call processDocuments with the selected document IDs
       await processDocuments(selectedDocs, {
-        useLangChain,
+        useLangChain: false,
         useGraphTransformer: false,
         promptConfigs: undefined
       })
@@ -156,65 +166,6 @@ export function DocumentSelection() {
     <div className="space-y-4">
       <h3 className="text-md font-medium">Document Selection</h3>
       <p className="text-sm text-muted-foreground mb-2">Select which documents to process for triple extraction</p>
-      
-      <div className="space-y-3 pt-2 mb-4">
-        <h4 className="text-sm font-medium">Processing Options</h4>
-        
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Switch 
-              id="use-langchain" 
-              checked={useLangChain}
-              onCheckedChange={(value) => {
-                setUseLangChain(value);
-                // Dispatch custom event to update other components
-                window.dispatchEvent(new CustomEvent('langChainToggled', { 
-                  detail: { useLangChain: value } 
-                }));
-              }}
-              disabled={isProcessing}
-            />
-            <Label htmlFor="use-langchain" className="text-sm cursor-pointer">Use LangChain</Label>
-          </div>
-          {/* <p className="text-xs text-muted-foreground pl-7">
-            Leverages LangChain for knowledge extraction from documents
-          </p> */}
-          
-          {useLangChain && (
-            <>
-              <div className="flex items-center space-x-2">
-                <Switch 
-                  id="use-sentence-chunking" 
-                  checked={useSentenceChunking}
-                  onCheckedChange={setUseSentenceChunking}
-                  disabled={isProcessing}
-                />
-                <Label htmlFor="use-sentence-chunking" className="text-sm cursor-pointer">
-                  Use Sentence Chunking
-                </Label>
-              </div>
-              <p className="text-xs text-muted-foreground pl-7">
-                Split documents into sentences for more accurate triple extraction
-              </p>
-              
-              <div className="flex items-center space-x-2">
-                <Switch 
-                  id="use-entity-extraction" 
-                  checked={useEntityExtraction}
-                  onCheckedChange={setUseEntityExtraction}
-                  disabled={isProcessing}
-                />
-                <Label htmlFor="use-entity-extraction" className="text-sm cursor-pointer">
-                  Entity Extraction
-                </Label>
-              </div>
-              <p className="text-xs text-muted-foreground pl-7">
-                Automatically detect and extract entities from documents
-              </p>
-            </>
-          )}
-        </div>
-      </div>
       
       {error && (
         <div className="bg-destructive/10 border border-destructive rounded-md p-4 flex items-start gap-3">
