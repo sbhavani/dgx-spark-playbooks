@@ -18,35 +18,35 @@ import { NextRequest, NextResponse } from 'next/server';
 import { QdrantService } from '@/lib/qdrant';
 
 /**
- * Get Pinecone vector database stats
+ * Get Qdrant vector database stats
  */
 export async function GET() {
   try {
-    // Initialize Pinecone service
-    const pineconeService = QdrantService.getInstance();
+    // Initialize Qdrant service
+    const qdrantService = QdrantService.getInstance();
     
     // We can now directly call getStats() which handles initialization and error recovery
-    const stats = await pineconeService.getStats();
+    const stats = await qdrantService.getStats();
     
     return NextResponse.json({
       ...stats,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error getting Pinecone stats:', error);
+    console.error('Error getting Qdrant stats:', error);
     
     // Return a successful response with error information
-    // This prevents the UI from breaking when Pinecone is unavailable
+    // This prevents the UI from breaking when Qdrant is unavailable
     let errorMessage = error instanceof Error ? error.message : String(error);
     
     // More specific error message for 404 errors
     if (errorMessage.includes('404')) {
-      errorMessage = 'Pinecone server returned 404. The server may not be running or the index does not exist.';
+      errorMessage = 'Qdrant server returned 404. The server may not be running or the collection does not exist.';
     }
     
     return NextResponse.json(
       { 
-        error: `Failed to get Pinecone stats: ${errorMessage}`,
+        error: `Failed to get Qdrant stats: ${errorMessage}`,
         totalVectorCount: 0,
         source: 'error',
         httpHealthy: false,
@@ -55,4 +55,5 @@ export async function GET() {
       { status: 200 } // Use 200 instead of 500 to avoid UI errors
     );
   }
-} 
+}
+

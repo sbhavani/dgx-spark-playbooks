@@ -23,11 +23,11 @@ import { InfoIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { VectorDBStats } from '@/types/graph'
 
-interface PineconeConnectionProps {
+interface QdrantConnectionProps {
   className?: string
 }
 
-export function PineconeConnection({ className }: PineconeConnectionProps) {
+export function QdrantConnection({ className }: QdrantConnectionProps) {
   const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "checking">("disconnected")
   const [error, setError] = useState<string | null>(null)
   const [stats, setStats] = useState<VectorDBStats>({ nodes: 0, relationships: 0, source: 'none' })
@@ -35,7 +35,7 @@ export function PineconeConnection({ className }: PineconeConnectionProps) {
   // Fetch vector DB stats
   const fetchStats = async () => {
     try {
-      const response = await fetch('/api/pinecone-diag/stats');
+      const response = await fetch('/api/vector-db/stats');
       const data = await response.json();
       
       if (response.ok) {
@@ -131,7 +131,7 @@ export function PineconeConnection({ className }: PineconeConnectionProps) {
                   setConnectionStatus("checking");
                   setError(null);
                   try {
-                    const response = await fetch('/api/pinecone-diag/create-index', { method: 'POST' });
+                    const response = await fetch('/api/vector-db/create-collection', { method: 'POST' });
                     if (response.ok) {
                       // Wait a bit for the collection to be created
                       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -203,4 +203,5 @@ export function PineconeConnection({ className }: PineconeConnectionProps) {
       </div>
     </div>
   )
-} 
+}
+

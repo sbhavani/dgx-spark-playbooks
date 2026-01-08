@@ -18,35 +18,36 @@ import { NextResponse } from 'next/server';
 import { QdrantService } from '@/lib/qdrant';
 
 /**
- * Create Pinecone index API endpoint
- * POST /api/pinecone-diag/create-index
+ * Create Qdrant collection API endpoint
+ * POST /api/vector-db/create-collection
  */
 export async function POST() {
   try {
-    // Get the Pinecone service instance
-    const pineconeService = QdrantService.getInstance();
+    // Get the Qdrant service instance
+    const qdrantService = QdrantService.getInstance();
     
-    // Force re-initialization to create the index
-    (pineconeService as any).initialized = false;
-    await pineconeService.initialize();
+    // Force re-initialization to create the collection
+    (qdrantService as any).initialized = false;
+    await qdrantService.initialize();
     
     // Check if initialization was successful by getting stats
-    const stats = await pineconeService.getStats();
+    const stats = await qdrantService.getStats();
     
     return NextResponse.json({
       success: true,
-      message: 'Pinecone index created successfully',
+      message: 'Qdrant collection created successfully',
       httpHealthy: stats.httpHealthy || false
     });
   } catch (error) {
-    console.error('Error creating Pinecone index:', error);
+    console.error('Error creating Qdrant collection:', error);
     
     return NextResponse.json(
       { 
         success: false,
-        error: `Failed to create Pinecone index: ${error instanceof Error ? error.message : String(error)}`
+        error: `Failed to create Qdrant collection: ${error instanceof Error ? error.message : String(error)}`
       },
       { status: 500 }
     );
   }
-} 
+}
+

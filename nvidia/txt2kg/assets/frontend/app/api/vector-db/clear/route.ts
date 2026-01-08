@@ -18,26 +18,27 @@ import { NextRequest, NextResponse } from 'next/server';
 import { QdrantService } from '@/lib/qdrant';
 
 /**
- * Clear all data from the Pinecone vector database
- * POST /api/pinecone-diag/clear
+ * Clear all data from the Qdrant vector database
+ * POST /api/vector-db/clear
  */
 export async function POST() {
-  // Get the Pinecone service instance
-  const pineconeService = QdrantService.getInstance();
+  // Get the Qdrant service instance
+  const qdrantService = QdrantService.getInstance();
   
   // Clear all vectors from the database
-  const deleteSuccess = await pineconeService.deleteAllEntities();
+  const deleteSuccess = await qdrantService.deleteAllEntities();
   
   // Get updated stats after clearing
-  const stats = await pineconeService.getStats();
+  const stats = await qdrantService.getStats();
   
   // Return response based on operation success
   return NextResponse.json({
     success: deleteSuccess,
     message: deleteSuccess 
-      ? 'Successfully cleared all data from Pinecone vector database'
-      : 'Failed to clear Pinecone database - service may not be available',
+      ? 'Successfully cleared all data from Qdrant vector database'
+      : 'Failed to clear Qdrant database - service may not be available',
     totalVectorCount: stats.totalVectorCount || 0,
     httpHealthy: stats.httpHealthy || false
   });
-} 
+}
+
