@@ -19,6 +19,7 @@
  */
 import { Document } from "@langchain/core/documents";
 import { randomUUID } from "crypto";
+import { EmbeddingsService } from './embeddings';
 
 // Helper function to generate deterministic UUID from string
 function stringToUUID(str: string): string {
@@ -184,6 +185,17 @@ export class QdrantService {
         return;
       }
 
+      // Get dimension from embeddings service
+      try {
+        const embeddingsService = EmbeddingsService.getInstance();
+        await embeddingsService.initialize();
+        this.dimension = embeddingsService.getDimension();
+        console.log(`📐 Using embeddings dimension: ${this.dimension}`);
+      } catch (error) {
+        console.log('⚠️ Could not get dimension from embeddings service, using default 384');
+        this.dimension = 384;
+      }
+
       // Check if collection exists
       const collectionInfo = await this.makeRequest(`/collections/${this.collectionName}`, 'GET');
 
@@ -204,10 +216,35 @@ export class QdrantService {
           console.log('Failed to create Qdrant collection - continuing without initialization');
         }
       } else {
-        // Collection exists
+        // Collection exists - check if dimension matches
+        const currentDimension = collectionInfo.result?.config?.params?.vectors?.size;
         const vectorCount = collectionInfo.result?.points_count || 0;
-        console.log(`Connected to Qdrant collection with ${vectorCount} vectors`);
-        this.initialized = true;
+
+        if (currentDimension && currentDimension !== this.dimension) {
+          console.warn(`⚠️ Collection '${this.collectionName}' has dimension ${currentDimension} but embeddings service uses ${this.dimension}`);
+          console.log(`🔄 Recreating collection with correct dimension...`);
+
+          // Delete old collection
+          await this.makeRequest(`/collections/${this.collectionName}`, 'DELETE');
+
+          // Create new collection with correct dimension
+          const createResult = await this.makeRequest(`/collections/${this.collectionName}`, 'PUT', {
+            vectors: {
+              size: this.dimension,
+              distance: 'Cosine'
+            }
+          });
+
+          if (createResult && createResult.result === true) {
+            console.log(`✅ Recreated collection '${this.collectionName}' with dimension ${this.dimension}`);
+            this.initialized = true;
+          } else {
+            console.log('Failed to recreate Qdrant collection - continuing without initialization');
+          }
+        } else {
+          console.log(`Connected to Qdrant collection with ${vectorCount} vectors (dimension: ${currentDimension})`);
+          this.initialized = true;
+        }
       }
 
       this.isInitializing = false;
@@ -649,20 +686,46 @@ export class QdrantService {
     metadata?: Record<string, any>[]
   ): Promise<void> {
     const documentCollection = 'document-embeddings';
-    
+
     try {
       console.log(`Storing ${documents.length} document chunks in collection: ${documentCollection}`);
 
-      // Ensure the document collection exists
+      // Ensure we have the correct dimension from embeddings service
+      if (!this.initialized) {
+        await this.initialize();
+      }
+
+      // Ensure the document collection exists with correct dimension
       const collectionInfo = await this.makeRequest(`/collections/${documentCollection}`, 'GET');
+
       if (!collectionInfo || collectionInfo.status === 'error') {
-        console.log(`Creating Qdrant collection: ${documentCollection}`);
+        console.log(`Creating Qdrant collection: ${documentCollection} with dimension ${this.dimension}`);
         await this.makeRequest(`/collections/${documentCollection}`, 'PUT', {
           vectors: {
             size: this.dimension,
             distance: 'Cosine'
           }
         });
+      } else {
+        // Check if dimension matches
+        const currentDimension = collectionInfo.result?.config?.params?.vectors?.size;
+        if (currentDimension && currentDimension !== this.dimension) {
+          console.warn(`⚠️ Collection '${documentCollection}' has dimension ${currentDimension} but embeddings use ${this.dimension}`);
+          console.log(`🔄 Recreating collection with correct dimension...`);
+
+          // Delete old collection
+          await this.makeRequest(`/collections/${documentCollection}`, 'DELETE');
+
+          // Create new collection with correct dimension
+          await this.makeRequest(`/collections/${documentCollection}`, 'PUT', {
+            vectors: {
+              size: this.dimension,
+              distance: 'Cosine'
+            }
+          });
+
+          console.log(`✅ Recreated collection '${documentCollection}' with dimension ${this.dimension}`);
+        }
       }
 
       const points: QdrantPoint[] = [];

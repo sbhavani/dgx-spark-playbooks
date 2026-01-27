@@ -99,23 +99,39 @@ export class EmbeddingsService {
         console.log(`Embeddings service initialized successfully using NVIDIA model: ${this.nvidiaModel}`);
         return;
       }
-      
-      // Check if the API is available
-      const response = await fetch(`${this.apiUrl}/health`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
 
-      if (!response.ok) {
-        throw new Error(`Failed to connect to embeddings API: ${response.statusText}`);
+      // Try to connect to sentence-transformers
+      try {
+        const response = await fetch(`${this.apiUrl}/health`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          signal: AbortSignal.timeout(5000) // 5 second timeout
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to connect to embeddings API: ${response.statusText}`);
+        }
+
+        console.log(`Embeddings service initialized successfully using model: ${this.modelId}`);
+      } catch (sentenceTransformerError) {
+        // Sentence-transformers is not available, try to fall back to NVIDIA API
+        if (this.nvidiaApiKey) {
+          console.warn('Sentence-transformers not available, falling back to NVIDIA API for embeddings');
+          this.useNvidiaApi = true;
+          this.dimension = 4096; // NVIDIA embedding dimension
+          console.log(`✅ Automatically switched to NVIDIA embeddings model: ${this.nvidiaModel}`);
+          return;
+        }
+
+        // Neither sentence-transformers nor NVIDIA API is available
+        throw new Error(`Sentence-transformers unavailable and no NVIDIA_API_KEY set. Original error: ${sentenceTransformerError}`);
       }
-
-      console.log(`Embeddings service initialized successfully using model: ${this.modelId}`);
     } catch (error) {
       console.error('Error initializing embeddings service:', error);
       console.warn('Continuing without embeddings service. Embeddings will not be available.');
+      throw error;
     }
   }
 

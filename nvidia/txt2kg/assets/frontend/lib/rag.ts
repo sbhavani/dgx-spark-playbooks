@@ -25,14 +25,11 @@
  * - Documents are retrieved via semantic similarity and fed to LLM for answer generation
  */
 
-import { ChatOpenAI } from "@langchain/openai";
 import { Document } from "@langchain/core/documents";
-import { RunnableSequence } from "@langchain/core/runnables";
-import { StringOutputParser } from "@langchain/core/output_parsers";
-import { PromptTemplate } from "@langchain/core/prompts";
 import { QdrantVectorStore } from "@langchain/community/vectorstores/qdrant";
 import { Embeddings } from "@langchain/core/embeddings";
 import { EmbeddingsService } from './embeddings';
+import OpenAI from "openai";
 
 // Custom embeddings adapter to use our EmbeddingsService with LangChain
 class CustomEmbeddings extends Embeddings {
@@ -59,7 +56,8 @@ export class RAGService {
   private static instance: RAGService;
   private vectorStore: QdrantVectorStore | null = null;
   private embeddingsService: CustomEmbeddings;
-  private llm: ChatOpenAI | null = null;
+  private openaiClient: OpenAI | null = null;
+  private nvidiaModel: string = "nvidia/llama-3.3-nemotron-super-49b-v1.5";
   private initialized: boolean = false;
   private isInitializing: boolean = false;
   private collectionName: string = 'document-embeddings';
@@ -99,27 +97,72 @@ export class RAGService {
         throw error;
       }
 
-      // Initialize NVIDIA LLM using ChatOpenAI with NVIDIA's base URL
-      this.llm = new ChatOpenAI({
-        modelName: "nvidia/llama-3.3-nemotron-super-49b-v1.5",
-        temperature: 0.2,
-        maxTokens: 1024,
-        openAIApiKey: nvidiaApiKey,
-        configuration: {
-          baseURL: "https://integrate.api.nvidia.com/v1",
-          timeout: 120000, // 120 second timeout
-        },
-        modelKwargs: {
-          top_p: 0.95,
-          frequency_penalty: 0,
-          presence_penalty: 0
-        }
+      // Initialize OpenAI client with NVIDIA base URL
+      this.openaiClient = new OpenAI({
+        apiKey: nvidiaApiKey,
+        baseURL: 'https://integrate.api.nvidia.com/v1',
+        timeout: 120000, // 120 second timeout
+        maxRetries: 1,
       });
 
-      console.log('✅ NVIDIA LLM initialized successfully');
+      console.log('✅ NVIDIA OpenAI client initialized successfully');
+
+      // Initialize embeddings service to get dimension
+      await this.embeddingsService.embedDocuments([]);
+      const embeddingsDimension = EmbeddingsService.getInstance().getDimension();
+      console.log(`📐 Embeddings dimension: ${embeddingsDimension}`);
 
       // Initialize Qdrant vector store
       const qdrantUrl = process.env.QDRANT_URL || 'http://localhost:6333';
+
+      // Check if collection exists and has correct dimension
+      try {
+        const response = await fetch(`${qdrantUrl}/collections/${this.collectionName}`);
+        if (response.ok) {
+          const collectionInfo = await response.json();
+          const currentDimension = collectionInfo.result?.config?.params?.vectors?.size;
+
+          if (currentDimension && currentDimension !== embeddingsDimension) {
+            console.warn(`⚠️ Collection '${this.collectionName}' has dimension ${currentDimension} but embeddings service uses ${embeddingsDimension}`);
+            console.log(`🔄 Recreating collection with correct dimension...`);
+
+            // Delete old collection
+            await fetch(`${qdrantUrl}/collections/${this.collectionName}`, {
+              method: 'DELETE'
+            });
+
+            // Create new collection with correct dimension
+            await fetch(`${qdrantUrl}/collections/${this.collectionName}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                vectors: {
+                  size: embeddingsDimension,
+                  distance: 'Cosine'
+                }
+              })
+            });
+
+            console.log(`✅ Recreated collection '${this.collectionName}' with dimension ${embeddingsDimension}`);
+          }
+        } else {
+          // Collection doesn't exist, create it
+          console.log(`📦 Creating new collection '${this.collectionName}' with dimension ${embeddingsDimension}`);
+          await fetch(`${qdrantUrl}/collections/${this.collectionName}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              vectors: {
+                size: embeddingsDimension,
+                distance: 'Cosine'
+              }
+            })
+          });
+          console.log(`✅ Created collection '${this.collectionName}'`);
+        }
+      } catch (error) {
+        console.warn('⚠️ Could not check/create Qdrant collection:', error);
+      }
 
       this.vectorStore = await QdrantVectorStore.fromExistingCollection(
         this.embeddingsService,
@@ -192,8 +235,8 @@ export class RAGService {
       await this.initialize();
     }
 
-    if (!this.llm) {
-      throw new Error('LLM not initialized');
+    if (!this.openaiClient) {
+      throw new Error('OpenAI client not initialized');
     }
 
     if (!this.vectorStore) {
@@ -208,32 +251,37 @@ export class RAGService {
     if (!similarDocs || similarDocs.length === 0) {
       console.log('⚠️ No relevant documents found, falling back to LLM general knowledge');
 
-      // Define prompt template for standalone LLM response
-      const fallbackPromptTemplate = PromptTemplate.fromTemplate(`
-You are a helpful assistant answering questions based on your general knowledge.
+      // Call NVIDIA API directly for fallback
+      const fallbackPrompt = `You are a helpful assistant answering questions based on your general knowledge.
 Since no specific information was found in the knowledge base, please provide the best answer you can.
 
-Question: {query}
+Question: ${query}
 
-Answer:
-`);
+Answer:`;
 
-      // Create fallback chain
-      const fallbackChain = RunnableSequence.from([
-        {
-          query: () => query,
-        },
-        fallbackPromptTemplate,
-        this.llm,
-        new StringOutputParser(),
-      ]);
+      try {
+        const completion = await this.openaiClient.chat.completions.create({
+          model: this.nvidiaModel,
+          messages: [
+            {
+              role: 'user',
+              content: fallbackPrompt
+            }
+          ],
+          temperature: 0.2,
+          max_tokens: 1024,
+          top_p: 0.95
+        });
 
-      // Execute fallback chain
-      const answer = await fallbackChain.invoke({});
-      return {
-        answer: `[Note: No specific information was found in the knowledge base. This answer is based on general knowledge.]\n\n${answer}`,
-        documentCount: 0
-      };
+        const answer = completion.choices[0]?.message?.content || "I couldn't generate an answer.";
+        return {
+          answer: `[Note: No specific information was found in the knowledge base. This answer is based on general knowledge.]\n\n${answer}`,
+          documentCount: 0
+        };
+      } catch (error) {
+        console.error('Error in fallback LLM call:', error);
+        throw error;
+      }
     }
 
     console.log(`✅ Found ${similarDocs.length} relevant document chunks`);
@@ -269,59 +317,66 @@ Answer:
 
     if (!context || context.trim().length === 0) {
       console.log('⚠️ Retrieved documents have no content, falling back to LLM');
-      const fallbackPromptTemplate = PromptTemplate.fromTemplate(`
-You are a helpful assistant answering questions based on your general knowledge.
+      const fallbackPrompt = `You are a helpful assistant answering questions based on your general knowledge.
 
-Question: {query}
+Question: ${query}
 
-Answer:
-`);
+Answer:`;
 
-      const fallbackChain = RunnableSequence.from([
-        {
-          query: () => query,
-        },
-        fallbackPromptTemplate,
-        this.llm,
-        new StringOutputParser(),
-      ]);
+      try {
+        const completion = await this.openaiClient.chat.completions.create({
+          model: this.nvidiaModel,
+          messages: [
+            {
+              role: 'user',
+              content: fallbackPrompt
+            }
+          ],
+          temperature: 0.2,
+          max_tokens: 1024,
+          top_p: 0.95
+        });
 
-      const answer = await fallbackChain.invoke({});
-      return {
-        answer: `[Note: No specific information was found in the knowledge base. This answer is based on general knowledge.]\n\n${answer}`,
-        documentCount: similarDocs.length
-      };
+        const answer = completion.choices[0]?.message?.content || "I couldn't generate an answer.";
+        return {
+          answer: `[Note: No specific information was found in the knowledge base. This answer is based on general knowledge.]\n\n${answer}`,
+          documentCount: similarDocs.length
+        };
+      } catch (error) {
+        console.error('Error in fallback LLM call:', error);
+        throw error;
+      }
     }
 
-    // Define prompt template for RAG
-    const promptTemplate = PromptTemplate.fromTemplate(`
-Answer the question based only on the following context from the knowledge base.
+    // Build prompt for RAG
+    const ragPrompt = `Answer the question based only on the following context from the knowledge base.
 If you cannot find the answer in the context, say "I cannot find this information in the knowledge base."
 
 Context:
-{context}
+${context}
 
-Question: {query}
+Question: ${query}
 
-Answer:
-`);
-
-    // Create retrieval chain using RunnableSequence
-    const retrievalChain = RunnableSequence.from([
-      {
-        context: () => context,
-        query: () => query,
-      },
-      promptTemplate,
-      this.llm,
-      new StringOutputParser(),
-    ]);
+Answer:`;
 
     console.log('🤖 Generating answer with NVIDIA LLM...');
 
-    // Execute chain
+    // Call NVIDIA API directly
     try {
-      const answer = await retrievalChain.invoke({});
+      const completion = await this.openaiClient.chat.completions.create({
+        model: this.nvidiaModel,
+        messages: [
+          {
+            role: 'user',
+            content: ragPrompt
+          }
+        ],
+        temperature: 0.2,
+        max_tokens: 1024,
+        top_p: 0.95
+      });
+
+      const answer = completion.choices[0]?.message?.content || "I couldn't generate an answer.";
       console.log('✅ RAG query completed successfully');
       console.log(`📝 Answer length: ${answer.length} characters`);
       console.log(`📄 Retrieved ${similarDocs.length} document chunks`);
