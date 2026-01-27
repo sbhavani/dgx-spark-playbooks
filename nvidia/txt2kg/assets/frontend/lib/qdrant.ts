@@ -734,7 +734,7 @@ export class QdrantService {
       for (let i = 0; i < documents.length; i++) {
         const docId = metadata?.[i]?.id || `doc_${randomUUID()}`;
         const point: QdrantPoint = {
-          id: stringToUUID(docId),
+          id: randomUUID(), // Use proper UUID instead of hash-based stringToUUID
           vector: embeddings[i],
           payload: {
             originalId: docId,
