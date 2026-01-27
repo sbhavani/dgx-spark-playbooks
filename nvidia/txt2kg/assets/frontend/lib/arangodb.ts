@@ -107,41 +107,73 @@ export class ArangoDBService {
       // Create entity collection if it doesn't exist
       if (!collectionNames.includes(this.collectionName)) {
         await this.db.createCollection(this.collectionName);
+      }
+
+      // Ensure inverted index exists on entities collection
+      try {
         await this.db.collection(this.collectionName).ensureIndex({
           name: 'inverted_index',
           type: 'inverted',
           fields: ['name'],
           analyzer: 'text_en'
         });
-        await this.db.createView(`${this.collectionName}_view`, {
-          type: 'search-alias',
-          indexes: [
-            {
-              collection: this.collectionName,
-              index: 'inverted_index'
-            }
-          ]
-        });
+      } catch (error) {
+        console.log('Index might already exist on entities collection');
+      }
+
+      // Ensure search-alias view exists for entities
+      const views = await this.db.listViews();
+      const viewNames = views.map(v => v.name);
+      if (!viewNames.includes(`${this.collectionName}_view`)) {
+        try {
+          await this.db.createView(`${this.collectionName}_view`, {
+            type: 'search-alias',
+            indexes: [
+              {
+                collection: this.collectionName,
+                index: 'inverted_index'
+              }
+            ]
+          });
+          console.log(`Created view ${this.collectionName}_view`);
+        } catch (error) {
+          console.log(`View ${this.collectionName}_view might already exist`);
+        }
       }
 
       // Create edge collection if it doesn't exist
       if (!collectionNames.includes(this.edgeCollectionName)) {
         await this.db.createEdgeCollection(this.edgeCollectionName);
+      }
+
+      // Ensure inverted index exists on relationships collection
+      try {
         await this.db.collection(this.edgeCollectionName).ensureIndex({
           name: 'inverted_index',
           type: 'inverted',
           fields: ['type'],
           analyzer: 'text_en'
         });
-        await this.db.createView(`${this.edgeCollectionName}_view`, {
-          type: 'search-alias',
-          indexes: [
-            {
-              collection: this.edgeCollectionName,
-              index: 'inverted_index'
-            }
-          ]
-        });
+      } catch (error) {
+        console.log('Index might already exist on relationships collection');
+      }
+
+      // Ensure search-alias view exists for relationships
+      if (!viewNames.includes(`${this.edgeCollectionName}_view`)) {
+        try {
+          await this.db.createView(`${this.edgeCollectionName}_view`, {
+            type: 'search-alias',
+            indexes: [
+              {
+                collection: this.edgeCollectionName,
+                index: 'inverted_index'
+              }
+            ]
+          });
+          console.log(`Created view ${this.edgeCollectionName}_view`);
+        } catch (error) {
+          console.log(`View ${this.edgeCollectionName}_view might already exist`);
+        }
       }
 
       // Create documents collection if it doesn't exist
