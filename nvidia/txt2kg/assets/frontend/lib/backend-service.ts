@@ -132,21 +132,19 @@ export class BackendService {
       await this.qdrantService.initialize();
     }
     
-    // Check if sentence-transformer service is available
+    // Check if sentence-transformer service is available (optional - NVIDIA API fallback exists)
     try {
-      // Remove the check skip in development mode
-      const response = await axios.get(`${this.sentenceTransformerUrl}/health`);
+      const response = await axios.get(`${this.sentenceTransformerUrl}/health`, {
+        timeout: 5000 // 5 second timeout
+      });
       console.log(`Connected to SentenceTransformer service: ${response.data.model}`);
-      this.initialized = true;
     } catch (error) {
-      console.error(`Failed to connect to sentence-transformer service: ${error}`);
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Development mode: Continuing despite sentence transformer error');
-        this.initialized = true;
-      } else {
-        throw new Error('Sentence transformer service is not available');
-      }
+      // Non-blocking: sentence-transformer is optional since EmbeddingsService has NVIDIA API fallback
+      console.warn(`Sentence-transformer service not available: ${error}`);
+      console.log('Continuing without sentence-transformer - NVIDIA API fallback will be used for embeddings');
     }
+
+    this.initialized = true;
   }
   
   /**

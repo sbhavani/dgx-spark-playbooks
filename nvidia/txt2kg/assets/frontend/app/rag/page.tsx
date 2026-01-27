@@ -32,6 +32,7 @@ export default function RagPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [vectorEnabled, setVectorEnabled] = useState(false);
+  const [lastQueryTime, setLastQueryTime] = useState<number | null>(null);
   const [metrics, setMetrics] = useState<{
     avgQueryTime: number;
     avgRelevance: number;
@@ -148,12 +149,14 @@ export default function RagPage() {
               relevanceScore = data.relevanceScore || 0;
               
               // Log the query with performance metrics
+              const queryTime = Date.now() - startTime;
+              setLastQueryTime(queryTime);
               logQuery(query, queryMode, {
-                executionTimeMs: Date.now() - startTime,
+                executionTimeMs: queryTime,
                 relevanceScore,
                 resultCount
               });
-              
+
               console.log(`✅ Pure RAG query completed. Retrieved ${resultCount} document chunks`);
               setIsLoading(false);
               return;
@@ -194,14 +197,16 @@ export default function RagPage() {
             relevanceScore = data.relevanceScore || 0;
             
             // Log the query with performance metrics
+            const queryTime = Date.now() - startTime;
+            setLastQueryTime(queryTime);
             logQuery(query, queryMode, {
-              executionTimeMs: Date.now() - startTime,
+              executionTimeMs: queryTime,
               relevanceScore,
               resultCount,
               precision: data.precision || 0,
               recall: data.recall || 0,
             });
-            
+
             // Log to console instead of showing alert
             let message = `Enhanced query completed. Found ${resultCount} relevant triples`;
             if (data.metadata?.entityMatches) {
@@ -284,14 +289,16 @@ export default function RagPage() {
       }
       
       // Log the query with performance metrics
+      const queryTime = Date.now() - startTime;
+      setLastQueryTime(queryTime);
       logQuery(query, queryMode, {
-        executionTimeMs: Date.now() - startTime,
+        executionTimeMs: queryTime,
         relevanceScore,
         resultCount,
         precision: data.precision || 0,
         recall: data.recall || 0,
       });
-      
+
       // Log to console instead of showing alert
       let message = `Query completed. Found ${resultCount} relevant triples`;
       if (vectorEnabled && params.useVectorSearch) {
@@ -302,10 +309,12 @@ export default function RagPage() {
       console.error("RAG query error:", error);
       setErrorMessage(error instanceof Error ? error.message : "An unknown error occurred");
       setResults([]);
-      
+
       // Log failed query
+      const queryTime = Date.now() - startTime;
+      setLastQueryTime(queryTime);
       logQuery(query, queryMode, {
-        executionTimeMs: Date.now() - startTime,
+        executionTimeMs: queryTime,
         resultCount: 0,
         error: error instanceof Error ? error.message : "Unknown error"
       });
@@ -350,6 +359,7 @@ export default function RagPage() {
     setResults(null);
     setLlmAnswer(null);
     setErrorMessage(null);
+    setLastQueryTime(null);
   };
 
   return (
@@ -444,6 +454,11 @@ export default function RagPage() {
                       {currentParams.queryMode === 'pure-rag' ? 'Pure RAG' :
                        currentParams.queryMode === 'vector-search' ? 'GraphRAG' :
                        'Graph Search'}
+                    </span>
+                  )}
+                  {lastQueryTime !== null && (
+                    <span className="text-xs px-2.5 py-1 rounded-full font-medium bg-muted/50 text-muted-foreground border border-border/30">
+                      {(lastQueryTime / 1000).toFixed(2)}s
                     </span>
                   )}
                 </div>
