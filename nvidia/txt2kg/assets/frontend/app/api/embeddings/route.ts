@@ -79,23 +79,22 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    // Create maps for embeddings and text content
-    const entityEmbeddings = new Map<string, number[]>();
-    const textContent = new Map<string, string>();
-    
-    // Populate the maps
-    for (let i = 0; i < chunkIds.length; i++) {
-      entityEmbeddings.set(chunkIds[i], embeddings[i]);
-      textContent.set(chunkIds[i], chunks[i]);
-    }
-    
-    // Store embeddings in Qdrant with retry logic
+    // Create metadata for each chunk
+    const metadata = chunks.map((_, index) => ({
+      id: chunkIds[index],
+      documentId: documentId || 'unnamed',
+      documentName: documentName || 'unnamed',
+      chunkIndex: index,
+      totalChunks: chunks.length
+    }));
+
+    // Store document chunks in the document-embeddings collection (for Pure RAG)
     try {
-      await qdrantService.storeEmbeddings(entityEmbeddings, textContent);
+      await qdrantService.storeDocumentChunks(chunks, embeddings, metadata);
     } catch (storeError) {
-      console.error('Error storing embeddings in Qdrant:', storeError);
+      console.error('Error storing document chunks in Qdrant:', storeError);
       return NextResponse.json(
-        { error: `Failed to store embeddings in Qdrant: ${storeError instanceof Error ? storeError.message : String(storeError)}` },
+        { error: `Failed to store document chunks in Qdrant: ${storeError instanceof Error ? storeError.message : String(storeError)}` },
         { status: 500 }
       );
     }
