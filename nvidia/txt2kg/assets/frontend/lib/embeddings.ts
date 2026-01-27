@@ -58,9 +58,9 @@ export class EmbeddingsService {
       }
     }
     
-    // Override dimension if using NVIDIA model (llama-3.2-nv-embedqa-1b-v2 has 4096 dimensions)
+    // Override dimension if using NVIDIA model (llama-3.2-nv-embedqa-1b-v2 has 2048 dimensions)
     if (this.useNvidiaApi) {
-      this.dimension = 4096;
+      this.dimension = 2048;
     }
     
     console.log('EmbeddingsService initialized with useNvidiaApi:', this.useNvidiaApi, 'model:', this.useNvidiaApi ? this.nvidiaModel : this.modelId);
@@ -120,7 +120,7 @@ export class EmbeddingsService {
         if (this.nvidiaApiKey) {
           console.warn('Sentence-transformers not available, falling back to NVIDIA API for embeddings');
           this.useNvidiaApi = true;
-          this.dimension = 4096; // NVIDIA embedding dimension
+          this.dimension = 2048; // NVIDIA llama-3.2-nv-embedqa-1b-v2 embedding dimension
           console.log(`✅ Automatically switched to NVIDIA embeddings model: ${this.nvidiaModel}`);
           return;
         }

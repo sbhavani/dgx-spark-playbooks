@@ -67,11 +67,12 @@ export default function RagPage() {
           console.warn('Graph database connection warning:', errorData.error);
         }
         
-        // Check if vector search is available
+        // Check if vector search is available (use documentVectorCount for Pure RAG)
         const vectorResponse = await fetch('/api/vector-db/stats');
         if (vectorResponse.ok) {
           const data = await vectorResponse.json();
-          setVectorEnabled(data.totalVectorCount > 0);
+          // Pure RAG uses document-embeddings collection, not entity-embeddings
+          setVectorEnabled((data.documentVectorCount || 0) > 0);
         }
         
         // Fetch basic metrics

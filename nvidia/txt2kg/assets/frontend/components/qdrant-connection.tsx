@@ -39,8 +39,11 @@ export function QdrantConnection({ className }: QdrantConnectionProps) {
       const data = await response.json();
       
       if (response.ok) {
+        // Show total vectors from both entity-embeddings and document-embeddings
+        const entityVectors = typeof data.totalVectorCount === 'number' ? data.totalVectorCount : 0;
+        const documentVectors = typeof data.documentVectorCount === 'number' ? data.documentVectorCount : 0;
         setStats({
-          nodes: typeof data.totalVectorCount === 'number' ? data.totalVectorCount : 0,
+          nodes: entityVectors + documentVectors,
           relationships: 0, // Vector DB doesn't store relationships
           source: data.source || 'unknown',
           httpHealthy: data.httpHealthy

@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
     console.log('Generating embeddings for chunks...');
     const embeddings = await embeddingsService.encode(chunks);
     console.log(`Generated ${embeddings.length} embeddings`);
+    console.log(`First embedding dimension: ${embeddings[0]?.length}, first 5 values:`, embeddings[0]?.slice(0, 5));
 
     // Initialize QdrantService
     const qdrantService = QdrantService.getInstance();

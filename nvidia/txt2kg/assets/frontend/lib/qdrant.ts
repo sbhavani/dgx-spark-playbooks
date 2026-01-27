@@ -326,10 +326,13 @@ export class QdrantService {
 
     try {
       console.log(`Upserting ${points.length} vectors to Qdrant collection: ${targetCollection}`);
+      console.log(`First point structure:`, JSON.stringify(points[0]).substring(0, 200));
 
       const response = await this.makeRequest(`/collections/${targetCollection}/points`, 'PUT', {
         points: points
       });
+
+      console.log(`Qdrant upsert response:`, JSON.stringify(response));
 
       if (!response || response.status === 'error') {
         console.log(`Qdrant upsert failed`);
@@ -573,12 +576,24 @@ export class QdrantService {
       console.log('Getting stats from Qdrant...');
       const response = await this.makeRequest(`/collections/${this.collectionName}`, 'GET');
 
+      // Also get document-embeddings stats for Pure RAG
+      let documentVectorCount = 0;
+      try {
+        const docResponse = await this.makeRequest('/collections/document-embeddings', 'GET');
+        if (docResponse && docResponse.result) {
+          documentVectorCount = docResponse.result.points_count || 0;
+        }
+      } catch {
+        // document-embeddings collection may not exist yet
+      }
+
       if (response && response.result) {
         const stats = response.result;
         console.log('Successfully retrieved stats from Qdrant');
         return {
           totalVectorCount: stats.points_count || 0,
           indexedVectorCount: stats.indexed_vectors_count || 0,
+          documentVectorCount: documentVectorCount, // Pure RAG document chunks
           status: stats.status || 'unknown',
           optimizerStatus: stats.optimizer_status || 'unknown',
           vectorSize: stats.config?.params?.vectors?.size || this.dimension,
@@ -591,6 +606,7 @@ export class QdrantService {
         console.log(`Qdrant stats request failed`);
         return {
           totalVectorCount: 0,
+          documentVectorCount: documentVectorCount,
           source: 'error',
           httpHealthy: false,
           error: 'Failed to get stats'
@@ -600,6 +616,7 @@ export class QdrantService {
       console.log('Qdrant connection failed - server may not be running');
       return {
         totalVectorCount: 0,
+        documentVectorCount: 0,
         source: 'error',
         httpHealthy: false,
         error: error instanceof Error ? error.message : String(error)
