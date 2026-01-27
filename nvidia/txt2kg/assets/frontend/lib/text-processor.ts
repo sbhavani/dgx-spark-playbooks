@@ -28,6 +28,7 @@ import { BaseLanguageModel } from "@langchain/core/language_models/base";
 import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 import { langChainService } from "./langchain-service";
 import { getShouldStopProcessing, resetStopProcessing } from "@/app/api/stop-processing/route";
+import OpenAI from "openai";
 
 // Define a type for sentence with embedding
 export interface SentenceEmbedding {
@@ -359,40 +360,45 @@ Text: ${chunk}
 
 ${formatInstructions}`;
 
-        // Call NVIDIA API directly using fetch
+        // Call NVIDIA API using OpenAI SDK
         console.log(`🖥️ Calling NVIDIA API with model: ${this.nvidiaModel}`);
-        const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: this.nvidiaModel, // Use the configured model
+
+        try {
+          // Initialize OpenAI client with NVIDIA base URL
+          const client = new OpenAI({
+            apiKey: apiKey,
+            baseURL: 'https://integrate.api.nvidia.com/v1',
+            timeout: 300000, // 5 minutes
+            maxRetries: 1,
+          });
+
+          // Call API with standard parameters
+          const completion = await client.chat.completions.create({
+            model: this.nvidiaModel,
             messages: [
               {
                 role: 'user',
                 content: prompt
               }
             ],
-            temperature: 0.1,
-            max_tokens: 4096,  // Reduced to leave room for input tokens in context
-            top_p: 0.95
-          })
-        });
+            temperature: 0.2,
+            top_p: 0.95,
+            max_tokens: 4096,
+          });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`NVIDIA API error (${response.status}): ${errorText}`);
+          const responseText = completion.choices[0]?.message?.content;
+
+          // Parse the response if we got content
+          if (responseText && responseText.trim().length > 0) {
+            const parsedTriples = await this.tripleParser!.parse(responseText);
+            allTriples.push(...parsedTriples);
+          } else {
+            console.warn(`No content received from NVIDIA API for chunk ${i + 1}`);
+          }
+        } catch (error) {
+          throw error;
         }
 
-        const data = await response.json();
-        const responseText = data.choices[0].message.content;
-        
-        // Parse the response
-        const parsedTriples = await this.tripleParser!.parse(responseText);
-        allTriples.push(...parsedTriples);
-        
       } catch (error) {
         console.error(`Error processing chunk ${i + 1}:`, error);
         throw error; // Re-throw to see the actual error

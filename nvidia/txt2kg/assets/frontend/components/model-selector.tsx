@@ -35,20 +35,10 @@ interface Model {
 const NVIDIA_MODELS: Model[] = [
   {
     id: "nvidia-nemotron",
-    name: "NVIDIA Llama 3.3 Nemotron Super 49B",
+    name: "NVIDIA Llama 3.3 Nemotron Super 49B (Recommended)",
     icon: <Cpu className="h-4 w-4 text-green-500" />,
-    description: "NVIDIA hosted Nemotron Super 49B v1.5 model",
+    description: "NVIDIA hosted Nemotron Super 49B v1.5 - Best for knowledge graph extraction",
     model: "nvidia/llama-3.3-nemotron-super-49b-v1.5",
-    apiKeyName: "NVIDIA_API_KEY",
-    baseURL: "https://integrate.api.nvidia.com/v1",
-    provider: "nvidia",
-  },
-  {
-    id: "nvidia-nemotron-nano",
-    name: "NVIDIA Nemotron Nano 9B v2",
-    icon: <Cpu className="h-4 w-4 text-green-500" />,
-    description: "NVIDIA hosted Nemotron Nano 9B v2 - Faster and more efficient",
-    model: "nvidia/nvidia-nemotron-nano-9b-v2",
     apiKeyName: "NVIDIA_API_KEY",
     baseURL: "https://integrate.api.nvidia.com/v1",
     provider: "nvidia",

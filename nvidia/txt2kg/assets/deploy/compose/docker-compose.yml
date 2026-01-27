@@ -53,8 +53,6 @@ services:
     depends_on:
       arangodb:
         condition: service_started
-      ollama:
-        condition: service_started
 
   # ArangoDB - Graph database
   arangodb:
