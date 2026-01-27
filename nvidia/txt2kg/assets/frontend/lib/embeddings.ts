@@ -153,9 +153,12 @@ export class EmbeddingsService {
       return [];
     }
 
+    // Ensure embeddings service is initialized (includes automatic fallback to NVIDIA)
+    await this.initialize();
+
     // Process in batches to avoid overwhelming the API
     const results: number[][] = [];
-    
+
     for (let i = 0; i < texts.length; i += batchSize) {
       // Check if embeddings generation should be stopped
       if (getShouldStopEmbeddings()) {
