@@ -264,14 +264,18 @@ Answer:`;
           model: this.nvidiaModel,
           messages: [
             {
+              role: 'system',
+              content: '/think'
+            },
+            {
               role: 'user',
               content: fallbackPrompt
             }
           ],
           temperature: 0.2,
-          max_tokens: 1024,
+          max_tokens: 4096,
           top_p: 0.95
-        });
+        } as any);
 
         const answer = completion.choices[0]?.message?.content || "I couldn't generate an answer.";
         return {
@@ -328,14 +332,18 @@ Answer:`;
           model: this.nvidiaModel,
           messages: [
             {
+              role: 'system',
+              content: '/think'
+            },
+            {
               role: 'user',
               content: fallbackPrompt
             }
           ],
           temperature: 0.2,
-          max_tokens: 1024,
+          max_tokens: 4096,
           top_p: 0.95
-        });
+        } as any);
 
         const answer = completion.choices[0]?.message?.content || "I couldn't generate an answer.";
         return {
@@ -367,14 +375,18 @@ Answer:`;
         model: this.nvidiaModel,
         messages: [
           {
+            role: 'system',
+            content: '/think'  // Enable thinking mode
+          },
+          {
             role: 'user',
             content: ragPrompt
           }
         ],
         temperature: 0.2,
-        max_tokens: 1024,
+        max_tokens: 4096,
         top_p: 0.95
-      });
+      } as any);
 
       const answer = completion.choices[0]?.message?.content || "I couldn't generate an answer.";
       console.log('✅ RAG query completed successfully');
